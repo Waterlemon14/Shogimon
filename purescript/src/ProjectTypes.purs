@@ -11,8 +11,8 @@ module ProjectTypes
 
 import Prelude
 
-import Data.List (List(..), (:), concat)
-import Data.Maybe (Maybe(..))
+import Data.List (List)
+import Data.Maybe (Maybe)
 
 import CS150241Project.Networking (Message)
 
@@ -22,10 +22,16 @@ import CS150241Project.Networking (Message)
 data Kind
   = Pawn
   | Bishop
+  | Rook
+  | Prince
+  | Princess
 
 instance Show Kind where
-  show Pawn   = "Pawn"
-  show Bishop = "Bishop"
+  show Pawn     = "Pawn"
+  show Bishop   = "Bishop"
+  show Rook     = "Rook"
+  show Prince   = "Prince"
+  show Princess = "Princess"
 
 derive instance Eq Kind
 

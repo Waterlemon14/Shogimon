@@ -26,7 +26,7 @@ import Graphics.Canvas as Canvas
 
 import Movements
   ( getPossibleMoves
-  , accessBoard
+  , accessCell
   )
 
 import ProjectTypes
@@ -51,6 +51,7 @@ import Config
   , canvas_offset_x
   , canvas_offset_y
   , fps
+  , images
   )
 
 
@@ -58,8 +59,17 @@ createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
 createBishop col row player_num = Just {kind: Bishop, position: {col:col,row:row}, image: "pikachu.png", player: player_num}
 
 createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row player_num = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: player_num}
+createPawn col row One = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: One}
+createPawn col row Two = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee-shiny.png", player: Two}
 
+createRook :: Int -> Int -> PlayerNum -> Maybe Piece
+createRook col row player_num = Just {kind: Rook, position: {col:col,row:row}, image: "turtwig.png", player: player_num}
+
+createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
+createPrince col row player_num = Just {kind: Prince, position: {col:col,row:row}, image: "latios.png", player: player_num}
+
+createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
+createPrincess col row player_num = Just {kind: Princess, position: {col:col,row:row}, image: "latias.png", player: player_num}
 
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
@@ -72,11 +82,14 @@ initialState = do
     init_board = [getBackRow 0 Two] <> [getPawnRow 1 Two 0] <> replicate (rows-4) nothing_row <> [getPawnRow (rows-2) One 0] <> [getBackRow (rows-1) One]
     
     getBackRow :: Int -> PlayerNum -> Array (Maybe Piece)
-    getBackRow row player_num = [ Nothing, 
+    getBackRow row player_num = [ createRook 0 row player_num, 
                                   createBishop 1 row player_num, 
                                   Nothing,
-                                  createBishop 3 row player_num, 
-                                  Nothing
+                                  createPrince 3 row player_num,
+                                  createPrincess 4 row player_num,
+                                  Nothing,
+                                  createBishop 6 row player_num, 
+                                  createRook 7 row player_num
                                 ]
 
     getPawnRow :: Int -> PlayerNum -> Int -> Array (Maybe Piece)
@@ -112,7 +125,7 @@ onTick _ gameState = do
     clicked_col = gameState.clickedCell.col
     clicked_row = gameState.clickedCell.row
 
-    clicked_piece = accessBoard clicked_col clicked_row gameState.board
+    clicked_piece = accessCell clicked_col clicked_row gameState.board
 
     updateActivePiece :: Maybe Piece -> GameState -> GameState
     updateActivePiece maybe_piece state = case maybe_piece of
@@ -147,7 +160,7 @@ onTick _ gameState = do
           else state.activePiece
         
         captured_piece = if valid_move == true
-          then case accessBoard state.clickedCell.col state.clickedCell.row state.board of
+          then case accessCell state.clickedCell.col state.clickedCell.row state.board of
             Nothing -> Nil
             Just piece -> piece : Nil
           else Nil
@@ -247,7 +260,7 @@ onRender images ctx gameState = do
           -- Can swap this to draw image if desired
           drawRect ctx { x: temp_x, y:temp_y, color: "white", width: cell_width, height: cell_height}
           -- Print the piece to the board if present, else go to next cell
-          case accessBoard col row gameState.board of
+          case accessCell col row gameState.board of
             Nothing -> drawBoard (col+1) row
             Just piece -> case Map.lookup piece.image images of
               Nothing -> drawBoard (col+1) row
@@ -347,5 +360,5 @@ main =
     , height
     , ipAddress: "localhost"
     , port: 15000
-    , imagePaths: [ "eevee.png", "pikachu.png" ]
+    , imagePaths: images
     }

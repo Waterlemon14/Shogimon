@@ -9,19 +9,20 @@ module Config
   , board_start_y
   , canvas_offset_x
   , canvas_offset_y
-  , fps
+  , fps,
+  images
   )
   where
 
 import Prelude
 
-import Data.Int (toNumber, floor)
+import Data.Int (toNumber)
 
 
 -- aspect ratio should be cols+2 : rows+2 for square cells
 -- Width of canvas
 width :: Number
-width = 490.0
+width = 700.0
 
 -- Height of canvas
 height :: Number
@@ -35,7 +36,7 @@ rows = 8
 -- Represents number of columns in the board
 -- Not 0 indexed, col 1 of row 1 is ((Board !! 0) !! 0)
 columns :: Int
-columns = 5
+columns = 8
 
 -- width-(1.0 + toNumber (columns+2))
 -- where 1.0 is space between cells that serve as the border
@@ -65,3 +66,7 @@ canvas_offset_y = 8.0
 
 fps :: Int
 fps = 60
+
+
+images :: Array String
+images = [ "eevee.png", "pikachu.png" , "turtwig.png", "umbreon.png", "sylveon.png", "latios.png", "latias.png", "eevee-shiny.png" ]
