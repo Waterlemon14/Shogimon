@@ -83,12 +83,12 @@ initialState = do
     
     getBackRow :: Int -> PlayerNum -> Array (Maybe Piece)
     getBackRow row player_num = [ createRook 0 row player_num, 
-                                  createBishop 1 row player_num, 
                                   Nothing,
+                                  createBishop 2 row player_num, 
                                   createPrince 3 row player_num,
                                   createPrincess 4 row player_num,
+                                  createBishop 5 row player_num, 
                                   Nothing,
-                                  createBishop 6 row player_num, 
                                   createRook 7 row player_num
                                 ]
 
@@ -120,13 +120,14 @@ getBoardRow row board = case board !! row of
 -- Called every tick to update GameState if a change is detected
 -- Returns an updated Effect Gamestate
 onTick :: (String -> Effect Unit) -> GameState -> Effect GameState
-onTick _ gameState = do
+onTick send gameState = do
   let
     clicked_col = gameState.clickedCell.col
     clicked_row = gameState.clickedCell.row
 
     clicked_piece = accessCell clicked_col clicked_row gameState.board
 
+    -- Assigns state active piece to clicked piece
     updateActivePiece :: Maybe Piece -> GameState -> GameState
     updateActivePiece maybe_piece state = case maybe_piece of
       Nothing -> state { activePiece = Nothing }
@@ -135,6 +136,7 @@ onTick _ gameState = do
     updateTickCount :: GameState -> GameState
     updateTickCount state = state { tickCount = gameState.tickCount + 1 }
 
+    -- get possible moves for piece kind
     updatePossibleMoves :: Maybe Piece -> GameState -> GameState
     updatePossibleMoves maybe_piece state = case maybe_piece of
       Nothing -> state { possibleMoves = Nil }
@@ -198,11 +200,36 @@ onTick _ gameState = do
               | current_row == piece_position.row = [removePiece (getBoardRow current_row board) ] <> helper (current_row + 1)
               | otherwise = [getBoardRow current_row board] <> helper (current_row + 1)
     
+    updateCapturedPiece :: Maybe Piece -> GameState -> GameState
+    updateCapturedPiece Nothing state = state { activePiece = Nothing }
+    updateCapturedPiece (Just piece) state | state.currentPlayer == One = 
+      if (elem piece state.playerOneCaptures) 
+        then state { activePiece = Just piece } 
+        else state
+    updateCapturedPiece (Just piece) state | otherwise = 
+       if (elem piece state.playerTwoCaptures) 
+        then state { activePiece = Just piece } 
+        else state
+
+    showPieceKind :: Maybe Piece -> String
+    showPieceKind Nothing = "Nothing"
+    showPieceKind (Just piece) = show piece.kind
+
+
+  if gameState.tickCount `mod` fps == 0 then do
+    send $ "Current Piece: " <> showPieceKind clicked_piece <> "\n" --<> 
+      --show gameState.currentPlayer <> "\n" <> 
+      -- showBoard gameState.board --<> "\n" 
+    else pure unit
+
   pure $ gameState
     # makeMove
     # updateActivePiece clicked_piece
     # updatePossibleMoves clicked_piece
     # updateTickCount
+    -- # updateCapturedPiece clicked_piece
+
+
 
 onMouseDown :: (String -> Effect Unit) -> { x :: Int, y :: Int } -> GameState -> Effect GameState
 onMouseDown send { x, y } gameState = do
@@ -213,7 +240,7 @@ onMouseDown send { x, y } gameState = do
     cell_col = floor $ (toNumber x - canvas_offset_x-cell_width) / cell_width
     cell_row = floor $ (toNumber y - canvas_offset_y-cell_height) / cell_height
 
-  send $ show cell_col <> "," <> show cell_row
+  send $ "Clicked Cell: " <> show cell_col <> "," <> show cell_row
   pure gameState {clickedCell = {col: cell_col, row: cell_row}}
 
 -- Not sure if we will be using this? Didn't remove it first
