@@ -1,5 +1,3 @@
-import pygame
-
 from model import GameModel
 from view import GameView
 from controller import GameController
