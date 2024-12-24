@@ -1,25 +1,11 @@
 module Main
-  ( Board
-  , GameState
-  , Kind(..)
-  , Piece
-  , PlayerNum(..)
-  , Position
-  , class Movement
-  , columns
-  , fps
-  , getPossibleMoves
-  , height
-  , initialState
-  , main
+  ( main
   , onKeyDown
   , onKeyUp
   , onMessage
   , onMouseDown
   , onRender
   , onTick
-  , rows
-  , width
   )
   where
 
@@ -32,170 +18,58 @@ import Data.Int (toNumber, floor)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.List (List(..), (:), concat)
-import Data.Array (replicate, index, (!!))
+import Data.Array (replicate, (!!))
 import Data.Foldable (elem)
 import Effect (Effect)
 import Effect.Console (log)
 import Graphics.Canvas as Canvas
 
--- aspect ratio should be cols+2 : rows+2 for square cells
--- Width of canvas
-width :: Number
-width = 490.0
+import Movements
+  ( getPossibleMoves
+  , accessCell
+  )
 
--- Height of canvas
-height :: Number
-height = 700.0
+import ProjectTypes
+  ( Kind(..)
+  , Position
+  , Board
+  , PlayerNum(..)
+  , Piece
+  , Captured
+  , GameState
+  )
 
--- Represents number of rows in the board
--- Not 0 indexed, row 1 is (Board !! 0)
-rows :: Int
-rows = 8
+import Config
+  ( width
+  , height
+  , rows
+  , columns
+  , cell_width
+  , cell_height
+  , board_start_x
+  , board_start_y
+  , canvas_offset_x
+  , canvas_offset_y
+  , fps
+  , images
+  )
 
--- Represents number of columns in the board
--- Not 0 indexed, col 1 of row 1 is ((Board !! 0) !! 0)
-columns :: Int
-columns = 5
 
--- width-(1.0 + toNumber (columns+2))
--- where 1.0 is space between cells that serve as the border
--- and columns+2 for the outer cell border
-cell_width :: Number
-cell_width = (width-(1.0 + toNumber (columns+2))) / (toNumber (columns+2))
+createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
+createBishop col row player_num = Just {kind: Bishop, position: {col:col,row:row}, image: "pikachu.png", player: player_num, isProtected: false}
 
--- same formula as width
-cell_height :: Number
-cell_height = (height-(1.0+toNumber (rows+2))) / (toNumber (rows+2))
+createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
+createPawn col row One = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: One, isProtected: false}
+createPawn col row Two = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee-shiny.png", player: Two, isProtected: false}
 
--- offset to get x value of the first column
-board_start_x :: Number
-board_start_x = cell_width
+createRook :: Int -> Int -> PlayerNum -> Maybe Piece
+createRook col row player_num = Just {kind: Rook, position: {col:col,row:row}, image: "turtwig.png", player: player_num, isProtected: false}
 
--- offset to get y value of the first column
-board_start_y :: Number
-board_start_y = cell_height
+createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
+createPrince col row player_num = Just {kind: Prince, position: {col:col,row:row}, image: "latios.png", player: player_num, isProtected: true}
 
--- offset from the left of the screen, might be different on different devices
-canvas_offset_x :: Number
-canvas_offset_x = 8.0
-
--- offset from the top of the screen, might be different on different devices
-canvas_offset_y :: Number
-canvas_offset_y = 8.0
-
-fps :: Int
-fps = 60
-
--- New type for the kind of piece, will be stored in a Piece record
--- To add a kind, add to the tagged union and Show instance
-data Kind
-  = Pawn
-  | Bishop
-
-instance Show Kind where
-  show Pawn   = "Pawn"
-  show Bishop = "Bishop"
-
-derive instance Eq Kind
-
--- Typeclass to get the possible moves of a piece kind
--- Whenever adding a piece kind, add to the instantiation below
-class Movement a where
-  -- getPossibleMoves should return a list of all possible moves that can be taken
-  -- by the piece in its current position given the Board, Position, and PlayerNum.
-  -- Given its position, check the board if the move is valid. When checking its
-  -- moves against another piece, check the PlayerNum of that piece vs. the given
-  -- PlayerNum to determine whether it is a valid move to capture it or not.
-  getPossibleMoves :: a -> Board -> Position -> PlayerNum -> List Position
-
--- Define getPossibleMoves of the new kind added here
-instance Movement Kind where
-  getPossibleMoves Pawn _ position player
-    | player == One = if position.row == 0 then Nil else {col: position.col, row: position.row - 1} : Nil
-    | otherwise     = if position.row == rows-1 then Nil else {col: position.col,row: position.row + 1} : Nil
-    
-  getPossibleMoves Bishop board position player = bishopHelper
-    where
-      bishopHelper :: List Position
-      bishopHelper = concat $ getUpperLeftMoves {col: position.col-1, row: position.row-1}
-        : getLowerLeftMoves {col: position.col-1, row: position.row+1}
-        : getUpperRightMoves {col: position.col+1, row: position.row-1}
-        : getLowerRightMoves {col: position.col+1, row: position.row+1}
-        : Nil
-        where
-          getUpperLeftMoves :: Position -> List Position
-          getUpperLeftMoves current_position
-            | current_position.row < 0 || current_position.col < 0 = Nil
-            | otherwise = case accessBoard current_position.col current_position.row board of
-              Nothing -> current_position : getUpperLeftMoves {col: current_position.col-1, row: current_position.row-1}
-              Just piece -> if piece.player /= player then current_position : Nil else Nil
-          getLowerLeftMoves :: Position -> List Position
-          getLowerLeftMoves current_position
-            | current_position.row >= rows || current_position.col < 0 = Nil
-            | otherwise = case accessBoard current_position.col current_position.row board of
-              Nothing -> current_position : getLowerLeftMoves {col: current_position.col-1, row: current_position.row+1}
-              Just piece -> if piece.player /= player then current_position : Nil else Nil
-          getUpperRightMoves :: Position -> List Position
-          getUpperRightMoves current_position
-            | current_position.row < 0 || current_position.col >= columns = Nil
-            | otherwise = case accessBoard current_position.col current_position.row board of
-              Nothing -> current_position : getUpperRightMoves {col: current_position.col+1, row: current_position.row-1}
-              Just piece -> if piece.player /= player then current_position : Nil else Nil
-          getLowerRightMoves :: Position -> List Position
-          getLowerRightMoves current_position
-            | current_position.row >= rows || current_position.col >= columns = Nil
-            | otherwise = case accessBoard current_position.col current_position.row board of
-              Nothing -> current_position : getLowerRightMoves {col: current_position.col+1, row: current_position.row+1}
-              Just piece -> if piece.player /= player then current_position : Nil else Nil
-
--- Used to represent the position of a piece on the board
-type Position =
-  { col :: Int
-  , row :: Int
-  }
-
--- Used to represent the board as a 2D array.
--- Board is 0 indexed (last row is rows-1)
-type Board = Array (Array (Maybe Piece))
-
--- Used to more accurately represent Players
-data PlayerNum = One | Two
-
-instance Show PlayerNum where
-  show One = "One"
-  show Two = "Two"
-
-derive instance Eq PlayerNum
-
--- Used to represent a piece and store relevant information to the piece
-type Piece =
-  { kind :: Kind            -- Kind of the piece
-  , position :: Position    -- Current position of the piece
-  , image :: String         -- Filename of the image used to draw the piece
-  , player :: PlayerNum     -- Which player the piece belongs to
-  }
-
--- Used to represent captured pieces. Instead of placing each capture piece
--- individually, counters are used to keep track of the number of captured pieces
-type Captured =
-  { kind :: Kind      -- Kind of the piece
-  , count :: Int      -- How many of that kind of piece is captured
-  , image :: String   -- Filename of the image used to draw the piece
-  }
-
--- Used to represent the current game state, keeps all relevant information
--- to the game state.
-type GameState =
-  { tickCount :: Int
-  , lastReceivedMessage :: Maybe Message
-  , board :: Board
-  , currentPlayer :: PlayerNum        -- Represents whose turn it is
-  , clickedCell :: Position           -- Position of the last clicked cell
-  , possibleMoves :: List Position    -- List of possible moves (position) that the active piece can take
-  , activePiece :: Maybe Piece        -- Currently clicked piece to be moved
-  , playerOneCaptures :: List Piece   -- List of pieces captured by player one
-  , playerTwoCaptures :: List Piece   -- List of pieces captured by player two
-  }
+createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
+createPrincess col row player_num = Just {kind: Princess, position: {col:col,row:row}, image: "latias.png", player: player_num, isProtected: true}
 
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
@@ -208,11 +82,19 @@ initialState = do
     init_board = [getBackRow 0 Two] <> [getPawnRow 1 Two 0] <> replicate (rows-4) nothing_row <> [getPawnRow (rows-2) One 0] <> [getBackRow (rows-1) One]
     
     getBackRow :: Int -> PlayerNum -> Array (Maybe Piece)
-    getBackRow row player_num = [Nothing, Just {kind: Bishop, position: {col:1,row:row}, image: "pikachu.png", player: player_num}, Nothing,
-                                  Just {kind: Bishop, position: {col:3,row:row}, image: "pikachu.png", player: player_num}, Nothing]
+    getBackRow row player_num = [ createRook 0 row player_num, 
+                                  createBishop 1 row player_num, 
+                                  Nothing,
+                                  createPrince 3 row player_num,
+                                  createPrincess 4 row player_num,
+                                  Nothing,
+                                  createBishop 6 row player_num, 
+                                  createRook 7 row player_num
+                                ]
+
     getPawnRow :: Int -> PlayerNum -> Int -> Array (Maybe Piece)
     getPawnRow row player_num col | col == columns = []
-                                  | otherwise = [Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: player_num}] <> getPawnRow row player_num (col+1)
+                                  | otherwise = [createPawn col row player_num] <> getPawnRow row player_num (col+1)
 
   pure { tickCount: 0
   , lastReceivedMessage: Nothing
@@ -225,19 +107,6 @@ initialState = do
   , playerTwoCaptures : Nil
   }
 
--- Access a specific column and row of the board
--- 0 indexed, 1st row 1st col is accessBoard 0 0 board
--- Returns a Maybe Piece, with Nothing if cell is not occupied
--- and Just Piece if a piece is present
-accessBoard :: Int -> Int -> Board -> Maybe Piece
-accessBoard col row board = case cell of
-    Nothing -> Nothing
-    Just maybe_piece -> maybe_piece
-  where
-    cell =
-      board
-      # (flip index) row
-      >>= (flip index) col
 
 -- Access a specific row of the board
 -- 0 indexed, 1st row is getBoardRow 0 board
@@ -251,13 +120,14 @@ getBoardRow row board = case board !! row of
 -- Called every tick to update GameState if a change is detected
 -- Returns an updated Effect Gamestate
 onTick :: (String -> Effect Unit) -> GameState -> Effect GameState
-onTick _ gameState = do
+onTick send gameState = do
   let
     clicked_col = gameState.clickedCell.col
     clicked_row = gameState.clickedCell.row
 
-    clicked_piece = accessBoard clicked_col clicked_row gameState.board
+    clicked_piece = accessCell clicked_col clicked_row gameState.board
 
+    -- Assigns state active piece to clicked piece
     updateActivePiece :: Maybe Piece -> GameState -> GameState
     updateActivePiece maybe_piece state = case maybe_piece of
       Nothing -> state { activePiece = Nothing }
@@ -266,11 +136,12 @@ onTick _ gameState = do
     updateTickCount :: GameState -> GameState
     updateTickCount state = state { tickCount = gameState.tickCount + 1 }
 
+    -- get possible moves for piece kind
     updatePossibleMoves :: Maybe Piece -> GameState -> GameState
     updatePossibleMoves maybe_piece state = case maybe_piece of
       Nothing -> state { possibleMoves = Nil }
       Just piece | piece.player /= gameState.currentPlayer -> state { possibleMoves = Nil }
-                 | otherwise -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player }
+                 | otherwise -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player piece.isProtected}
     
     -- Update the board if a valid move is made (clicked cell is a possible move)
     makeMove :: GameState -> GameState
@@ -291,7 +162,7 @@ onTick _ gameState = do
           else state.activePiece
         
         captured_piece = if valid_move == true
-          then case accessBoard state.clickedCell.col state.clickedCell.row state.board of
+          then case accessCell state.clickedCell.col state.clickedCell.row state.board of
             Nothing -> Nil
             Just piece -> piece : Nil
           else Nil
@@ -329,11 +200,36 @@ onTick _ gameState = do
               | current_row == piece_position.row = [removePiece (getBoardRow current_row board) ] <> helper (current_row + 1)
               | otherwise = [getBoardRow current_row board] <> helper (current_row + 1)
     
+    updateCapturedPiece :: Maybe Piece -> GameState -> GameState
+    updateCapturedPiece Nothing state = state { activePiece = Nothing }
+    updateCapturedPiece (Just piece) state | state.currentPlayer == One = 
+      if (elem piece state.playerOneCaptures) 
+        then state { activePiece = Just piece } 
+        else state
+    updateCapturedPiece (Just piece) state | otherwise = 
+       if (elem piece state.playerTwoCaptures) 
+        then state { activePiece = Just piece } 
+        else state
+
+    showPieceKind :: Maybe Piece -> String
+    showPieceKind Nothing = "Nothing"
+    showPieceKind (Just piece) = show piece.kind
+
+
+  if gameState.tickCount `mod` fps == 0 then do
+    send $ "Current Piece: " <> showPieceKind clicked_piece <> "\n" --<>
+      --show gameState.currentPlayer <> "\n" <> 
+      -- showBoard gameState.board --<> "\n" 
+    else pure unit
+
   pure $ gameState
     # makeMove
     # updateActivePiece clicked_piece
     # updatePossibleMoves clicked_piece
     # updateTickCount
+    -- # updateCapturedPiece clicked_piece
+
+
 
 onMouseDown :: (String -> Effect Unit) -> { x :: Int, y :: Int } -> GameState -> Effect GameState
 onMouseDown send { x, y } gameState = do
@@ -344,7 +240,7 @@ onMouseDown send { x, y } gameState = do
     cell_col = floor $ (toNumber x - canvas_offset_x-cell_width) / cell_width
     cell_row = floor $ (toNumber y - canvas_offset_y-cell_height) / cell_height
 
-  send $ show cell_col <> "," <> show cell_row
+  send $ "Clicked Cell: " <> show cell_col <> "," <> show cell_row
   pure gameState {clickedCell = {col: cell_col, row: cell_row}}
 
 -- Not sure if we will be using this? Didn't remove it first
@@ -391,7 +287,7 @@ onRender images ctx gameState = do
           -- Can swap this to draw image if desired
           drawRect ctx { x: temp_x, y:temp_y, color: "white", width: cell_width, height: cell_height}
           -- Print the piece to the board if present, else go to next cell
-          case accessBoard col row gameState.board of
+          case accessCell col row gameState.board of
             Nothing -> drawBoard (col+1) row
             Just piece -> case Map.lookup piece.image images of
               Nothing -> drawBoard (col+1) row
@@ -491,5 +387,5 @@ main =
     , height
     , ipAddress: "localhost"
     , port: 15000
-    , imagePaths: [ "eevee.png", "pikachu.png" ]
+    , imagePaths: images
     }

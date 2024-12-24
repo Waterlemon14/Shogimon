@@ -1,14 +1,23 @@
 package:
   name: cs150241project-lib
   dependencies:
+    - arrays
     - avar
     - canvas
     - console
     - effect
+    - integers
     - js-timers
     - lists
+    - maybe
     - prelude
     - random
+    - refs
+    - spec
+    - spec-node
+    - tuples
+    - web-events
+    - web-html
     - web-socket
     - web-uievents
   test:
