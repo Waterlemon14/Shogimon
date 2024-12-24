@@ -64,6 +64,7 @@ type Piece =
   , position :: Position    -- Current position of the piece
   , image :: String         -- Filename of the image used to draw the piece
   , player :: PlayerNum     -- Which player the piece belongs to
+  , isProtected :: Boolean    -- If the piece is to be protected
   }
 
 

@@ -3120,7 +3120,7 @@
           return cell.value0;
         }
         ;
-        throw new Error("Failed pattern match at Movements (line 71, column 28 - line 73, column 36): " + [cell.constructor.name]);
+        throw new Error("Failed pattern match at Movements (line 70, column 28 - line 72, column 36): " + [cell.constructor.name]);
       };
     };
   };
@@ -3130,34 +3130,52 @@
         return function(v3) {
           return function(v4) {
             return function(v5) {
-              if (v.row < 0 || (v.col < 0 || (v.row >= rows4 || (v.col >= columns || v5 <= 0)))) {
-                return Nil.value;
-              }
-              ;
-              var v6 = accessCell(v.col)(v.row)(v1);
-              if (v6 instanceof Nothing) {
-                return new Cons({
-                  col: v.col,
-                  row: v.row
-                }, moveSearcher({
-                  col: v.col + v3 | 0,
-                  row: v.row + v4 | 0
-                })(v1)(v2)(v3)(v4)(v5 - 1 | 0));
-              }
-              ;
-              if (v6 instanceof Just) {
-                var $36 = notEq2(v6.value0.player)(v2);
-                if ($36) {
+              return function(v6) {
+                if (v.row < 0 || (v.col < 0 || (v.row >= rows4 || (v.col >= columns || v5 <= 0)))) {
+                  return Nil.value;
+                }
+                ;
+                var v7 = accessCell(v.col)(v.row)(v1);
+                if (v7 instanceof Nothing) {
                   return new Cons({
                     col: v.col,
                     row: v.row
-                  }, Nil.value);
+                  }, moveSearcher({
+                    col: v.col + v3 | 0,
+                    row: v.row + v4 | 0
+                  })(v1)(v2)(v3)(v4)(v5 - 1 | 0)(v6));
                 }
                 ;
-                return Nil.value;
-              }
-              ;
-              throw new Error("Failed pattern match at Movements (line 89, column 3 - line 91, column 75): " + [v6.constructor.name]);
+                if (v7 instanceof Just) {
+                  if (v6) {
+                    return Nil.value;
+                  }
+                  ;
+                  if (!v6) {
+                    var v8 = notEq2(v7.value0.player)(v2);
+                    if (v8) {
+                      if (v7.value0.isProtected) {
+                        return Nil.value;
+                      }
+                      ;
+                      return new Cons({
+                        col: v.col,
+                        row: v.row
+                      }, Nil.value);
+                    }
+                    ;
+                    if (!v8) {
+                      return Nil.value;
+                    }
+                    ;
+                    throw new Error("Failed pattern match at Movements (line 94, column 16 - line 97, column 21): " + [v8.constructor.name]);
+                  }
+                  ;
+                  throw new Error("Failed pattern match at Movements (line 91, column 19 - line 97, column 21): " + [v6.constructor.name]);
+                }
+                ;
+                throw new Error("Failed pattern match at Movements (line 88, column 3 - line 97, column 21): " + [v7.constructor.name]);
+              };
             };
           };
         };
@@ -3169,88 +3187,90 @@
       return function(v1) {
         return function(v2) {
           return function(v3) {
-            if (v instanceof Pawn) {
-              if (eq3(v3)(One.value)) {
-                return moveSearcher({
+            return function(v4) {
+              if (v instanceof Pawn) {
+                if (eq3(v3)(One.value)) {
+                  return moveSearcher({
+                    col: v2.col,
+                    row: v2.row - 1 | 0
+                  })(v1)(v3)(0)(-1 | 0)(1)(v4);
+                }
+                ;
+                if (otherwise) {
+                  return moveSearcher({
+                    col: v2.col,
+                    row: v2.row + 1 | 0
+                  })(v1)(v3)(0)(1)(1)(v4);
+                }
+                ;
+              }
+              ;
+              if (v instanceof Bishop) {
+                return concat2(new Cons(moveSearcher({
+                  col: v2.col - 1 | 0,
+                  row: v2.row - 1 | 0
+                })(v1)(v3)(-1 | 0)(-1 | 0)(rows4)(v4), new Cons(moveSearcher({
+                  col: v2.col - 1 | 0,
+                  row: v2.row + 1 | 0
+                })(v1)(v3)(-1 | 0)(1)(rows4)(v4), new Cons(moveSearcher({
+                  col: v2.col + 1 | 0,
+                  row: v2.row - 1 | 0
+                })(v1)(v3)(1)(-1 | 0)(rows4)(v4), new Cons(moveSearcher({
+                  col: v2.col + 1 | 0,
+                  row: v2.row + 1 | 0
+                })(v1)(v3)(1)(1)(rows4)(v4), Nil.value)))));
+              }
+              ;
+              if (v instanceof Rook) {
+                return concat2(new Cons(moveSearcher({
                   col: v2.col,
                   row: v2.row - 1 | 0
-                })(v1)(v3)(0)(-1 | 0)(1);
-              }
-              ;
-              if (otherwise) {
-                return moveSearcher({
+                })(v1)(v3)(0)(-1 | 0)(rows4)(v4), new Cons(moveSearcher({
                   col: v2.col,
                   row: v2.row + 1 | 0
-                })(v1)(v3)(0)(1)(1);
+                })(v1)(v3)(0)(1)(rows4)(v4), new Cons(moveSearcher({
+                  col: v2.col - 1 | 0,
+                  row: v2.row
+                })(v1)(v3)(-1 | 0)(0)(rows4)(v4), new Cons(moveSearcher({
+                  col: v2.col + 1 | 0,
+                  row: v2.row
+                })(v1)(v3)(1)(0)(rows4)(v4), Nil.value)))));
               }
               ;
-            }
-            ;
-            if (v instanceof Bishop) {
-              return concat2(new Cons(moveSearcher({
-                col: v2.col - 1 | 0,
-                row: v2.row - 1 | 0
-              })(v1)(v3)(-1 | 0)(-1 | 0)(rows4), new Cons(moveSearcher({
-                col: v2.col - 1 | 0,
-                row: v2.row + 1 | 0
-              })(v1)(v3)(-1 | 0)(1)(rows4), new Cons(moveSearcher({
-                col: v2.col + 1 | 0,
-                row: v2.row - 1 | 0
-              })(v1)(v3)(1)(-1 | 0)(rows4), new Cons(moveSearcher({
-                col: v2.col + 1 | 0,
-                row: v2.row + 1 | 0
-              })(v1)(v3)(1)(1)(rows4), Nil.value)))));
-            }
-            ;
-            if (v instanceof Rook) {
-              return concat2(new Cons(moveSearcher({
-                col: v2.col,
-                row: v2.row - 1 | 0
-              })(v1)(v3)(0)(-1 | 0)(rows4), new Cons(moveSearcher({
-                col: v2.col,
-                row: v2.row + 1 | 0
-              })(v1)(v3)(0)(1)(rows4), new Cons(moveSearcher({
-                col: v2.col - 1 | 0,
-                row: v2.row
-              })(v1)(v3)(-1 | 0)(0)(rows4), new Cons(moveSearcher({
-                col: v2.col + 1 | 0,
-                row: v2.row
-              })(v1)(v3)(1)(0)(rows4), Nil.value)))));
-            }
-            ;
-            if (v instanceof Prince) {
-              return concat2(new Cons(moveSearcher({
-                col: v2.col,
-                row: v2.row - 1 | 0
-              })(v1)(v3)(0)(-1 | 0)(1), new Cons(moveSearcher({
-                col: v2.col,
-                row: v2.row + 1 | 0
-              })(v1)(v3)(0)(1)(1), new Cons(moveSearcher({
-                col: v2.col - 1 | 0,
-                row: v2.row
-              })(v1)(v3)(-1 | 0)(0)(1), new Cons(moveSearcher({
-                col: v2.col + 1 | 0,
-                row: v2.row
-              })(v1)(v3)(1)(0)(1), Nil.value)))));
-            }
-            ;
-            if (v instanceof Princess) {
-              return concat2(new Cons(moveSearcher({
-                col: v2.col - 1 | 0,
-                row: v2.row - 1 | 0
-              })(v1)(v3)(-1 | 0)(-1 | 0)(1), new Cons(moveSearcher({
-                col: v2.col - 1 | 0,
-                row: v2.row + 1 | 0
-              })(v1)(v3)(-1 | 0)(1)(1), new Cons(moveSearcher({
-                col: v2.col + 1 | 0,
-                row: v2.row - 1 | 0
-              })(v1)(v3)(1)(-1 | 0)(1), new Cons(moveSearcher({
-                col: v2.col + 1 | 0,
-                row: v2.row + 1 | 0
-              })(v1)(v3)(1)(1)(1), Nil.value)))));
-            }
-            ;
-            throw new Error("Failed pattern match at Movements (line 30, column 1 - line 61, column 18): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name]);
+              if (v instanceof Prince) {
+                return concat2(new Cons(moveSearcher({
+                  col: v2.col,
+                  row: v2.row - 1 | 0
+                })(v1)(v3)(0)(-1 | 0)(1)(v4), new Cons(moveSearcher({
+                  col: v2.col,
+                  row: v2.row + 1 | 0
+                })(v1)(v3)(0)(1)(1)(v4), new Cons(moveSearcher({
+                  col: v2.col - 1 | 0,
+                  row: v2.row
+                })(v1)(v3)(-1 | 0)(0)(1)(v4), new Cons(moveSearcher({
+                  col: v2.col + 1 | 0,
+                  row: v2.row
+                })(v1)(v3)(1)(0)(1)(v4), Nil.value)))));
+              }
+              ;
+              if (v instanceof Princess) {
+                return concat2(new Cons(moveSearcher({
+                  col: v2.col - 1 | 0,
+                  row: v2.row - 1 | 0
+                })(v1)(v3)(-1 | 0)(-1 | 0)(1)(v4), new Cons(moveSearcher({
+                  col: v2.col - 1 | 0,
+                  row: v2.row + 1 | 0
+                })(v1)(v3)(-1 | 0)(1)(1)(v4), new Cons(moveSearcher({
+                  col: v2.col + 1 | 0,
+                  row: v2.row - 1 | 0
+                })(v1)(v3)(1)(-1 | 0)(1)(v4), new Cons(moveSearcher({
+                  col: v2.col + 1 | 0,
+                  row: v2.row + 1 | 0
+                })(v1)(v3)(1)(1)(1)(v4), Nil.value)))));
+              }
+              ;
+              throw new Error("Failed pattern match at Movements (line 31, column 1 - line 62, column 18): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name, v4.constructor.name]);
+            };
           };
         };
       };
@@ -3287,7 +3307,7 @@
       return "col";
     }
   })(eqInt));
-  var eqRec22 = /* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2({
+  var eqRec22 = /* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2({
     reflectSymbol: function() {
       return "position";
     }
@@ -3300,6 +3320,10 @@
       return "kind";
     }
   })(eqKind))()({
+    reflectSymbol: function() {
+      return "isProtected";
+    }
+  })(eqBoolean))()({
     reflectSymbol: function() {
       return "image";
     }
@@ -3465,8 +3489,8 @@
                           }
                           ;
                           if (v2 instanceof Cons) {
-                            var $133 = eq4(v2.value0.kind)(v.value0.kind);
-                            if ($133) {
+                            var $138 = eq4(v2.value0.kind)(v.value0.kind);
+                            if ($138) {
                               $tco_done1 = true;
                               return true;
                             }
@@ -3486,8 +3510,8 @@
                       };
                       var updateCaptured = function() {
                         var updateHelper = function(captured) {
-                          var $136 = eq4(v.value0.kind)(captured.kind);
-                          if ($136) {
+                          var $141 = eq4(v.value0.kind)(captured.kind);
+                          if ($141) {
                             return {
                               kind: captured.kind,
                               image: captured.image,
@@ -3498,8 +3522,8 @@
                           return captured;
                         };
                         var in_captured = hasBeenCaptured(v1);
-                        var $137 = in_captured === true;
-                        if ($137) {
+                        var $142 = in_captured === true;
+                        if ($142) {
                           return map6(updateHelper)(v1);
                         }
                         ;
@@ -3672,13 +3696,13 @@
                 activePiece: state3.activePiece,
                 playerOneCaptures: state3.playerOneCaptures,
                 playerTwoCaptures: state3.playerTwoCaptures,
-                possibleMoves: getPossibleMoves2(maybe_piece.value0.kind)(gameState.board)(maybe_piece.value0.position)(maybe_piece.value0.player)
+                possibleMoves: getPossibleMoves2(maybe_piece.value0.kind)(gameState.board)(maybe_piece.value0.position)(maybe_piece.value0.player)(maybe_piece.value0.isProtected)
               };
             }
             ;
           }
           ;
-          throw new Error("Failed pattern match at Main (line 141, column 45 - line 144, column 130): " + [maybe_piece.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 141, column 45 - line 144, column 147): " + [maybe_piece.constructor.name]);
         };
       };
       var updateCapturedPiece = function(v) {
@@ -3698,8 +3722,8 @@
           }
           ;
           if (v instanceof Just && eq22(v1.currentPlayer)(One.value)) {
-            var $151 = elem1(v.value0)(v1.playerOneCaptures);
-            if ($151) {
+            var $156 = elem1(v.value0)(v1.playerOneCaptures);
+            if ($156) {
               return {
                 tickCount: v1.tickCount,
                 lastReceivedMessage: v1.lastReceivedMessage,
@@ -3717,8 +3741,8 @@
           }
           ;
           if (v instanceof Just && otherwise) {
-            var $153 = elem1(v.value0)(v1.playerTwoCaptures);
-            if ($153) {
+            var $158 = elem1(v.value0)(v1.playerTwoCaptures);
+            if ($158) {
               return {
                 tickCount: v1.tickCount,
                 lastReceivedMessage: v1.lastReceivedMessage,
@@ -3755,8 +3779,8 @@
           }
           ;
           if (maybe_piece instanceof Just) {
-            var $156 = eq22(maybe_piece.value0.player)(state3.currentPlayer);
-            if ($156) {
+            var $161 = eq22(maybe_piece.value0.player)(state3.currentPlayer);
+            if ($161) {
               return {
                 tickCount: state3.tickCount,
                 lastReceivedMessage: state3.lastReceivedMessage,
@@ -3801,8 +3825,8 @@
         var valid_move = elem22(state3.clickedCell)(state3.possibleMoves);
         var removePiece = function(row) {
           var checker = function(to_compare) {
-            var $160 = eq32(state3.activePiece)(to_compare);
-            if ($160) {
+            var $165 = eq32(state3.activePiece)(to_compare);
+            if ($165) {
               return Nothing.value;
             }
             ;
@@ -3811,8 +3835,8 @@
           return map1(checker)(row);
         };
         var new_piece = function() {
-          var $161 = valid_move === true;
-          if ($161) {
+          var $166 = valid_move === true;
+          if ($166) {
             if (state3.activePiece instanceof Nothing) {
               return Nothing.value;
             }
@@ -3820,6 +3844,7 @@
             if (state3.activePiece instanceof Just) {
               return new Just({
                 image: state3.activePiece.value0.image,
+                isProtected: state3.activePiece.value0.isProtected,
                 kind: state3.activePiece.value0.kind,
                 player: state3.activePiece.value0.player,
                 position: state3.clickedCell
@@ -3832,8 +3857,8 @@
           return state3.activePiece;
         }();
         var captured_piece = function() {
-          var $164 = valid_move === true;
-          if ($164) {
+          var $169 = valid_move === true;
+          if ($169) {
             var v = accessCell(state3.clickedCell.col)(state3.clickedCell.row)(state3.board);
             if (v instanceof Nothing) {
               return Nil.value;
@@ -3907,23 +3932,23 @@
             };
           };
         };
-        var $171 = valid_move === true;
-        if ($171) {
+        var $176 = valid_move === true;
+        if ($176) {
           if (state3.activePiece instanceof Nothing) {
             return state3;
           }
           ;
           if (state3.activePiece instanceof Just) {
             var next_player = function() {
-              var $173 = eq22(state3.currentPlayer)(One.value);
-              if ($173) {
+              var $178 = eq22(state3.currentPlayer)(One.value);
+              if ($178) {
                 return Two.value;
               }
               ;
               return One.value;
             }();
-            var $174 = eq22(state3.currentPlayer)(One.value);
-            if ($174) {
+            var $179 = eq22(state3.currentPlayer)(One.value);
+            if ($179) {
               return {
                 tickCount: state3.tickCount,
                 lastReceivedMessage: state3.lastReceivedMessage,
@@ -3958,8 +3983,8 @@
       var clicked_piece = accessCell(gameState.clickedCell.col)(gameState.clickedCell.row)(gameState.board);
       return function __do() {
         (function() {
-          var $176 = mod2(gameState.tickCount)(fps) === 0;
-          if ($176) {
+          var $181 = mod2(gameState.tickCount)(fps) === 0;
+          if ($181) {
             return send("Current Piece: " + (showPieceKind(clicked_piece) + "\n"))();
           }
           ;
@@ -3979,7 +4004,8 @@
             row
           },
           image: "turtwig.png",
-          player: player_num
+          player: player_num,
+          isProtected: false
         });
       };
     };
@@ -3994,7 +4020,8 @@
             row
           },
           image: "latias.png",
-          player: player_num
+          player: player_num,
+          isProtected: true
         });
       };
     };
@@ -4009,7 +4036,8 @@
             row
           },
           image: "latios.png",
-          player: player_num
+          player: player_num,
+          isProtected: true
         });
       };
     };
@@ -4025,7 +4053,8 @@
               row: v1
             },
             image: "eevee.png",
-            player: One.value
+            player: One.value,
+            isProtected: false
           });
         }
         ;
@@ -4037,7 +4066,8 @@
               row: v1
             },
             image: "eevee-shiny.png",
-            player: Two.value
+            player: Two.value,
+            isProtected: false
           });
         }
         ;
@@ -4055,7 +4085,8 @@
             row
           },
           image: "pikachu.png",
-          player: player_num
+          player: player_num,
+          isProtected: false
         });
       };
     };
@@ -4079,7 +4110,7 @@
     };
     var getBackRow = function(row) {
       return function(player_num) {
-        return [createRook(0)(row)(player_num), Nothing.value, createBishop(2)(row)(player_num), createPrince(3)(row)(player_num), createPrincess(4)(row)(player_num), createBishop(5)(row)(player_num), Nothing.value, createRook(7)(row)(player_num)];
+        return [createRook(0)(row)(player_num), createBishop(1)(row)(player_num), Nothing.value, createPrince(3)(row)(player_num), createPrincess(4)(row)(player_num), Nothing.value, createBishop(6)(row)(player_num), createRook(7)(row)(player_num)];
       };
     };
     var init_board = append13([getBackRow(0)(Two.value)])(append13([getPawnRow(1)(Two.value)(0)])(append13(replicate(rows4 - 4 | 0)(nothing_row))(append13([getPawnRow(rows4 - 2 | 0)(One.value)(0)])([getBackRow(rows4 - 1 | 0)(One.value)]))));

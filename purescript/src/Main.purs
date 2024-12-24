@@ -56,20 +56,20 @@ import Config
 
 
 createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
-createBishop col row player_num = Just {kind: Bishop, position: {col:col,row:row}, image: "pikachu.png", player: player_num}
+createBishop col row player_num = Just {kind: Bishop, position: {col:col,row:row}, image: "pikachu.png", player: player_num, isProtected: false}
 
 createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row One = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: One}
-createPawn col row Two = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee-shiny.png", player: Two}
+createPawn col row One = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: One, isProtected: false}
+createPawn col row Two = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee-shiny.png", player: Two, isProtected: false}
 
 createRook :: Int -> Int -> PlayerNum -> Maybe Piece
-createRook col row player_num = Just {kind: Rook, position: {col:col,row:row}, image: "turtwig.png", player: player_num}
+createRook col row player_num = Just {kind: Rook, position: {col:col,row:row}, image: "turtwig.png", player: player_num, isProtected: false}
 
 createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrince col row player_num = Just {kind: Prince, position: {col:col,row:row}, image: "latios.png", player: player_num}
+createPrince col row player_num = Just {kind: Prince, position: {col:col,row:row}, image: "latios.png", player: player_num, isProtected: true}
 
 createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrincess col row player_num = Just {kind: Princess, position: {col:col,row:row}, image: "latias.png", player: player_num}
+createPrincess col row player_num = Just {kind: Princess, position: {col:col,row:row}, image: "latias.png", player: player_num, isProtected: true}
 
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
@@ -83,12 +83,12 @@ initialState = do
     
     getBackRow :: Int -> PlayerNum -> Array (Maybe Piece)
     getBackRow row player_num = [ createRook 0 row player_num, 
+                                  createBishop 1 row player_num, 
                                   Nothing,
-                                  createBishop 2 row player_num, 
                                   createPrince 3 row player_num,
                                   createPrincess 4 row player_num,
-                                  createBishop 5 row player_num, 
                                   Nothing,
+                                  createBishop 6 row player_num, 
                                   createRook 7 row player_num
                                 ]
 
@@ -141,7 +141,7 @@ onTick send gameState = do
     updatePossibleMoves maybe_piece state = case maybe_piece of
       Nothing -> state { possibleMoves = Nil }
       Just piece | piece.player /= gameState.currentPlayer -> state { possibleMoves = Nil }
-                 | otherwise -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player }
+                 | otherwise -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player piece.isProtected}
     
     -- Update the board if a valid move is made (clicked cell is a possible move)
     makeMove :: GameState -> GameState
@@ -217,7 +217,7 @@ onTick send gameState = do
 
 
   if gameState.tickCount `mod` fps == 0 then do
-    send $ "Current Piece: " <> showPieceKind clicked_piece <> "\n" --<> 
+    send $ "Current Piece: " <> showPieceKind clicked_piece <> "\n" --<>
       --show gameState.currentPlayer <> "\n" <> 
       -- showBoard gameState.board --<> "\n" 
     else pure unit
