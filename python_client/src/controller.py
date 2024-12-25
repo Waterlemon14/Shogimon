@@ -7,4 +7,4 @@ class GameController:
         self._view = view
 
     def start(self):
-        ...
+        self._view.run()

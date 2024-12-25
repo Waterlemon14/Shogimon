@@ -1,8 +1,16 @@
 from dataclasses import dataclass
 from typing import Protocol
+from enum import StrEnum
+
+
+class GameStatus(StrEnum):
+    ONGOING = 'Ongoing'
+    ROUND_WIN = 'Round win'
+    ROUND_LOSE = 'Round lose'
+
 
 @dataclass(frozen=True)
-class BoardState():
+class GameState():
     ...
 
 class Movement(Protocol):
