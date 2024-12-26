@@ -4,5 +4,8 @@ class GameModel:
     def __init__(self):
         ...
 
-    def next_round(self):
+    def make_turn(self):
+        ...
+
+    def new_game(self):
         ...
