@@ -17,7 +17,7 @@ import CS150241Project.Networking (Message)
 import Data.Int (toNumber, floor)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), (:), concat, length, snoc)
+import Data.List (List(..)) -- , (:), concat, length, snoc)
 import Data.Array (replicate, (!!))
 import Data.Foldable (elem)
 import Effect (Effect)
@@ -27,6 +27,7 @@ import Graphics.Canvas as Canvas
 import Movements
   ( getPossibleMoves
   , accessCell
+  , accessCaptured
   )
 
 import ProjectTypes
@@ -129,7 +130,18 @@ onTick send gameState = do
     clicked_col = gameState.clickedCell.col
     clicked_row = gameState.clickedCell.row
 
-    clicked_piece = accessCell clicked_col clicked_row gameState.board
+    pieceConstructor :: Captured -> Piece
+    pieceConstructor cp = {kind: cp.kind, position: {row: -1, col: -1}, image: cp.image, player: gameState.currentPlayer, isProtected: if cp.kind == Princess || cp.kind == Prince then true else false}
+
+    clicked_piece = if clicked_row == 8 || clicked_row == -1 
+      then 
+        if gameState.currentPlayer == One
+          then
+            map pieceConstructor (accessCaptured (clicked_col+1) gameState.playerOneCaptures)
+          else
+            map pieceConstructor (accessCaptured (clicked_col+1) gameState.playerTwoCaptures)
+      else 
+        accessCell clicked_col clicked_row gameState.board
 
     -- Assigns state active piece to clicked piece
     updateActivePiece :: Maybe Piece -> GameState -> GameState
@@ -153,8 +165,8 @@ onTick send gameState = do
       then case state.activePiece of
         Nothing -> state
         Just activePiece -> if state.currentPlayer == One
-          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = concat (state.playerOneCaptures : captured_piece : Nil) }
-          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = concat (state.playerTwoCaptures : captured_piece : Nil) }
+          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = captured_piece state.playerOneCaptures }
+          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = captured_piece state.playerTwoCaptures }
           where next_player = if state.currentPlayer == One then Two else One
       else state
       where
@@ -164,16 +176,17 @@ onTick send gameState = do
             Nothing -> Nothing
             Just piece -> Just (piece { position = state.clickedCell })
           else state.activePiece
+
+        captured_piece :: List Captured -> List Captured
+        captured_piece captured = case accessCell state.clickedCell.col state.clickedCell.row state.board of
+            Nothing -> captured
+            Just piece -> addCaptured captured piece
         
-        captured_piece = if valid_move == true
-          then case accessCell state.clickedCell.col state.clickedCell.row state.board of
-            Nothing -> Nil
-            Just piece -> if state.currentPlayer == One
-              then
-                piece { player = One } : Nil
-              else
-                piece { player = Two } : Nil
-          else Nil
+        
+        addCaptured :: List Captured -> Piece -> List Captured
+        addCaptured Nil piece = Cons { kind: piece.kind, count: 1, image: piece.image } Nil
+        addCaptured (Cons h t) piece | h.kind == piece.kind = Cons (h {count = h.count + 1}) t
+        addCaptured (Cons h t) piece | otherwise = Cons h (addCaptured t piece)
 
         -- Remove the piece from its original position
         removePiece :: Array (Maybe Piece) -> Array (Maybe Piece)
@@ -223,13 +236,13 @@ onTick send gameState = do
     --     then state { activePiece = Just piece } 
     --     else state
 
-    showPieceKind :: Maybe Piece -> String
-    showPieceKind Nothing = "Nothing"
-    showPieceKind (Just piece) = show piece.kind
+    -- showPieceKind :: Maybe Piece -> String
+    -- showPieceKind Nothing = "Nothing"
+    -- showPieceKind (Just piece) = show piece.kind
 
 
   if gameState.tickCount `mod` fps == 0 then do
-    send $ "Current Piece: " <> show gameState.clickedCell <> "\n" --<>
+    send $ "Current Piece: " <> show clicked_piece <> "\n" --<>
       --show gameState.currentPlayer <> "\n" <> 
       -- showBoard gameState.board --<> "\n" 
     else pure unit
@@ -317,39 +330,39 @@ onRender images ctx gameState = do
       drawMoves tail
     
     -- Draws the captured pieces on the border of the board
-    drawCaptured :: List Piece -> List Piece -> Effect Unit
+    drawCaptured :: List Captured -> List Captured -> Effect Unit
     drawCaptured playerOneCaptures playerTwoCaptures = do
       let
-        -- Given a list of captured pieces, it counts the number of pieces
-        -- per kind captured and returns as a List Captured.
-        countKinds :: List Piece -> List Captured -> List Captured
-        countKinds Nil captured_list = captured_list
-        countKinds (Cons piece piece_tail) captured_list = countKinds piece_tail updateCaptured
-          where
-            -- Checker function for if a piece of that kind
-            -- is already in the list of captured pieces
-            hasBeenCaptured :: List Captured -> Boolean
-            hasBeenCaptured Nil = false
-            hasBeenCaptured (Cons captured captured_tail) = if captured.kind == piece.kind then true else hasBeenCaptured captured_tail
+        -- -- Given a list of captured pieces, it counts the number of pieces
+        -- -- per kind captured and returns as a List Captured.
+        -- countKinds :: List Captured -> List Captured -> List Captured
+        -- countKinds Nil captured_list = captured_list
+        -- countKinds (Cons piece piece_tail) captured_list = countKinds piece_tail updateCaptured
+        --   where
+        --     -- Checker function for if a piece of that kind
+        --     -- is already in the list of captured pieces
+        --     hasBeenCaptured :: List Captured -> Boolean
+        --     hasBeenCaptured Nil = false
+        --     hasBeenCaptured (Cons captured captured_tail) = if captured.kind == piece.kind then true else hasBeenCaptured captured_tail
 
-            -- Updates the list of captured pieces by adding it to the list if
-            -- that kind has not been captured yet, or incrementing the counter
-            -- for a piece that has already been captured
-            updateCaptured :: List Captured
-            updateCaptured = if in_captured == true
-              then map updateHelper captured_list
-              else snoc captured_list { kind: piece.kind, count: 1, image: piece.image }
-              where
-                in_captured = hasBeenCaptured captured_list
+        --     -- Updates the list of captured pieces by adding it to the list if
+        --     -- that kind has not been captured yet, or incrementing the counter
+        --     -- for a piece that has already been captured
+        --     updateCaptured :: List Captured
+        --     updateCaptured = if in_captured == true
+        --       then map updateHelper captured_list
+        --       else snoc captured_list { kind: piece.kind, count: 1, image: piece.image }
+        --       where
+        --         in_captured = hasBeenCaptured captured_list
 
-                updateHelper :: Captured -> Captured
-                updateHelper captured = if piece.kind == captured.kind
-                  then captured { count = captured.count + 1 }
-                  else captured
+        --         updateHelper :: Captured -> Captured
+        --         updateHelper captured = if piece.kind == captured.kind
+        --           then captured { count = captured.count + 1 }
+        --           else captured
 
 
-        player_one_kinds = countKinds playerOneCaptures Nil
-        player_two_kinds = countKinds playerTwoCaptures Nil
+        -- player_one_kinds = countKinds playerOneCaptures Nil
+        -- player_two_kinds = countKinds playerTwoCaptures Nil
 
         
         player_one_y_offset = (cell_height+1.0) * (1.0 + toNumber rows)
@@ -369,8 +382,8 @@ onRender images ctx gameState = do
           drawText ctx { x: (cell_width+1.0) * count + cell_width/2.0, y: y_offset + cell_height/1.25 + 15.0, color, font, size, text: show captured.count }
           drawKinds tail y_offset (count+1.0)
       
-      drawKinds player_one_kinds player_one_y_offset 0.0
-      drawKinds player_two_kinds 0.0 0.0
+      drawKinds playerOneCaptures player_one_y_offset 0.0
+      drawKinds playerTwoCaptures 0.0 0.0
       pure unit
 
 

@@ -2,17 +2,18 @@ module Movements
   ( class Movement
   , getPossibleMoves
   , accessCell
+  , accessCaptured
   )
   where
 
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), (:), concat)
+import Data.List (List(..), (:), concat, (!!))
 import Data.Array (index)
 
 
-import ProjectTypes (Kind(..), Position, Board, PlayerNum(..), Piece)
+import ProjectTypes (Kind(..), Position, Board, PlayerNum(..), Piece, Captured)
 import Config (rows, columns)
 
 
@@ -75,6 +76,9 @@ accessCell col row board = case cell of
       board
       # (flip index) row
       >>= (flip index) col
+
+accessCaptured :: Int -> List Captured -> Maybe Captured
+accessCaptured col capturedList = capturedList !! col
 
 -- Abstraction for searching for moves
 -- Position: start of tile to search (not current position of piece)
