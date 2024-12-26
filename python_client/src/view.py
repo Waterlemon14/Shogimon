@@ -20,9 +20,9 @@ class Tile:
         """
         ...
 
-    def mark_unoccupied(self):
+    def mark_empty(self):
         """
-        Remove occupant from tile
+        Render tile as empty
         """
         ...
 
