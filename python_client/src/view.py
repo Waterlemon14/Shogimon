@@ -27,11 +27,11 @@ class Tile:
         self._y = y
         self._width = 64
         self._height = 64
-        # self._occupant = Character()
+        # self._occupant = Piece()
 
     def mark_occupied(self, piece: Piece):
         """
-        Set tile occupant to character
+        Set tile occupant to piece
         """
         ...
 
@@ -51,11 +51,17 @@ class GameView:
     def __init__(self):
         self._width = 1280
         self._height = 720
+        # self._make_turn_observers: list[MakeGuessObserver] = []
+        # self._next_round_observers: list[NextRoundObserver] = []
+        # self._new_game_observers: list[NewGameObserver] = []
 
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
 
     def render_all(self):
+        """
+        Render all game components
+        """
         ...
 
     def run(self):
