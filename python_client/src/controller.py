@@ -1,12 +1,12 @@
 from model import GameModel
 from view import GameView
-from project_types import GameStateChangeObserver, Movement
+from project_types import GameState, GameStateChangeObserver, Movement
 
 class GameController:
     def __init__(self, model: GameModel, view: GameView):
         self._model = model
         self._view = view
-        self._game_state_change_observers = []
+        self._game_state_change_observers: list[GameStateChangeObserver] = []
 
     def start(self):
         view = self._view
@@ -25,3 +25,7 @@ class GameController:
 
     def on_new_game(self):
         self._model.new_game()
+
+    def _on_state_change(self, state: GameState):
+        for observer in self._game_state_change_observers:
+            observer.on_state_change(state)
