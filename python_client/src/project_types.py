@@ -47,16 +47,14 @@ class Player(Protocol):
 
 class MakeTurnObserver(Protocol):
     """
-    For view;
-    Communicator between turn of each player
+    For view; Communicator between turn of each player
     """
     def on_make_turn(self, turn: Movement):
         ...
 
 class NewGameObserver(Protocol):
     """
-    For view;
-    Communicator 
+    For view; Communicator for when new game start
     """
     def on_new_game(self):
         ...
