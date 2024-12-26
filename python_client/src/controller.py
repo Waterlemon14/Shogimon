@@ -1,7 +1,6 @@
 from model import GameModel
 from view import GameView
 from project_types import GameStateChangeObserver
-# TO DO: ADD IMPORTS
 
 class GameController:
     def __init__(self, model: GameModel, view: GameView):
@@ -19,5 +18,4 @@ class GameController:
         ...
 
     def register_game_state_change_observer(self, observer: GameStateChangeObserver):
-        # TO DO: ADD IMPORTS
         self._game_state_change_observers.append(observer)
