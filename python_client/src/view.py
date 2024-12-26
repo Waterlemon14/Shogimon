@@ -1,5 +1,8 @@
 import pygame
-from project_types import (Movement, Piece, Player, MakeTurnObserver, NewGameObserver)
+from project_types import (GameState, Movement, Piece, Player, MakeTurnObserver, NewGameObserver)
+
+SCREEN_WIDTH = 720
+SCREEN_HEIGHT = 1280
 
 class Eevee(Piece):
     def __init__(self):
@@ -27,7 +30,7 @@ class Tile:
         self._y = y
         self._width = 64
         self._height = 64
-        # self._occupant = Piece()
+        self._occupant = None
 
     def mark_occupied(self, piece: Piece):
         """
@@ -37,20 +40,20 @@ class Tile:
 
     def mark_empty(self):
         """
-        Render tile as empty
+        Set tile to empty
         """
         ...
 
-    def render_to_screen(self):
+    def render_to_screen(self, screen: pygame.Surface):
         """
-        Render to screen -- get from GameView
+        Render to screen --- take screen from GameView
         """
         ...
 
 class GameView:
     def __init__(self):
-        self._width = 1280
-        self._height = 720
+        self._width = SCREEN_WIDTH
+        self._height = SCREEN_HEIGHT
         self._make_turn_observers: list[MakeTurnObserver] = []
         self._new_game_observers: list[NewGameObserver] = []
 
@@ -62,6 +65,9 @@ class GameView:
 
     def register_new_game_observer(self, observer: NewGameObserver):
         self._new_game_observers.append(observer)
+
+    def on_state_change(self, state: GameState):
+        ...
 
     def render_all(self):
         """
