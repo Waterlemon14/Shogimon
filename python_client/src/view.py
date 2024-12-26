@@ -12,7 +12,11 @@ class Character:
 
 class Tile:
     def __init__(self, x: int, y: int):
-        ...
+        self._x = x
+        self._y = y
+        self._width = 64
+        self._height = 64
+        # self._occupant = Character()
 
     def mark_occupied(self, char: Character):
         """
