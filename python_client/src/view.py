@@ -1,6 +1,5 @@
 import pygame
-from project_types import (Movement, Piece, Player)
-# TO DO: ADD IMPORTS
+from project_types import (Movement, Piece, Player, MakeTurnObserver, NewGameObserver)
 
 class Eevee(Piece):
     def __init__(self):
@@ -49,7 +48,6 @@ class Tile:
         ...
 
 class GameView:
-    # TO DO: ADD IMPORTS
     def __init__(self):
         self._width = 1280
         self._height = 720
@@ -60,12 +58,10 @@ class GameView:
         self._font = pygame.font.SysFont('Arial', 25)
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
-        for observer in self._make_turn_observers:
-            observer.on_make_turn()
+        self._make_turn_observers.append(observer)
 
     def register_new_game_observer(self, observer: NewGameObserver):
-        for observer in self._new_game_observers:
-            observer.on_new_game()
+        self._new_game_observers.append(observer)
 
     def render_all(self):
         """

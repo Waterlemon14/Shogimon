@@ -1,5 +1,6 @@
 from model import GameModel
 from view import GameView
+from project_types import GameStateChangeObserver
 # TO DO: ADD IMPORTS
 
 class GameController:
