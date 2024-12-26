@@ -5,9 +5,8 @@ from enum import StrEnum
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
-    ROUND_WIN = 'Round win'
-    ROUND_LOSE = 'Round lose'
-
+    PLAYER_WIN = 'Round win'
+    PLAYER_LOSE = 'Round lose'
 
 @dataclass(frozen=True)
 class GameState():
@@ -44,4 +43,28 @@ class Player(Protocol):
         """
         Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piece
         """
+        ...
+
+class MakeTurnObserver(Protocol):
+    """
+    For view;
+    Communicator between turn of each player
+    """
+    def on_make_turn(self, turn: Movement):
+        ...
+
+class NewGameObserver(Protocol):
+    """
+    For view;
+    Communicator 
+    """
+    def on_new_game(self):
+        ...
+
+class GameStateChangeObserver(Protocol):
+    """
+    For controller;
+    Communicator of change in game state (i.e., ongoing, player 1 win, player 1 lose)
+    """
+    def on_state_change(self, state: GameState):
         ...
