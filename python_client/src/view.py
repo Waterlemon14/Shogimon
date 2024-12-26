@@ -1,13 +1,24 @@
 import pygame
+from project_types import (Movement, Piece, Player)
 
-class Character:
+class Eevee(Piece):
     def __init__(self):
         ...
 
-    def render_to_tile(self):
-        """
-        Render to respective tile
-        """
+    def is_captured(self) -> bool:
+        ...
+
+    def possible_moves(self) -> list:
+        ...
+
+class Pikachu(Piece):
+    def __init__(self):
+        ...
+
+    def is_captured(self) -> bool:
+        ...
+
+    def possible_moves(self) -> list:
         ...
 
 class Tile:
@@ -18,7 +29,7 @@ class Tile:
         self._height = 64
         # self._occupant = Character()
 
-    def mark_occupied(self, char: Character):
+    def mark_occupied(self, piece: Piece):
         """
         Set tile occupant to character
         """
@@ -44,10 +55,7 @@ class GameView:
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
 
-    def render_tile(self):
-        ...
-
-    def render_to_screen(self):
+    def render_all(self):
         ...
 
     def run(self):
