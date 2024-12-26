@@ -17,7 +17,7 @@ import CS150241Project.Networking (Message)
 import Data.Int (toNumber, floor)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), (:), concat)
+import Data.List (List(..), (:), concat, length, snoc)
 import Data.Array (replicate, (!!))
 import Data.Foldable (elem)
 import Effect (Effect)
@@ -56,20 +56,24 @@ import Config
 
 
 createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
-createBishop col row player_num = Just {kind: Bishop, position: {col:col,row:row}, image: "pikachu.png", player: player_num, isProtected: false}
+createBishop col row One    = Just {kind: Bishop, position: {col:col,row:row},    image: "pikachu-original-cap.png", player: One, isProtected: false}
+createBishop col row Two    = Just {kind: Bishop, position: {col:col,row:row},    image: "pikachu-unova-cap.png", player: Two, isProtected: false}
 
 createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row One = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: One, isProtected: false}
-createPawn col row Two = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee-shiny.png", player: Two, isProtected: false}
+createPawn col row One      = Just {kind: Pawn, position: {col:col,row:row},      image: "eevee.png", player: One, isProtected: false}
+createPawn col row Two      = Just {kind: Pawn, position: {col:col,row:row},      image: "eevee-shiny.png", player: Two, isProtected: false}
 
 createRook :: Int -> Int -> PlayerNum -> Maybe Piece
-createRook col row player_num = Just {kind: Rook, position: {col:col,row:row}, image: "turtwig.png", player: player_num, isProtected: false}
+createRook col row One      = Just {kind: Rook, position: {col:col,row:row},      image: "turtwig.png", player: One, isProtected: false}
+createRook col row Two      = Just {kind: Rook, position: {col:col,row:row},      image: "turtwig-shiny.png", player: Two, isProtected: false}
 
 createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrince col row player_num = Just {kind: Prince, position: {col:col,row:row}, image: "latios.png", player: player_num, isProtected: true}
+createPrince col row One    = Just {kind: Prince, position: {col:col,row:row},    image: "latios.png", player: One, isProtected: true}
+createPrince col row Two    = Just {kind: Prince, position: {col:col,row:row},    image: "latios-shiny.png", player: Two, isProtected: true}
 
 createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrincess col row player_num = Just {kind: Princess, position: {col:col,row:row}, image: "latias.png", player: player_num, isProtected: true}
+createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  image: "latias.png", player: One, isProtected: true}
+createPrincess col row Two  = Just {kind: Princess, position: {col:col,row:row},  image: "latias-shiny.png", player: Two, isProtected: true}
 
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
@@ -149,8 +153,8 @@ onTick send gameState = do
       then case state.activePiece of
         Nothing -> state
         Just activePiece -> if state.currentPlayer == One
-          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = concat (captured_piece : state.playerOneCaptures : Nil) }
-          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = concat (captured_piece : state.playerTwoCaptures : Nil) }
+          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = concat (state.playerOneCaptures : captured_piece : Nil) }
+          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = concat (state.playerTwoCaptures : captured_piece : Nil) }
           where next_player = if state.currentPlayer == One then Two else One
       else state
       where
@@ -164,7 +168,11 @@ onTick send gameState = do
         captured_piece = if valid_move == true
           then case accessCell state.clickedCell.col state.clickedCell.row state.board of
             Nothing -> Nil
-            Just piece -> piece : Nil
+            Just piece -> if state.currentPlayer == One
+              then
+                piece { player = One } : Nil
+              else
+                piece { player = Two } : Nil
           else Nil
 
         -- Remove the piece from its original position
@@ -200,16 +208,20 @@ onTick send gameState = do
               | current_row == piece_position.row = [removePiece (getBoardRow current_row board) ] <> helper (current_row + 1)
               | otherwise = [getBoardRow current_row board] <> helper (current_row + 1)
     
-    updateCapturedPiece :: Maybe Piece -> GameState -> GameState
-    updateCapturedPiece Nothing state = state { activePiece = Nothing }
-    updateCapturedPiece (Just piece) state | state.currentPlayer == One = 
-      if (elem piece state.playerOneCaptures) 
-        then state { activePiece = Just piece } 
-        else state
-    updateCapturedPiece (Just piece) state | otherwise = 
-       if (elem piece state.playerTwoCaptures) 
-        then state { activePiece = Just piece } 
-        else state
+    -- updateCapturedPiece :: GameState -> GameState
+    -- updateCapturedPiece state 
+    --   | state.currentPlayer == One && (state.clickedCell.row == rows) =  
+    --   | state.currentPlayer == Two && (state.clickedCell.row == -1) = 
+
+    -- updateCapturedPiece Nothing state = state { activePiece = Nothing }
+    -- updateCapturedPiece (Just piece) state | state.currentPlayer == One = 
+    --   if (elem piece state.playerOneCaptures) 
+    --     then state { activePiece = Just piece } 
+    --     else state
+    -- updateCapturedPiece (Just piece) state | otherwise = 
+    --    if (elem piece state.playerTwoCaptures) 
+    --     then state { activePiece = Just piece } 
+    --     else state
 
     showPieceKind :: Maybe Piece -> String
     showPieceKind Nothing = "Nothing"
@@ -217,7 +229,7 @@ onTick send gameState = do
 
 
   if gameState.tickCount `mod` fps == 0 then do
-    send $ "Current Piece: " <> showPieceKind clicked_piece <> "\n" --<>
+    send $ "Current Piece: " <> show gameState.clickedCell <> "\n" --<>
       --show gameState.currentPlayer <> "\n" <> 
       -- showBoard gameState.board --<> "\n" 
     else pure unit
@@ -227,7 +239,7 @@ onTick send gameState = do
     # updateActivePiece clicked_piece
     # updatePossibleMoves clicked_piece
     # updateTickCount
-    -- # updateCapturedPiece clicked_piece
+    -- # updateCapturedPiece
 
 
 
@@ -247,7 +259,7 @@ onMouseDown send { x, y } gameState = do
 -- since I just buit on the demo
 onKeyDown :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
 onKeyDown send key gameState = do
-  send $ "I pressed " <> key
+  send $ "I pressed " <> key <> show gameState.playerOneCaptures
   pure gameState
 
 -- Not sure if we will be using this? Didn't remove it first
@@ -326,7 +338,7 @@ onRender images ctx gameState = do
             updateCaptured :: List Captured
             updateCaptured = if in_captured == true
               then map updateHelper captured_list
-              else { kind: piece.kind, count: 1, image: piece.image } : captured_list
+              else snoc captured_list { kind: piece.kind, count: 1, image: piece.image }
               where
                 in_captured = hasBeenCaptured captured_list
 
