@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Protocol
-from enum import StrEnum
+from enum import StrEnum, auto
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
@@ -8,39 +8,38 @@ class GameStatus(StrEnum):
     PLAYER_LOSE = 'Round lose'
 
 class PieceKind(StrEnum):
-    EEVEE = 'Eevee'
-    PIKACHU = 'Pikachu'
-    LATIAS = 'Latias'
-    TURTWIG = 'Turtwig'
-    SYLVEON = 'Sylveon'
-    UMBREON = 'Umbreon'
+    EEVEE = auto()
+    PIKACHU = auto()
+    LATIAS = auto()
+    TURTWIG = auto()
+    SYLVEON = auto()
+    UMBREON = auto()
+
+class PlayerNumber(StrEnum):
+    ONE = auto()
+    TWO = auto()
 
 @dataclass(frozen=True)
 class GameState():
     ...
 
 class Movement(Protocol):
+    FORWARD = [(-1, 0)]
+    FORWARD_DIAGONALS = [(-1, -1), (-1, +1)]
+ 
+    ORTHOGONALS = [(dr, dc) for dr in {-1, 0 +1}
+                   for dc in {-1, 0 +1}
+                   if 0 in {dr, dc}]
+ 
+    DIAGONALS = [(dr, dc) for dr in {-1, +1}
+                 for dc in {-1, +1}]
+    
     def get_movement_range(self) -> list:
         ...
 
-class Player(Protocol):
-    def make_turn(self):
-        """
-        If turn of player, choose between _move_piece and _drop_piece
-        """
-        ...
-
-    def _move_piece(self) -> bool:
-        """
-        Return TRUE if a piece is captured, else return FALSE
-        """
-        ...
-
-    def _drop_piece(self) -> bool:
-        """
-        Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piece
-        """
-        ...
+class Tile:
+    row: int
+    col: int
 
 class MakeTurnObserver(Protocol):
     """
