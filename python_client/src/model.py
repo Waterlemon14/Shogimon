@@ -3,23 +3,21 @@ from typing import Self
 from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber
 # from view import Tile
 
-# Movements
-
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
         return [self.FORWARD]
     
-class Pickachu(Movement):
+class PikachuMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        pass
+        ...
 
-class Turtwig(Movement):
+class TurtwigMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        pass
+        ...
 
-class Sylveon(Movement):
+class SylveonMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        pass
+        ...
 
 class Piece:
     def __init__(self, kind: PieceKind, tile: Tile, movement: Movement, protected: bool):
