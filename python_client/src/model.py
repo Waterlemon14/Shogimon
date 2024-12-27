@@ -76,7 +76,7 @@ class Board:
         # To fix
         return row < self._height and col < self._width
     
-    
+
     # TO DO: Board Setter
     # TO DO: Piece Factory 
     # TO DO: Bunch of methods for present classes
@@ -156,6 +156,12 @@ class GameModel:
 
     def __init__(self, state: GameState):
         self.state = state
+        # create pieces from factory
+        # eg. eevee = Piece(...)
+        # set board
+        # eg, board = Board(8,8)
+        # board.put(.....)
+        
         ...
 
     def make_turn(self, turn: Movement):
