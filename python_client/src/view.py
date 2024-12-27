@@ -73,6 +73,12 @@ class GameView:
     def on_state_change(self, state: GameState):
         ...
 
+    def render_piece(self, piece: Piece):
+        """
+        Some method that will map each Piece object to an image for the view
+        """
+        ...
+
     def render_all(self):
         """
         Render all game components

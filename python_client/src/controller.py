@@ -37,5 +37,3 @@ class GameController:
     def _on_state_change(self, state: GameState):
         for observer in self._game_state_change_observers:
             observer.on_state_change(state)
-
-    # some method that will map each Piece object to an image for the view
