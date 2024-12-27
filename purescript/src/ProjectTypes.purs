@@ -6,6 +6,7 @@ module ProjectTypes
   , Piece
   , Captured
   , GameState
+  , Winner(..)
   )
   where
 
@@ -77,6 +78,16 @@ type Captured =
   }
 
 
+-- Used to more accurately represent gameover state
+data Winner = Player1 | Player2 | Draw
+
+instance Show Winner where
+  show Player1 = "Player 1"
+  show Player2 = "Player 2"
+  show Draw = "Draw"
+
+derive instance Eq Winner
+
 -- Used to represent the current game state, keeps all relevant information
 -- to the game state.
 type GameState =
@@ -89,4 +100,6 @@ type GameState =
   , activePiece :: Maybe Piece        -- Currently clicked piece to be moved
   , playerOneCaptures :: List Captured   -- List of pieces captured by player one
   , playerTwoCaptures :: List Captured   -- List of pieces captured by player two
+  , winner :: Maybe Winner
+  , moveCount :: Int
   }

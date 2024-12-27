@@ -2,13 +2,14 @@ module Movements
   ( class Movement
   , getPossibleMoves
   , accessCell
+  , protectedPieceMovementCells
   )
   where
 
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), (:), concat)
+import Data.List (List(..), (:), concat, union)
 import Data.Array (index)
 import Data.Foldable (notElem)
 
@@ -111,12 +112,16 @@ getFreeCells board col row
     Just _  -> getFreeCells board (col+1) row
 
     where 
-      invalidCells = protectedPieceMovementCells 0 0
-      protectedPieceMovementCells c r
+      invalidCells = union (protectedPieceMovementCells 0 0 board One) (protectedPieceMovementCells 0 0 board Two)
+
+
+protectedPieceMovementCells :: Int -> Int -> Board -> PlayerNum -> List Position
+protectedPieceMovementCells c r board pnum
         | r >= rows = Nil  -- Base case
-        | c >= columns = protectedPieceMovementCells 0 (r+1) -- Once whole row searched, search next row
+        | c >= columns = protectedPieceMovementCells 0 (r+1) board pnum -- Once whole row searched, search next row
         | otherwise = case accessCell c r board of 
-          Nothing -> protectedPieceMovementCells (c+1) r
-          Just piece -> if piece.isProtected 
+          Nothing -> protectedPieceMovementCells (c+1) r board pnum
+          Just piece -> if piece.isProtected && piece.player == pnum
             then getPossibleMoves piece.kind board piece.position piece.player piece.isProtected false
-            else protectedPieceMovementCells (c+1) r
+            else protectedPieceMovementCells (c+1) r board pnum
+
