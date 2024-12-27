@@ -3,7 +3,7 @@ from view import GameView
 from controller import GameController
 
 if __name__ == '__main__':
-    model = GameModel()
+    model = GameModel.default()
     view = GameView()
 
     controller = GameController(model, view)

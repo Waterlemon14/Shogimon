@@ -1,8 +1,14 @@
-import pygame
-from project_types import Movement
+from typing import Self
+
+from project_types import GameState, Movement
 
 class GameModel:
-    def __init__(self):
+    @classmethod
+    def default(cls) -> Self:
+        ...
+
+    def __init__(self, state: GameState):
+        self._state = state
         ...
 
     def make_turn(self, turn: Movement):
