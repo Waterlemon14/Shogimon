@@ -30,13 +30,12 @@ class Piece:
         self._piece = piece
         self._tile = tile
         self._is_captured = False
-        self._is_protected = True if piece in (PieceKind.LATIAS) else False
 
     def is_captured(self) -> bool:
         return self._is_captured
     
     def is_protected(self) -> bool:
-        return self._is_protected
+        return True if self._piece in (PieceKind.LATIAS) else False
 
     def possible_moves(self) -> list:
         """
