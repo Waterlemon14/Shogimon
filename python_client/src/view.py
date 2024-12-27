@@ -78,7 +78,26 @@ class GameView:
         ...
 
     def run(self):
-        """
-        Actual Pygame logic for running
-        """
-        ...
+        pygame.init()
+
+        self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self._clock = pygame.time.Clock()
+
+        _game_is_running = True
+
+        while _game_is_running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    _game_is_running = False
+
+                elif event.type == pygame.KEYDOWN:
+                    ...
+
+            self._screen.fill('#FFFFFF')
+
+            ...
+
+            pygame.display.flip()
+            self._clock.tick(30)
+
+        pygame.quit()
