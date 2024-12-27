@@ -2,11 +2,20 @@ from dataclasses import dataclass
 from typing import Protocol
 from enum import StrEnum
 
+from view import Tile
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
     PLAYER_WIN = 'Round win'
     PLAYER_LOSE = 'Round lose'
+
+class PieceKind(StrEnum):
+    EEVEE = 'Eevee'
+    PIKACHU = 'Pikachu'
+    LATIAS = 'Latias'
+    TURTWIG = 'Turtwig'
+    SYLVEON = 'Sylveon'
+    UMBREON = 'Umbreon'
 
 @dataclass(frozen=True)
 class GameState():
@@ -16,8 +25,16 @@ class Movement(Protocol):
     def get_movement_range(self) -> list:
         ...
 
-class Piece(Protocol):
+class Piece:
+    def __init__(self, piece: PieceKind, tile: Tile):
+        self._piece = piece
+        self._tile = tile
+        self._is_captured = False
+
     def is_captured(self) -> bool:
+        ...
+    
+    def is_protected(self) -> bool:
         ...
 
     def possible_moves(self) -> list:
