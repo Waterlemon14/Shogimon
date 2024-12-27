@@ -78,7 +78,38 @@ class Board:
     
 
     # TO DO: Board Setter
-    # TO DO: Piece Factory 
+    # will set board, clear board, etc.
+
+    # TO DO: Piece Factory, similar to:
+    """
+    class PieceFactory:
+    """Instantiates a Piece based on a PieceKind."""
+ 
+    @classmethod
+    def make(self, piece_kind: PieceKind,
+             location: Location) -> Piece:
+        match piece_kind:
+            case PieceKind.CHICK:
+                movement = ChickMovement()
+ 
+            case PieceKind.HEN | PieceKind.EMPOWERED_CAT | PieceKind.DOG:
+                movement = DogMovement()
+ 
+            case PieceKind.ELEPHANT:
+                movement = ElephantMovement()
+ 
+            case PieceKind.GIRAFFE:
+                movement = GiraffeMovement()
+ 
+            case PieceKind.LION:
+                movement = LionMovement()
+ 
+            case PieceKind.CAT:
+                movement = CatMovement()
+ 
+        return Piece(piece_kind, location, movement)
+    """
+
     # TO DO: Bunch of methods for present classes
 
     """See project_types.py, movement classes above
