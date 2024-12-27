@@ -6,26 +6,6 @@ from model import Piece
 SCREEN_WIDTH = 720
 SCREEN_HEIGHT = 1280
 
-class Eevee(Piece):
-    def __init__(self):
-        ...
-
-    def is_captured(self) -> bool:
-        ...
-
-    def possible_moves(self) -> list:
-        ...
-
-class Pikachu(Piece):
-    def __init__(self):
-        ...
-
-    def is_captured(self) -> bool:
-        ...
-
-    def possible_moves(self) -> list:
-        ...
-
 class Tile:
     def __init__(self, x: int, y: int):
         self._x = x
