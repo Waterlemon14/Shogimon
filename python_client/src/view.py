@@ -1,5 +1,7 @@
 import pygame
-from project_types import (GameState, Movement, Piece, Player, MakeTurnObserver, NewGameObserver)
+
+from project_types import (GameState, Movement, Player, MakeTurnObserver, NewGameObserver)
+from model import Piece
 
 SCREEN_WIDTH = 720
 SCREEN_HEIGHT = 1280
