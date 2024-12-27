@@ -59,6 +59,10 @@ class Piece:
           self.col + dc == target.col
         )
     
+    # TO DO: Board Class
+    # TO DO: Board Setter
+    # TO DO: Piece Factory 
+    # TO DO: Bunch of methods for present classes
 
     """See project_types.py, movement classes above
 
