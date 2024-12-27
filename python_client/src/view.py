@@ -32,19 +32,13 @@ class Tile:
         self._y = y
         self._width = 64
         self._height = 64
-        self._occupant = None
+        self._occupant: Piece | None = None
 
     def mark_occupied(self, piece: Piece):
-        """
-        Set tile occupant to piece
-        """
-        ...
+        self._occupant = piece
 
     def mark_empty(self):
-        """
-        Set tile to empty
-        """
-        ...
+        self._occupant = None
 
     def render_to_screen(self, screen: pygame.Surface):
         """
