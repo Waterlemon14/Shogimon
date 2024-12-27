@@ -8,7 +8,7 @@ class GameModel:
         ...
 
     def __init__(self, state: GameState):
-        self._state = state
+        self.state = state
         ...
 
     def make_turn(self, turn: Movement):
