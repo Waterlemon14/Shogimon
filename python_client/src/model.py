@@ -105,7 +105,7 @@ class Piece:
     def possible_moves(self) -> list[Movement]:
         ..."""
 
-class Player():
+class Player:
     def __init__(self, number: PlayerNumber):
         self._number = number
         pass
