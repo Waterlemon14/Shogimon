@@ -24,7 +24,7 @@ class ProtectedPiece:
         self._tile = tile
     
     def is_immobile(self) -> bool:
-        ...
+        return self.possible_moves == []
 
     def possible_moves(self) -> list:
         ...
