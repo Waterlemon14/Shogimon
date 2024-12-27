@@ -76,4 +76,7 @@ class GameView:
         ...
 
     def run(self):
+        """
+        Actual Pygame logic for running
+        """
         ...
