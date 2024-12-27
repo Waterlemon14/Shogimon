@@ -17,7 +17,7 @@ import CS150241Project.Networking (Message)
 import Data.Int (toNumber, floor)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.List (List(..)) -- , (:), concat, length, snoc)
+import Data.List (List(..), index) -- , (:), concat, length, snoc)
 import Data.Array (replicate, (!!))
 import Data.Foldable (elem)
 import Effect (Effect)
@@ -27,7 +27,6 @@ import Graphics.Canvas as Canvas
 import Movements
   ( getPossibleMoves
   , accessCell
-  , accessCaptured
   )
 
 import ProjectTypes
@@ -133,15 +132,16 @@ onTick send gameState = do
     pieceConstructor :: Captured -> Piece
     pieceConstructor cp = {kind: cp.kind, position: {row: -1, col: -1}, image: cp.image, player: gameState.currentPlayer, isProtected: if cp.kind == Princess || cp.kind == Prince then true else false}
 
-    clicked_piece = if clicked_row == 8 || clicked_row == -1 
-      then 
-        if gameState.currentPlayer == One
-          then
-            map pieceConstructor (accessCaptured (clicked_col+1) gameState.playerOneCaptures)
-          else
-            map pieceConstructor (accessCaptured (clicked_col+1) gameState.playerTwoCaptures)
-      else 
-        accessCell clicked_col clicked_row gameState.board
+    pieceFinder :: Int -> Int -> PlayerNum -> Maybe Piece
+    pieceFinder col   8   One  = map pieceConstructor (index gameState.playerOneCaptures (col+1))
+    pieceFinder col (-1)  Two  = map pieceConstructor (index gameState.playerTwoCaptures (col+1))
+    pieceFinder col row   pnum = case accessCell col row gameState.board of 
+      Nothing -> Nothing
+      Just piece -> if piece.player == pnum
+        then Just piece
+        else Nothing
+
+    clicked_piece = pieceFinder clicked_col clicked_row gameState.currentPlayer
 
     -- Assigns state active piece to clicked piece
     updateActivePiece :: Maybe Piece -> GameState -> GameState
@@ -156,8 +156,7 @@ onTick send gameState = do
     updatePossibleMoves :: Maybe Piece -> GameState -> GameState
     updatePossibleMoves maybe_piece state = case maybe_piece of
       Nothing -> state { possibleMoves = Nil }
-      Just piece | piece.player /= gameState.currentPlayer -> state { possibleMoves = Nil }
-                 | otherwise -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player piece.isProtected}
+      Just piece -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player piece.isProtected (piece.position.col == (-1) && piece.position.row == (-1))}
     
     -- Update the board if a valid move is made (clicked cell is a possible move)
     makeMove :: GameState -> GameState
@@ -165,8 +164,8 @@ onTick send gameState = do
       then case state.activePiece of
         Nothing -> state
         Just activePiece -> if state.currentPlayer == One
-          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = captured_piece state.playerOneCaptures }
-          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = captured_piece state.playerTwoCaptures }
+          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = captured_pieces state.playerOneCaptures }
+          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = captured_pieces state.playerTwoCaptures }
           where next_player = if state.currentPlayer == One then Two else One
       else state
       where
@@ -177,8 +176,8 @@ onTick send gameState = do
             Just piece -> Just (piece { position = state.clickedCell })
           else state.activePiece
 
-        captured_piece :: List Captured -> List Captured
-        captured_piece captured = case accessCell state.clickedCell.col state.clickedCell.row state.board of
+        captured_pieces :: List Captured -> List Captured
+        captured_pieces captured = case accessCell state.clickedCell.col state.clickedCell.row state.board of
             Nothing -> captured
             Just piece -> addCaptured captured piece
         
@@ -265,7 +264,7 @@ onMouseDown send { x, y } gameState = do
     cell_col = floor $ (toNumber x - canvas_offset_x-cell_width) / cell_width
     cell_row = floor $ (toNumber y - canvas_offset_y-cell_height) / cell_height
 
-  send $ "Clicked Cell: " <> show cell_col <> "," <> show cell_row
+  send $ "Clicked Cell: col " <> show cell_col <> ", row " <> show cell_row
   pure gameState {clickedCell = {col: cell_col, row: cell_row}}
 
 -- Not sure if we will be using this? Didn't remove it first
