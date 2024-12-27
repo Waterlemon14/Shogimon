@@ -17,7 +17,7 @@ import CS150241Project.Networking (Message)
 import Data.Int (toNumber, floor)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), (:), concat)
+import Data.List (List(..), index, null) -- , (:), concat, length, snoc)
 import Data.Array (replicate, (!!))
 import Data.Foldable (elem)
 import Effect (Effect)
@@ -27,6 +27,7 @@ import Graphics.Canvas as Canvas
 import Movements
   ( getPossibleMoves
   , accessCell
+  , protectedPieceMovementCells
   )
 
 import ProjectTypes
@@ -37,6 +38,7 @@ import ProjectTypes
   , Piece
   , Captured
   , GameState
+  , Winner(..)
   )
 
 import Config
@@ -56,20 +58,24 @@ import Config
 
 
 createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
-createBishop col row player_num = Just {kind: Bishop, position: {col:col,row:row}, image: "pikachu.png", player: player_num, isProtected: false}
+createBishop col row One    = Just {kind: Bishop, position: {col:col,row:row},    image: "pikachu-original-cap.png", player: One, isProtected: false}
+createBishop col row Two    = Just {kind: Bishop, position: {col:col,row:row},    image: "pikachu-unova-cap.png", player: Two, isProtected: false}
 
 createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row One = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee.png", player: One, isProtected: false}
-createPawn col row Two = Just {kind: Pawn, position: {col:col,row:row}, image: "eevee-shiny.png", player: Two, isProtected: false}
+createPawn col row One      = Just {kind: Pawn, position: {col:col,row:row},      image: "eevee.png", player: One, isProtected: false}
+createPawn col row Two      = Just {kind: Pawn, position: {col:col,row:row},      image: "eevee-shiny.png", player: Two, isProtected: false}
 
 createRook :: Int -> Int -> PlayerNum -> Maybe Piece
-createRook col row player_num = Just {kind: Rook, position: {col:col,row:row}, image: "turtwig.png", player: player_num, isProtected: false}
+createRook col row One      = Just {kind: Rook, position: {col:col,row:row},      image: "turtwig.png", player: One, isProtected: false}
+createRook col row Two      = Just {kind: Rook, position: {col:col,row:row},      image: "turtwig-shiny.png", player: Two, isProtected: false}
 
 createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrince col row player_num = Just {kind: Prince, position: {col:col,row:row}, image: "latios.png", player: player_num, isProtected: true}
+createPrince col row One    = Just {kind: Prince, position: {col:col,row:row},    image: "latios.png", player: One, isProtected: true}
+createPrince col row Two    = Just {kind: Prince, position: {col:col,row:row},    image: "latios-shiny.png", player: Two, isProtected: true}
 
 createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrincess col row player_num = Just {kind: Princess, position: {col:col,row:row}, image: "latias.png", player: player_num, isProtected: true}
+createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  image: "latias.png", player: One, isProtected: true}
+createPrincess col row Two  = Just {kind: Princess, position: {col:col,row:row},  image: "latias-shiny.png", player: Two, isProtected: true}
 
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
@@ -105,6 +111,8 @@ initialState = do
   , activePiece: Nothing
   , playerOneCaptures : Nil
   , playerTwoCaptures : Nil
+  , winner : Nothing
+  , moveCount : 3
   }
 
 
@@ -125,7 +133,22 @@ onTick send gameState = do
     clicked_col = gameState.clickedCell.col
     clicked_row = gameState.clickedCell.row
 
-    clicked_piece = accessCell clicked_col clicked_row gameState.board
+    pieceConstructor :: Captured -> Maybe Piece
+    pieceConstructor cp 
+      | cp.kind == Bishop = createBishop  (-1) (-1) gameState.currentPlayer 
+      | cp.kind == Pawn   = createPawn    (-1) (-1) gameState.currentPlayer 
+      | otherwise         = createRook    (-1) (-1) gameState.currentPlayer 
+
+    pieceFinder :: Int -> Int -> PlayerNum -> Maybe Piece
+    pieceFinder col   8   One  = (flip bind) pieceConstructor (index gameState.playerOneCaptures (col+1))
+    pieceFinder col (-1)  Two  = (flip bind) pieceConstructor (index gameState.playerTwoCaptures (col+1))
+    pieceFinder col row   pnum = case accessCell col row gameState.board of 
+      Nothing -> Nothing
+      Just piece -> if piece.player == pnum
+        then Just piece
+        else Nothing
+
+    clicked_piece = pieceFinder clicked_col clicked_row gameState.currentPlayer
 
     -- Assigns state active piece to clicked piece
     updateActivePiece :: Maybe Piece -> GameState -> GameState
@@ -140,8 +163,7 @@ onTick send gameState = do
     updatePossibleMoves :: Maybe Piece -> GameState -> GameState
     updatePossibleMoves maybe_piece state = case maybe_piece of
       Nothing -> state { possibleMoves = Nil }
-      Just piece | piece.player /= gameState.currentPlayer -> state { possibleMoves = Nil }
-                 | otherwise -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player piece.isProtected}
+      Just piece -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player piece.isProtected (piece.position.col == (-1) && piece.position.row == (-1))}
     
     -- Update the board if a valid move is made (clicked cell is a possible move)
     makeMove :: GameState -> GameState
@@ -149,9 +171,18 @@ onTick send gameState = do
       then case state.activePiece of
         Nothing -> state
         Just activePiece -> if state.currentPlayer == One
-          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = concat (captured_piece : state.playerOneCaptures : Nil) }
-          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = concat (captured_piece : state.playerTwoCaptures : Nil) }
-          where next_player = if state.currentPlayer == One then Two else One
+          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = capturedPieces state.playerOneCaptures activePiece, moveCount = checker }
+          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = capturedPieces state.playerTwoCaptures activePiece, moveCount = checker }
+          where 
+            next_player = if state.moveCount == 1 
+              then if state.currentPlayer == One then Two else One
+              else state.currentPlayer
+
+            checker = if state.moveCount == 1 
+              then 3
+              else state.moveCount - 1
+
+
       else state
       where
         valid_move = elem state.clickedCell state.possibleMoves
@@ -160,12 +191,27 @@ onTick send gameState = do
             Nothing -> Nothing
             Just piece -> Just (piece { position = state.clickedCell })
           else state.activePiece
+
+        capturedPieces :: List Captured -> Piece -> List Captured
+        capturedPieces captured activePiece 
+          -- remove the placed piece from the list
+          | activePiece.position.row == -1 && activePiece.position.col == -1 = decrCount captured activePiece
+          -- adds the captured piece into the list if it exists
+          | otherwise = case accessCell state.clickedCell.col state.clickedCell.row state.board of
+            Nothing -> captured
+            Just piece -> addCaptured captured piece
+
+        decrCount :: List Captured -> Piece -> List Captured
+        decrCount Nil _ = Nil
+        decrCount (Cons h t) p 
+          | h.kind == p.kind = if h.count == 1 then t else (Cons (h { count = h.count - 1 }) t)
+          | otherwise = Cons h (decrCount t p)
+
         
-        captured_piece = if valid_move == true
-          then case accessCell state.clickedCell.col state.clickedCell.row state.board of
-            Nothing -> Nil
-            Just piece -> piece : Nil
-          else Nil
+        addCaptured :: List Captured -> Piece -> List Captured
+        addCaptured Nil piece = Cons { kind: piece.kind, count: 1, image: piece.image } Nil
+        addCaptured (Cons h t) piece | h.kind == piece.kind = Cons (h {count = h.count + 1}) t
+        addCaptured (Cons h t) piece | otherwise = Cons h (addCaptured t piece)
 
         -- Remove the piece from its original position
         removePiece :: Array (Maybe Piece) -> Array (Maybe Piece)
@@ -199,37 +245,33 @@ onTick send gameState = do
               | current_row == target_position.row = [addPiece (getBoardRow current_row board) target_position.col ] <> helper (current_row + 1)
               | current_row == piece_position.row = [removePiece (getBoardRow current_row board) ] <> helper (current_row + 1)
               | otherwise = [getBoardRow current_row board] <> helper (current_row + 1)
-    
-    updateCapturedPiece :: Maybe Piece -> GameState -> GameState
-    updateCapturedPiece Nothing state = state { activePiece = Nothing }
-    updateCapturedPiece (Just piece) state | state.currentPlayer == One = 
-      if (elem piece state.playerOneCaptures) 
-        then state { activePiece = Just piece } 
-        else state
-    updateCapturedPiece (Just piece) state | otherwise = 
-       if (elem piece state.playerTwoCaptures) 
-        then state { activePiece = Just piece } 
-        else state
 
-    showPieceKind :: Maybe Piece -> String
-    showPieceKind Nothing = "Nothing"
-    showPieceKind (Just piece) = show piece.kind
 
+    updateGameOver :: GameState -> GameState
+    updateGameOver state = if null (protectedPieceMovementCells 0 0 state.board One) 
+      then if null (protectedPieceMovementCells 0 0 state.board Two)
+        then state { winner = Just Draw }
+        else state { winner = Just Player2 } 
+      else if null (protectedPieceMovementCells 0 0 state.board Two) 
+        then state { winner = Just Player1 } 
+        else state
 
   if gameState.tickCount `mod` fps == 0 then do
-    send $ "Current Piece: " <> showPieceKind clicked_piece <> "\n" --<>
+    send $ "Current Piece: " <> show clicked_piece <> "\n" --<>
       --show gameState.currentPlayer <> "\n" <> 
       -- showBoard gameState.board --<> "\n" 
     else pure unit
 
-  pure $ gameState
-    # makeMove
-    # updateActivePiece clicked_piece
-    # updatePossibleMoves clicked_piece
-    # updateTickCount
-    -- # updateCapturedPiece clicked_piece
-
-
+  case gameState.winner of 
+    Nothing -> 
+      pure $ gameState
+        # makeMove
+        # updateActivePiece clicked_piece
+        # updatePossibleMoves clicked_piece
+        # updateTickCount
+        # updateGameOver
+    Just _ ->
+      pure gameState
 
 onMouseDown :: (String -> Effect Unit) -> { x :: Int, y :: Int } -> GameState -> Effect GameState
 onMouseDown send { x, y } gameState = do
@@ -240,14 +282,14 @@ onMouseDown send { x, y } gameState = do
     cell_col = floor $ (toNumber x - canvas_offset_x-cell_width) / cell_width
     cell_row = floor $ (toNumber y - canvas_offset_y-cell_height) / cell_height
 
-  send $ "Clicked Cell: " <> show cell_col <> "," <> show cell_row
+  send $ "Clicked Cell: col " <> show cell_col <> ", row " <> show cell_row
   pure gameState {clickedCell = {col: cell_col, row: cell_row}}
 
 -- Not sure if we will be using this? Didn't remove it first
 -- since I just buit on the demo
 onKeyDown :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
 onKeyDown send key gameState = do
-  send $ "I pressed " <> key
+  send $ "I pressed " <> key <> show gameState.playerOneCaptures
   pure gameState
 
 -- Not sure if we will be using this? Didn't remove it first
@@ -271,6 +313,8 @@ onRender images ctx gameState = do
     color = "black"
     font = "arial"
     size = 18
+    messageX = width / 2.0
+    messageY = width / 2.0
 
     -- Draws the board using board from GameState
     -- Iterates through all column-row pairs
@@ -305,41 +349,9 @@ onRender images ctx gameState = do
       drawMoves tail
     
     -- Draws the captured pieces on the border of the board
-    drawCaptured :: List Piece -> List Piece -> Effect Unit
+    drawCaptured :: List Captured -> List Captured -> Effect Unit
     drawCaptured playerOneCaptures playerTwoCaptures = do
       let
-        -- Given a list of captured pieces, it counts the number of pieces
-        -- per kind captured and returns as a List Captured.
-        countKinds :: List Piece -> List Captured -> List Captured
-        countKinds Nil captured_list = captured_list
-        countKinds (Cons piece piece_tail) captured_list = countKinds piece_tail updateCaptured
-          where
-            -- Checker function for if a piece of that kind
-            -- is already in the list of captured pieces
-            hasBeenCaptured :: List Captured -> Boolean
-            hasBeenCaptured Nil = false
-            hasBeenCaptured (Cons captured captured_tail) = if captured.kind == piece.kind then true else hasBeenCaptured captured_tail
-
-            -- Updates the list of captured pieces by adding it to the list if
-            -- that kind has not been captured yet, or incrementing the counter
-            -- for a piece that has already been captured
-            updateCaptured :: List Captured
-            updateCaptured = if in_captured == true
-              then map updateHelper captured_list
-              else { kind: piece.kind, count: 1, image: piece.image } : captured_list
-              where
-                in_captured = hasBeenCaptured captured_list
-
-                updateHelper :: Captured -> Captured
-                updateHelper captured = if piece.kind == captured.kind
-                  then captured { count = captured.count + 1 }
-                  else captured
-
-
-        player_one_kinds = countKinds playerOneCaptures Nil
-        player_two_kinds = countKinds playerTwoCaptures Nil
-
-        
         player_one_y_offset = (cell_height+1.0) * (1.0 + toNumber rows)
 
         -- Takes a list of captured pieces and draw them on the board
@@ -357,14 +369,18 @@ onRender images ctx gameState = do
           drawText ctx { x: (cell_width+1.0) * count + cell_width/2.0, y: y_offset + cell_height/1.25 + 15.0, color, font, size, text: show captured.count }
           drawKinds tail y_offset (count+1.0)
       
-      drawKinds player_one_kinds player_one_y_offset 0.0
-      drawKinds player_two_kinds 0.0 0.0
+      drawKinds playerOneCaptures player_one_y_offset 0.0
+      drawKinds playerTwoCaptures 0.0 0.0
       pure unit
 
 
   drawBoard 0 0
   drawMoves gameState.possibleMoves
   drawCaptured gameState.playerOneCaptures gameState.playerTwoCaptures
+
+  case gameState.winner of 
+    Nothing -> pure unit
+    Just winner -> drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Game Verdict: " <> show winner }
 
   -- This can be used to check messages received or to print something
   -- on the screen for debugging purposes
