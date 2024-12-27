@@ -28,9 +28,11 @@ class GameController:
 
     def on_make_turn(self, turn: Movement):
         self._model.make_turn(turn)
+        self._on_state_change(self._model.state)
 
     def on_new_game(self):
         self._model.new_game()
+        self._on_state_change(self._model.state)
 
     def _on_state_change(self, state: GameState):
         for observer in self._game_state_change_observers:
