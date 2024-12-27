@@ -60,6 +60,23 @@ class Piece:
         )
     
     # TO DO: Board Class
+class Board:
+    def __init__(self, height: int, width: int):
+        self._height = height
+        self._width = width
+        ...
+
+    def put(self, row: int, col: int, piece: Piece):
+        ...
+
+    def take(self, row: int, col: int) -> Piece | None:
+        ...
+
+    def is_valid_tile(self, row: int, col: int) -> bool:
+        # To fix
+        return row < self._height and col < self._width
+    
+    
     # TO DO: Board Setter
     # TO DO: Piece Factory 
     # TO DO: Bunch of methods for present classes
