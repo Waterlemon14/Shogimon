@@ -11,14 +11,22 @@ class Piece:
 
     def is_captured(self) -> bool:
         return self._is_captured
-    
-    def is_protected(self) -> bool:
-        return True if self._piece in (PieceKind.LATIAS) else False
 
     def possible_moves(self) -> list:
         """
         Returns list of possible moves given board state and list from get_movement_range()
         """
+        ...
+
+class ProtectedPiece:
+    def __init__(self, piece: PieceKind, tile: Tile):
+        self._piece = piece
+        self._tile = tile
+    
+    def is_immobile(self) -> bool:
+        ...
+
+    def possible_moves(self) -> list:
         ...
 
 class GameModel:
