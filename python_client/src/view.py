@@ -6,19 +6,47 @@ from model import Piece, ProtectedPiece
 SCREEN_WIDTH = 720
 SCREEN_HEIGHT = 1280
 
+class Captures:
+    """
+    To show captured pieces of each player
+    """
+    ...
+
 class Tile:
-    def __init__(self, x: int, y: int):
+    """
+    piece will be a link to an img
+
+    load img in pygame:
+    pygame.image.load("C:\\Users\\DELL\\Downloads\\gfg.png").convert()
+    """
+    def __init__(self, piece: str, x: int, y: int):
         self._x = x
         self._y = y
+        self._piece = piece
         self._width = 64
         self._height = 64
-        self._occupant: Piece | None = None
+        # self._occupant: Piece | None = None - don't need this na i think
 
-    def mark_occupied(self, piece: Piece):
-        self._occupant = piece
+    def mark_occupied(self, piece: str):
+        # smth load image
+        """
+        show img in tile
+        """
+        self._piece = piece
 
     def mark_empty(self):
-        self._occupant = None
+        """
+        remove img from tile
+        """
+        # smth load image
+        self._piece = ""
+
+    def mark_targeted(self, color: str):
+        """
+        when player is trying to move and has clicked a piece
+        mark red like purescript code
+        """
+        ...
 
     def render_to_screen(self, screen: pygame.Surface):
         """

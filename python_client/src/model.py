@@ -64,6 +64,7 @@ class Board:
     def __init__(self, height: int, width: int):
         self._height = height
         self._width = width
+        self._grid = [] # 2d array ????
         ...
 
     def put(self, row: int, col: int, piece: Piece):
@@ -83,7 +84,7 @@ class Board:
     # TO DO: Piece Factory, similar to:
     """
     class PieceFactory:
-    """Instantiates a Piece based on a PieceKind."""
+    Instantiates a Piece based on a PieceKind.
  
     @classmethod
     def make(self, piece_kind: PieceKind,
