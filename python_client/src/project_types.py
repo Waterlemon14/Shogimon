@@ -18,11 +18,9 @@ class PieceKind(StrEnum):
         returnable = "../../img/" + self.value
 
         if shiny:
-            returnable += "-shiny.png"
-        else:
-            returnable += ".png"
-
-        return returnable
+            return returnable + "-shiny.png"
+        
+        return returnable + ".png"
 
 class PlayerNumber(StrEnum):
     ONE = auto()
