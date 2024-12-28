@@ -1,7 +1,6 @@
 from typing import Self
 
 from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber, MovePossibilities, PiecePositions
-# from view import Tile
 
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
@@ -65,9 +64,9 @@ class Piece:
         To verifiy, from Lecture 15
         """
         return any(
-          True for dr, dc in self._movement.get_movement_range()
-          if self.row + dr == target.row and
-          self.col + dc == target.col
+            True for dr, dc in self._movement.get_movement_range()
+            if self.row + dr == target.row and
+            self.col + dc == target.col
         )
 
 class ProtectedPiece:
@@ -93,13 +92,13 @@ class ProtectedPiece:
         To verifiy, from Lecture 15
         """
         return any(
-          True for dr, dc in self._movement.get_movement_range()
-          if self.row + dr == target.row and
-          self.col + dc == target.col
+            True for dr, dc in self._movement.get_movement_range()
+            if self.row + dr == target.row and
+            self.col + dc == target.col
         )
     # TO DO: Board Class
-class Board:
 
+class Board:
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
