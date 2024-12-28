@@ -13,8 +13,16 @@ class PieceKind(StrEnum):
     LATIAS = auto()
     LATIOS = auto()
     TURTWIG = auto()
-    # SYLVEON = auto()
-    # UMBREON = auto()
+
+    def image_path(self, shiny: bool) -> str:
+        returnable = "../../img/" + self.value
+
+        if shiny:
+            returnable += "-shiny.png"
+        else:
+            returnable += ".png"
+
+        return returnable
 
 class PlayerNumber(StrEnum):
     ONE = auto()

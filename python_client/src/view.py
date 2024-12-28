@@ -69,16 +69,6 @@ class Tile:
         """
         ...
 
-    def _return_directory(self, piece: PieceKind, player: PlayerNumber) -> str:
-        returnable = "../../img/" + piece.value
-
-        if player == PlayerNumber.TWO:
-            returnable += "-shiny.png"
-        else:
-            returnable += ".png"
-
-        return returnable
-
 class GameView:
     def __init__(self):
         self._width = SCREEN_WIDTH
