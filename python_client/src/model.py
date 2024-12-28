@@ -101,11 +101,16 @@ class ProtectedPiece:
 
     # TO DO: Board Class
 class Board:
+
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
-        self._grid: list[list[Piece | None]] = [[None for _ in range(width)] for _ in range(height)]
+        self._pieces: list[Piece]
         ...
+
+    @property
+    def pieces(self) -> list[PieceKind]:
+        return [piece.kind for piece in self._pieces]
 
     def put(self, row: int, col: int, piece: Piece):
         ...
@@ -173,12 +178,14 @@ class Player:
 class GameModel:
     @classmethod
     def default(cls) -> Self:
+
+        board = Board(8, 8)
         state = GameState(
             player_number = PlayerNumber.ONE,
             active_player = PlayerNumber.ONE,
             is_still_playable=True,
             captured_pieces= {PlayerNumber.ONE: [], PlayerNumber.TWO: []},
-            board_pieces= [[]],
+            board_pieces= board.pieces,
             move_count=3
         )
 

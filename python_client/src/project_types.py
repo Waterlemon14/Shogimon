@@ -20,13 +20,17 @@ class PlayerNumber(StrEnum):
     ONE = auto()
     TWO = auto()
 
+class Tile:
+    row: int
+    col: int
+
 @dataclass(frozen=True)
 class GameState:
     player_number: PlayerNumber
     active_player: PlayerNumber
     is_still_playable: bool
     captured_pieces:  dict[PlayerNumber, list[PieceKind]]
-    board_pieces:     list[list[PieceKind]]
+    board_pieces:     dict[PlayerNumber, list[tuple[PieceKind, Tile]]]
     move_count: int
 
     # we probs need more methods
@@ -50,10 +54,6 @@ class MovePossibilities(Enum):
 class Movement(Protocol):    
     def get_movement_range(self) -> list[tuple[int, int]]:
         ...
-
-class Tile:
-    row: int
-    col: int
 
 class MakeTurnObserver(Protocol):
     """
