@@ -1,11 +1,17 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber
+from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber, MovePossibilities
 # from view import Tile
 
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        return [self.FORWARD]
+        returnable = []
+
+        for each in [MovePossibilities.FORWARD]:
+            # SOME LOGIC TO UNWRAP MOVEPOSSIBILITIES INTO EXPECTED DATA TYPE
+            ...
+        
+        return returnable
     
 class PikachuMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
@@ -19,13 +25,26 @@ class SylveonMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
         ...
 
+class CurrentPlayer:
+    """
+    Subfamily of protocol Player;
+    Get interactions from view
+    """
+    ...
+
+class Opponent:
+    """
+    Subfamily of protocol Player;
+    Get interactions from server (saka na natin problemahin)
+    """
+    ...
+
 class Piece:
-    def __init__(self, kind: PieceKind, tile: Tile, movement: Movement, protected: bool):
+    def __init__(self, kind: PieceKind, tile: Tile, movement: Movement):
         self._kind = kind
         self._tile = tile
         self._is_captured = False
         self._movement = movement
-        self._protected = protected
 
     @property
     def kind(self) -> PieceKind:
@@ -38,10 +57,6 @@ class Piece:
     @property
     def col(self) -> int:
         return self._tile.col
-    
-    @property
-    def protected(self) -> bool:
-        return self._protected
 
     @property
     def is_captured(self) -> bool:
@@ -142,7 +157,7 @@ class Board:
         
         ..."""
 
-"""class ProtectedPiece:
+class ProtectedPiece:
     def __init__(self, piece: PieceKind, tile: Tile):
         self._piece = piece
         self._tile = tile
@@ -154,7 +169,7 @@ class Board:
         ...
 
     def possible_moves(self) -> list[Movement]:
-        ..."""
+        ...
 
 class Player:
     def __init__(self, number: PlayerNumber):
