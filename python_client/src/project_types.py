@@ -20,6 +20,7 @@ class PlayerNumber(StrEnum):
     ONE = auto()
     TWO = auto()
 
+@dataclass(frozen=True)
 class Tile:
     row: int
     col: int

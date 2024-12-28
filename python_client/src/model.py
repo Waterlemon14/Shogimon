@@ -105,12 +105,7 @@ class Board:
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
-        self._pieces: list[Piece]
         ...
-
-    @property
-    def pieces(self) -> list[PieceKind]:
-        return [piece.kind for piece in self._pieces]
 
     def put(self, row: int, col: int, piece: Piece):
         ...
@@ -150,12 +145,19 @@ class PieceFactory:
             case PieceKind.LATIAS:
                 movement = LatiasMovement()
                 return ProtectedPiece(piece_kind, tile, movement)
- 
 
 class Player:
-    def __init__(self, number: PlayerNumber):
-        self._number = number
+    def __init__(self, number: PlayerNumber, deployed_pieces: list[Piece | ProtectedPiece], captured_pieces: list[Piece | ProtectedPiece]):
+        self._number: PlayerNumber = number
+        self._deployed_pieces: list[Piece | ProtectedPiece] = deployed_pieces
+        self._captured_pieces: list[Piece | ProtectedPiece] = captured_pieces
         pass
+
+    def get_deployed_pieces(self) -> list[tuple[PieceKind, Tile]]:
+        return [(piece.kind, Tile(piece.row, piece.col)) for piece in self._deployed_pieces]
+
+    def get_captured_pieces(self) -> list[PieceKind]:
+        return [piece.kind for piece in self._captured_pieces]
 
     def make_turn(self):
         """
@@ -180,19 +182,22 @@ class GameModel:
     def default(cls) -> Self:
 
         board = Board(8, 8)
+        player1 = Player(PlayerNumber.ONE, [], [])
+        player2 = Player(PlayerNumber.TWO, [], [])
+
         state = GameState(
             player_number = PlayerNumber.ONE,
             active_player = PlayerNumber.ONE,
             is_still_playable=True,
             captured_pieces= {PlayerNumber.ONE: [], PlayerNumber.TWO: []},
-            board_pieces= board.pieces,
+            board_pieces= board.get_pieces(),
             move_count=3
         )
 
         return cls(state)
 
 
-    def __init__(self, state: GameState):
+    def __init__(self, state: GameState, board: Board, player1: Player, player2: Player):
         self.state = state
         
         ...
