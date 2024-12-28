@@ -21,17 +21,22 @@ class PlayerNumber(StrEnum):
     TWO = auto()
 
 @dataclass(frozen=True)
-class Tile:
+class Location:
     row: int
     col: int
+
+@dataclass(frozen=True)
+class LivePiece:
+    piecekind: PieceKind
+    tile: Location
 
 @dataclass(frozen=True)
 class GameState:
     player_number: PlayerNumber
     active_player: PlayerNumber
     is_still_playable: bool
-    captured_pieces:  dict[PlayerNumber, list[PieceKind]]
-    board_pieces:     dict[PlayerNumber, list[tuple[PieceKind, Tile]]]
+    captured_pieces: dict[PlayerNumber, list[PieceKind]]
+    board_pieces: dict[PlayerNumber, list[LivePiece]]
     move_count: int
 
     # we probs need more methods
@@ -57,7 +62,7 @@ class Movement(Protocol):
         ...
 
 class PiecePositions(Protocol):
-    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Tile]]:
+    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
         ...
 
 class MakeTurnObserver(Protocol):
