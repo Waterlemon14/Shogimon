@@ -15,12 +15,10 @@ class PieceKind(StrEnum):
     TURTWIG = auto()
 
     def image_path(self, shiny: bool) -> str:
-        returnable = "../../img/" + self.value
-
         if shiny:
-            return returnable + "-shiny.png"
+            return "../../img/" + self.value + "-shiny.png"
         
-        return returnable + ".png"
+        return "../../img/" + self.value + ".png"
     
 class ActionType(StrEnum):
     MOVE = auto()
