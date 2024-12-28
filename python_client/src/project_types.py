@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Protocol
-from enum import StrEnum, auto
+from enum import Enum, StrEnum, auto
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
@@ -23,17 +23,22 @@ class PlayerNumber(StrEnum):
 class GameState():
     ...
 
-class Movement(Protocol):
+class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
     FORWARD_DIAGONALS = [(-1, -1), (-1, +1)]
- 
-    ORTHOGONALS = [(dr, dc) for dr in {-1, 0 +1}
-                   for dc in {-1, 0 +1}
-                   if 0 in {dr, dc}]
- 
-    DIAGONALS = [(dr, dc) for dr in {-1, +1}
-                 for dc in {-1, +1}]
-    
+    ORTHOGONALS = [
+        (dr, dc)
+        for dr in {-1, 0 +1}
+        for dc in {-1, 0 +1}
+        if 0 in {dr, dc}
+    ]
+    DIAGONALS = [
+        (dr, dc)
+        for dr in {-1, +1}
+        for dc in {-1, +1}
+    ]
+
+class Movement(Protocol):    
     def get_movement_range(self) -> list:
         ...
 
