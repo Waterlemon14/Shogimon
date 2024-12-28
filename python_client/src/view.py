@@ -5,6 +5,7 @@ from model import Piece
 
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
+TILE_SIZE = 64
 
 class Captures:
     """
@@ -37,25 +38,23 @@ class Tile:
     load img in pygame:
     pygame.image.load("C:\\Users\\DELL\\Downloads\\gfg.png").convert()
     """
-    def __init__(self, piecekind: PieceKind, x: int, y: int):
+    def __init__(self, kind: PieceKind, x: int, y: int):
         self._x = x
         self._y = y
-        self._piecekind: PieceKind | None = piecekind
-        self._width = 64
-        self._height = 64
+        self._width = TILE_SIZE
+        self._height = TILE_SIZE
+        self._occupier: PieceKind | None = kind
         self._targetable = False
 
-    def mark_occupied(self, piecekind: PieceKind):
-        """
-        show img in tile
-        """
-        self._piecekind = piecekind
+    @property
+    def occupier(self) -> PieceKind | None:
+        return self._occupier
+
+    def mark_occupied(self, kind: PieceKind):
+        self._occupier = kind
 
     def mark_empty(self):
-        """
-        remove img from tile
-        """
-        self._piecekind = None
+        self._occupier = None
 
     def mark_targetable(self):
         self._targetable = True
@@ -64,9 +63,11 @@ class Tile:
         self._targetable = False
 
     def render_to_screen(self, screen: pygame.Surface):
-        """
-        Render to screen --- take screen from GameView
-        """
+        ...
+        
+        if self._occupier is None:
+            ...
+
         ...
 
 class GameView:
