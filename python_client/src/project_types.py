@@ -27,8 +27,14 @@ class Location:
 
 @dataclass(frozen=True)
 class LivePiece:
-    piecekind: PieceKind
+    piece_kind: PieceKind
     tile: Location
+
+@dataclass(frozen=True)
+class PlayerTurn:
+    player_number: PlayerNumber
+    piece_kind: PieceKind
+    location: Location
 
 @dataclass(frozen=True)
 class GameState:
