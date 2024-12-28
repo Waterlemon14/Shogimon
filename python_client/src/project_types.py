@@ -21,8 +21,15 @@ class PlayerNumber(StrEnum):
     TWO = auto()
 
 @dataclass(frozen=True)
-class GameState():
-    ...
+class GameState:
+    player_number: PlayerNumber
+    active_player: PlayerNumber
+    is_still_playable: bool
+    captured_pieces:  dict[PlayerNumber, list[PieceKind]]
+    board_pieces:     list[list[PieceKind]]
+    move_count: int
+
+    # we probs need more methods
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]

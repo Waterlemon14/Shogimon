@@ -173,15 +173,20 @@ class Player:
 class GameModel:
     @classmethod
     def default(cls) -> Self:
-        ...
+        state = GameState(
+            player_number = PlayerNumber.ONE,
+            active_player = PlayerNumber.ONE,
+            is_still_playable=True,
+            captured_pieces= {PlayerNumber.ONE: [], PlayerNumber.TWO: []},
+            board_pieces= [[]],
+            move_count=3
+        )
+
+        return cls(state)
+
 
     def __init__(self, state: GameState):
         self.state = state
-        # create pieces from factory
-        # eg. eevee = Piece(...)
-        # set board
-        # eg, board = Board(8,8)
-        # board.put(.....)
         
         ...
 
