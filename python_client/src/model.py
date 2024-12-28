@@ -1,6 +1,6 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber, MovePossibilities, PiecePositions
+from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece
 
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
@@ -37,9 +37,9 @@ class Opponent:
     ...
 
 class Piece:
-    def __init__(self, kind: PieceKind, tile: Tile, movement: Movement):
+    def __init__(self, kind: PieceKind, location: Location, movement: Movement):
         self._kind = kind
-        self._tile = tile
+        self._location = location
         self._is_captured = False
         self._movement = movement
 
@@ -49,17 +49,17 @@ class Piece:
     
     @property
     def row(self) -> int:
-        return self._tile.row
+        return self._location.row
     
     @property
     def col(self) -> int:
-        return self._tile.col
+        return self._location.col
 
     @property
     def is_captured(self) -> bool:
         return self._is_captured
 
-    def can_move(self, target: Tile) -> bool:
+    def can_move(self, target: Location) -> bool:
         """
         To verifiy, from Lecture 15
         """
@@ -70,9 +70,9 @@ class Piece:
         )
 
 class ProtectedPiece:
-    def __init__(self, kind: PieceKind, tile: Tile, movement: Movement):
+    def __init__(self, kind: PieceKind, location: Location, movement: Movement):
         self._kind = kind
-        self._tile = tile
+        self._location = location
         self._movement = movement
     
     @property
@@ -81,13 +81,13 @@ class ProtectedPiece:
     
     @property
     def row(self) -> int:
-        return self._tile.row
+        return self._location.row
     
     @property
     def col(self) -> int:
-        return self._tile.col
+        return self._location.col
 
-    def can_move(self, target: Tile) -> bool:
+    def can_move(self, target: Location) -> bool:
         """
         To verifiy, from Lecture 15
         """
@@ -111,7 +111,7 @@ class Board:
     def take(self, row: int, col: int) -> Piece | None:
         ...
 
-    def is_valid_tile(self, row: int, col: int) -> bool:
+    def is_valid_location(self, row: int, col: int) -> bool:
         # To fix
         return row < self._height and col < self._width
     
@@ -122,8 +122,8 @@ class Player:
         self._captured_pieces: list[Piece | ProtectedPiece] = captured_pieces
         pass
 
-    def get_deployed_pieces(self) -> list[tuple[PieceKind, Tile]]:
-        return [(piece.kind, Tile(piece.row, piece.col)) for piece in self._deployed_pieces]
+    def get_deployed_pieces(self) -> list[LivePiece]:
+        return [LivePiece(piece.kind, Location(piece.row, piece.col)) for piece in self._deployed_pieces]
 
     def get_captured_pieces(self) -> list[PieceKind]:
         return [piece.kind for piece in self._captured_pieces]
@@ -149,60 +149,60 @@ class PieceFactory:
 
     @classmethod
     def make(cls, piece_kind: PieceKind,
-             tile: Tile) -> Piece | ProtectedPiece:
+             location: Location) -> Piece | ProtectedPiece:
         match piece_kind:
             case PieceKind.EEVEE:
                 movement = EeveeMovement()
-                return Piece(piece_kind, tile, movement)
+                return Piece(piece_kind, location, movement)
  
             case PieceKind.PIKACHU:
                 movement = PikachuMovement()
-                return Piece(piece_kind, tile, movement)
+                return Piece(piece_kind, location, movement)
  
             case PieceKind.TURTWIG:
                 movement = TurtwigMovement()
-                return Piece(piece_kind, tile, movement)
+                return Piece(piece_kind, location, movement)
  
             case PieceKind.LATIOS:
                 movement = LatiosMovement()
-                return ProtectedPiece(piece_kind, tile, movement)
+                return ProtectedPiece(piece_kind, location, movement)
  
             case PieceKind.LATIAS:
                 movement = LatiasMovement()
-                return ProtectedPiece(piece_kind, tile, movement)
+                return ProtectedPiece(piece_kind, location, movement)
 
 class PlayerTwoPositions:
-    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Tile]]:
+    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
 
         positions = [
-            (PlayerNumber.TWO, PieceKind.TURTWIG, Tile(0, 0)),
-            (PlayerNumber.TWO, PieceKind.PIKACHU, Tile(0, 1)),
-            (PlayerNumber.TWO, PieceKind.LATIOS, Tile(0, 3)),
-            (PlayerNumber.TWO, PieceKind.LATIAS, Tile(0, 4)),
-            (PlayerNumber.TWO, PieceKind.PIKACHU, Tile(0, 6)),
-            (PlayerNumber.TWO, PieceKind.TURTWIG, Tile(0, 7)),
+            (PlayerNumber.TWO, PieceKind.TURTWIG, Location(0, 0)),
+            (PlayerNumber.TWO, PieceKind.PIKACHU, Location(0, 1)),
+            (PlayerNumber.TWO, PieceKind.LATIOS, Location(0, 3)),
+            (PlayerNumber.TWO, PieceKind.LATIAS, Location(0, 4)),
+            (PlayerNumber.TWO, PieceKind.PIKACHU, Location(0, 6)),
+            (PlayerNumber.TWO, PieceKind.TURTWIG, Location(0, 7)),
         ]
 
         positions += [
-            (PlayerNumber.TWO, PieceKind.EEVEE, Tile(1, n)) for n in range(8)
+            (PlayerNumber.TWO, PieceKind.EEVEE, Location(1, n)) for n in range(8)
         ]
 
         return positions
 
 class PlayerOnePositions:
-    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Tile]]:
+    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
 
         positions = [
-            (PlayerNumber.ONE, PieceKind.TURTWIG, Tile(7, 0)),
-            (PlayerNumber.ONE, PieceKind.PIKACHU, Tile(7, 1)),
-            (PlayerNumber.ONE, PieceKind.LATIOS, Tile(7, 3)),
-            (PlayerNumber.ONE, PieceKind.LATIAS, Tile(7, 4)),
-            (PlayerNumber.ONE, PieceKind.PIKACHU, Tile(7, 6)),
-            (PlayerNumber.ONE, PieceKind.TURTWIG, Tile(7, 7)),
+            (PlayerNumber.ONE, PieceKind.TURTWIG, Location(7, 0)),
+            (PlayerNumber.ONE, PieceKind.PIKACHU, Location(7, 1)),
+            (PlayerNumber.ONE, PieceKind.LATIOS, Location(7, 3)),
+            (PlayerNumber.ONE, PieceKind.LATIAS, Location(7, 4)),
+            (PlayerNumber.ONE, PieceKind.PIKACHU, Location(7, 6)),
+            (PlayerNumber.ONE, PieceKind.TURTWIG, Location(7, 7)),
         ]
 
         positions += [
-            (PlayerNumber.ONE, PieceKind.EEVEE, Tile(6, n)) for n in range(8)
+            (PlayerNumber.ONE, PieceKind.EEVEE, Location(6, n)) for n in range(8)
         ]
 
         return positions
@@ -215,9 +215,9 @@ class BoardSetter:
         player1: list[Piece | ProtectedPiece] = []
         player2: list[Piece | ProtectedPiece] = []
 
-        for player, kind, tile in self._positions:
-            piece = PieceFactory.make(kind, tile)
-            board.put(tile.row, tile.col, piece)
+        for player, kind, location in self._positions:
+            piece = PieceFactory.make(kind, location)
+            board.put(location.row, location.col, piece)
 
             if player == PlayerNumber.ONE:
                 player1.append(piece)
