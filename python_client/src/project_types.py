@@ -11,9 +11,10 @@ class PieceKind(StrEnum):
     EEVEE = auto()
     PIKACHU = auto()
     LATIAS = auto()
+    LATIOS = auto()
     TURTWIG = auto()
-    SYLVEON = auto()
-    UMBREON = auto()
+    # SYLVEON = auto()
+    # UMBREON = auto()
 
 class PlayerNumber(StrEnum):
     ONE = auto()
