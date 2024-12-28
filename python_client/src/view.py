@@ -1,10 +1,10 @@
 import pygame
 
-from project_types import (GameState, Movement, MakeTurnObserver, NewGameObserver)
+from project_types import (PieceKind, GameState, Movement, MakeTurnObserver, NewGameObserver)
 from model import Piece
 
-SCREEN_WIDTH = 720
-SCREEN_HEIGHT = 1280
+SCREEN_WIDTH = 700
+SCREEN_HEIGHT = 700
 
 class Captures:
     """
@@ -19,27 +19,24 @@ class Tile:
     load img in pygame:
     pygame.image.load("C:\\Users\\DELL\\Downloads\\gfg.png").convert()
     """
-    def __init__(self, piece: str, x: int, y: int):
+    def __init__(self, piecekind: PieceKind, x: int, y: int):
         self._x = x
         self._y = y
-        self._piece = piece
+        self._piecekind: PieceKind | None = piecekind
         self._width = 64
         self._height = 64
-        # self._occupant: Piece | None = None - don't need this na i think
 
-    def mark_occupied(self, piece: str):
-        # smth load image
+    def mark_occupied(self, piecekind: PieceKind):
         """
         show img in tile
         """
-        self._piece = piece
+        self._piecekind = piecekind
 
     def mark_empty(self):
         """
         remove img from tile
         """
-        # smth load image
-        self._piece = ""
+        self._piecekind = None
 
     def mark_targeted(self, color: str):
         """
@@ -53,6 +50,13 @@ class Tile:
         Render to screen --- take screen from GameView
         """
         ...
+
+    def _return_directory(self, piece: PieceKind):
+        match piece:
+            case PieceKind.EEVEE:
+                return "img/eevee.png"
+            case PieceKind.SYLVEON:
+                ...
 
 class GameView:
     def __init__(self):
