@@ -1,6 +1,6 @@
 import pygame
 
-from project_types import (PieceKind, GameState, Movement, MakeTurnObserver, NewGameObserver, PlayerNumber)
+from project_types import (PieceKind, Location, GameState, Movement, MakeTurnObserver, NewGameObserver, PlayerNumber)
 from model import Piece
 
 SCREEN_WIDTH = 700
@@ -38,9 +38,8 @@ class Tile:
     load img in pygame:
     pygame.image.load("C:\\Users\\DELL\\Downloads\\gfg.png").convert()
     """
-    def __init__(self, kind: PieceKind, x: int, y: int):
-        self._x = x
-        self._y = y
+    def __init__(self, kind: PieceKind, location: Location):
+        self._location = location
         self._width = TILE_SIZE
         self._height = TILE_SIZE
         self._occupier: PieceKind | None = kind
