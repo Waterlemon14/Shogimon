@@ -1,6 +1,6 @@
 import pygame
 
-from project_types import (PieceKind, GameState, Movement, MakeTurnObserver, NewGameObserver)
+from project_types import (PieceKind, GameState, Movement, MakeTurnObserver, NewGameObserver, PlayerNumber)
 from model import Piece
 
 SCREEN_WIDTH = 700
@@ -51,12 +51,15 @@ class Tile:
         """
         ...
 
-    def _return_directory(self, piece: PieceKind):
-        match piece:
-            case PieceKind.EEVEE:
-                return "img/eevee.png"
-            case PieceKind.SYLVEON:
-                ...
+    def _return_directory(self, piece: PieceKind, player: PlayerNumber) -> str:
+        returnable = "../../img/" + piece.value
+
+        if player == PlayerNumber.TWO:
+            returnable += "-shiny.png"
+        else:
+            returnable += ".png"
+
+        return returnable
 
 class GameView:
     def __init__(self):
