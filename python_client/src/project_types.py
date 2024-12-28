@@ -21,6 +21,10 @@ class PieceKind(StrEnum):
             return returnable + "-shiny.png"
         
         return returnable + ".png"
+    
+class ActionType(StrEnum):
+    MOVE = auto()
+    DROP = auto()
 
 class PlayerNumber(StrEnum):
     ONE = auto()
@@ -37,7 +41,8 @@ class LivePiece:
     tile: Location
 
 @dataclass(frozen=True)
-class PlayerTurn:
+class PlayerAction:
+    action_type: ActionType
     player_number: PlayerNumber
     piece_kind: PieceKind
     location: Location
