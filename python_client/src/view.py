@@ -43,6 +43,7 @@ class Tile:
         self._piecekind: PieceKind | None = piecekind
         self._width = 64
         self._height = 64
+        self._targetable = False
 
     def mark_occupied(self, piecekind: PieceKind):
         """
@@ -56,12 +57,11 @@ class Tile:
         """
         self._piecekind = None
 
-    def mark_targeted(self, color: str):
-        """
-        when player is trying to move and has clicked a piece
-        mark red like purescript code
-        """
-        ...
+    def mark_targetable(self):
+        self._targetable = True
+
+    def unmark_targetable(self):
+        self._targetable = False
 
     def render_to_screen(self, screen: pygame.Surface):
         """
