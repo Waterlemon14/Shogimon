@@ -5,25 +5,23 @@ from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber, Mo
 
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        returnable = []
-
-        for each in [MovePossibilities.FORWARD]:
-            # SOME LOGIC TO UNWRAP MOVEPOSSIBILITIES INTO EXPECTED DATA TYPE
-            ...
-        
-        return returnable
+        return MovePossibilities.FORWARD.value
     
 class PikachuMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        ...
+        return MovePossibilities.DIAGONALS.value
 
 class TurtwigMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        ...
+        return MovePossibilities.ORTHOGONALS.value
 
-class SylveonMovement(Movement):
+class Latios(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
-        ...
+        return MovePossibilities.SINGLE_ORTHOGONALS.value
+    
+class Latias(Movement):
+    def get_movement_range(self) -> list[tuple[int, int]]:
+        return MovePossibilities.SINGLE_ORTHOGONALS.value
 
 class CurrentPlayer:
     """

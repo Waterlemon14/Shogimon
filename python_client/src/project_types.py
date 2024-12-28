@@ -25,7 +25,6 @@ class GameState():
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
-    FORWARD_DIAGONALS = [(-1, -1), (-1, +1)]
     ORTHOGONALS = [
         (dr, dc)
         for dr in {-1, 0 +1}
@@ -37,9 +36,11 @@ class MovePossibilities(Enum):
         for dr in {-1, +1}
         for dc in {-1, +1}
     ]
+    SINGLE_DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
+    SINGLE_ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
 
 class Movement(Protocol):    
-    def get_movement_range(self) -> list:
+    def get_movement_range(self) -> list[tuple[int, int]]:
         ...
 
 class Tile:
