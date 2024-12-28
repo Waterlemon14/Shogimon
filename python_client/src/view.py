@@ -94,10 +94,10 @@ class GameView:
         """
         ...
 
-    def render_all(self):
-        """
-        Render all game components
-        """
+    def _render_board(self):
+        ...
+
+    def _render_captures(self):
         ...
 
     def run(self):
@@ -117,6 +117,11 @@ class GameView:
                     ...
 
             self._screen.fill('#FFFFFF')
+
+            ...
+
+            self._render_board()
+            self._render_captures()
 
             ...
 
