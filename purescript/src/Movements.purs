@@ -9,7 +9,7 @@ module Movements
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), (:), concat, union)
+import Data.List (List(..), (:), concat)
 import Data.Array (index)
 import Data.Foldable (notElem)
 
@@ -30,6 +30,7 @@ class Movement a where
   getPossibleMoves :: a -> Board -> Position -> PlayerNum -> Boolean -> Boolean -> List Position
 
 -- Define getPossibleMoves of the new kind added here
+-- Inputs: Kind, Board, Piece Position, Owner of Piece, isPieceProtected, isPieceCaptured
 instance Movement Kind where
   getPossibleMoves _ board _ _ _ true = getFreeCells board 0 0
 
@@ -96,9 +97,9 @@ moveSearcher {col, row} board player colMove rowMove limit isProtected =
     Just piece -> case isProtected of 
 
       true -> Nil
-      false -> case piece.player /= player of 
+      false -> case piece.player /= player of
 
-        true -> if piece.isProtected then Nil else {col, row} : Nil
+        true -> if piece.isProtected then Nil else {col, row} : Nil     -- meaning piece in cell cannot be eaten
         false -> Nil
 
 getFreeCells :: Board -> Int -> Int -> List Position
@@ -106,22 +107,24 @@ getFreeCells board col row
   | row >= rows = Nil  -- Base case
   | col >= columns = getFreeCells board 0 (row+1) -- Once whole row searched, search next row
   | otherwise = case accessCell col row board of
-    Nothing     -> if notElem {col, row} invalidCells
+    Nothing     -> if notElem {col: col, row: row} invalidCells
       then {col, row} : getFreeCells board (col+1) row
       else getFreeCells board (col+1) row
     Just _  -> getFreeCells board (col+1) row
 
     where 
-      invalidCells = union (protectedPieceMovementCells 0 0 board One) (protectedPieceMovementCells 0 0 board Two)
+      invalidCells = concat $ (protectedPieceMovementCells 0 0 board One) : (protectedPieceMovementCells 0 0 board Two) : Nil
 
 
 protectedPieceMovementCells :: Int -> Int -> Board -> PlayerNum -> List Position
-protectedPieceMovementCells c r board pnum
-        | r >= rows = Nil  -- Base case
-        | c >= columns = protectedPieceMovementCells 0 (r+1) board pnum -- Once whole row searched, search next row
+protectedPieceMovementCells c r board player
+        | r >= rows = Nil                                                 -- Base case
+        | c >= columns = protectedPieceMovementCells 0 (r+1) board player -- Once whole row searched, search next row
         | otherwise = case accessCell c r board of 
-          Nothing -> protectedPieceMovementCells (c+1) r board pnum
-          Just piece -> if piece.isProtected && piece.player == pnum
-            then getPossibleMoves piece.kind board piece.position piece.player piece.isProtected false
-            else protectedPieceMovementCells (c+1) r board pnum
+          Nothing -> protectedPieceMovementCells (c+1) r board player
+          Just piece -> if piece.isProtected && piece.player == player
+            then concat $ getPossibleMoves piece.kind board piece.position piece.player piece.isProtected false 
+                        : protectedPieceMovementCells (c+1) r board player 
+                        : Nil
+            else protectedPieceMovementCells (c+1) r board player
 

@@ -17,7 +17,7 @@ import CS150241Project.Networking (Message)
 import Data.Int (toNumber, floor)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), index, null) -- , (:), concat, length, snoc)
+import Data.List (List(..), index, null, concat, (:)) -- , (:), concat, length, snoc)
 import Data.Array (replicate, (!!))
 import Data.Foldable (elem)
 import Effect (Effect)
@@ -58,20 +58,20 @@ import Config
 
 
 createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
-createBishop col row One    = Just {kind: Bishop, position: {col:col,row:row},    image: "pikachu-original-cap.png", player: One, isProtected: false}
-createBishop col row Two    = Just {kind: Bishop, position: {col:col,row:row},    image: "pikachu-unova-cap.png", player: Two, isProtected: false}
+createBishop col row One    = Just {kind: Bishop,   position: {col:col,row:row},  image: "pikachu.png", player: One, isProtected: false}
+createBishop col row Two    = Just {kind: Bishop,   position: {col:col,row:row},  image: "pikachu-shiny.png", player: Two, isProtected: false}
 
 createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row One      = Just {kind: Pawn, position: {col:col,row:row},      image: "eevee.png", player: One, isProtected: false}
-createPawn col row Two      = Just {kind: Pawn, position: {col:col,row:row},      image: "eevee-shiny.png", player: Two, isProtected: false}
+createPawn col row One      = Just {kind: Pawn,     position: {col:col,row:row},  image: "eevee.png", player: One, isProtected: false}
+createPawn col row Two      = Just {kind: Pawn,     position: {col:col,row:row},  image: "eevee-shiny.png", player: Two, isProtected: false}
 
 createRook :: Int -> Int -> PlayerNum -> Maybe Piece
-createRook col row One      = Just {kind: Rook, position: {col:col,row:row},      image: "turtwig.png", player: One, isProtected: false}
-createRook col row Two      = Just {kind: Rook, position: {col:col,row:row},      image: "turtwig-shiny.png", player: Two, isProtected: false}
+createRook col row One      = Just {kind: Rook,     position: {col:col,row:row},  image: "turtwig.png", player: One, isProtected: false}
+createRook col row Two      = Just {kind: Rook,     position: {col:col,row:row},  image: "turtwig-shiny.png", player: Two, isProtected: false}
 
 createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrince col row One    = Just {kind: Prince, position: {col:col,row:row},    image: "latios.png", player: One, isProtected: true}
-createPrince col row Two    = Just {kind: Prince, position: {col:col,row:row},    image: "latios-shiny.png", player: Two, isProtected: true}
+createPrince col row One    = Just {kind: Prince,   position: {col:col,row:row},  image: "latios.png", player: One, isProtected: true}
+createPrince col row Two    = Just {kind: Prince,   position: {col:col,row:row},  image: "latios-shiny.png", player: Two, isProtected: true}
 
 createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
 createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  image: "latias.png", player: One, isProtected: true}
@@ -139,14 +139,16 @@ onTick send gameState = do
       | cp.kind == Pawn   = createPawn    (-1) (-1) gameState.currentPlayer 
       | otherwise         = createRook    (-1) (-1) gameState.currentPlayer 
 
+    -- Finds currently clicked piece
     pieceFinder :: Int -> Int -> PlayerNum -> Maybe Piece
-    pieceFinder col   8   One  = (flip bind) pieceConstructor (index gameState.playerOneCaptures (col+1))
-    pieceFinder col (-1)  Two  = (flip bind) pieceConstructor (index gameState.playerTwoCaptures (col+1))
-    pieceFinder col row   pnum = case accessCell col row gameState.board of 
-      Nothing -> Nothing
-      Just piece -> if piece.player == pnum
-        then Just piece
-        else Nothing
+    pieceFinder col row player
+      | row == 8    && player == One = (flip bind) pieceConstructor (index gameState.playerOneCaptures (col+1))
+      | row == (-1) && player == Two = (flip bind) pieceConstructor (index gameState.playerTwoCaptures (col+1))
+      | otherwise                    = case accessCell col row gameState.board of 
+                                        Nothing -> Nothing
+                                        Just piece -> if piece.player == player
+                                          then Just piece
+                                          else Nothing
 
     clicked_piece = pieceFinder clicked_col clicked_row gameState.currentPlayer
 
@@ -256,11 +258,15 @@ onTick send gameState = do
         then state { winner = Just Player1 } 
         else state
 
-  if gameState.tickCount `mod` fps == 0 then do
-    send $ "Current Piece: " <> show clicked_piece <> "\n" --<>
-      --show gameState.currentPlayer <> "\n" <> 
-      -- showBoard gameState.board --<> "\n" 
-    else pure unit
+    -- mapper :: List Position -> String
+    -- mapper Nil str = str
+    -- mapper (Cons h t) str =  mapper t (str <> show h)
+
+  -- if gameState.tickCount `mod` fps == 0 then do
+  --   send $ show (concat $ (protectedPieceMovementCells 0 0 gameState.board One) : (protectedPieceMovementCells 0 0 gameState.board Two) : Nil) <> "\n" --<>
+  --     --show gameState.currentPlayer <> "\n" <> 
+  --     -- showBoard gameState.board --<> "\n" 
+  --   else pure unit
 
   case gameState.winner of 
     Nothing -> 
@@ -282,7 +288,7 @@ onMouseDown send { x, y } gameState = do
     cell_col = floor $ (toNumber x - canvas_offset_x-cell_width) / cell_width
     cell_row = floor $ (toNumber y - canvas_offset_y-cell_height) / cell_height
 
-  send $ "Clicked Cell: col " <> show cell_col <> ", row " <> show cell_row
+  -- send $ "Clicked Cell: col " <> show cell_col <> ", row " <> show cell_row
   pure gameState {clickedCell = {col: cell_col, row: cell_row}}
 
 -- Not sure if we will be using this? Didn't remove it first

@@ -69,9 +69,9 @@ fps = 60
 
 
 images :: Array String
-images =  [ "eevee.png", "eevee-shiny.png", 
-            "pikachu-original-cap.png", "pikachu-unova-cap.png", 
-            "turtwig.png", "turtwig-shiny.png",
-            "latios.png", "latios-shiny.png",
-            "latias.png", "latias-shiny.png"
+images =  [ "eevee.png",    "eevee-shiny.png", 
+            "pikachu.png",  "pikachu-shiny.png", 
+            "turtwig.png",  "turtwig-shiny.png",
+            "latios.png",   "latios-shiny.png",
+            "latias.png",   "latias-shiny.png"
           ]
