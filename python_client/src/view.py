@@ -10,7 +10,25 @@ class Captures:
     """
     To show captured pieces of each player
     """
-    ...
+    def __init__(self, number: PlayerNumber):
+        self._captures: list[PieceKind] = []
+        self._capture_owner = number
+
+    @property
+    def get_captures(self) -> list[PieceKind]:
+        return self._captures
+    
+    @property
+    def get_player_owner(self) -> PlayerNumber:
+        return self._capture_owner
+    
+    def render_captures(self):
+        match self._capture_owner:
+            case PlayerNumber.ONE:
+                ...
+                
+            case PlayerNumber.TWO:
+                ...
 
 class Tile:
     """
