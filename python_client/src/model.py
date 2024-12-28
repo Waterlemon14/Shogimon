@@ -1,6 +1,6 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber, MovePossibilities
+from project_types import GameState, Movement, PieceKind, Tile, PlayerNumber, MovePossibilities, PiecePositions
 # from view import Tile
 
 class EeveeMovement(Movement):
@@ -97,18 +97,17 @@ class ProtectedPiece:
           if self.row + dr == target.row and
           self.col + dc == target.col
         )
-
-
     # TO DO: Board Class
 class Board:
 
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
+        self._grid: list[list[Piece | ProtectedPiece]]
         ...
 
-    def put(self, row: int, col: int, piece: Piece):
-        ...
+    def put(self, row: int, col: int, piece: Piece | ProtectedPiece):
+        self._grid[row][col] = piece
 
     def take(self, row: int, col: int) -> Piece | None:
         ...
@@ -117,35 +116,6 @@ class Board:
         # To fix
         return row < self._height and col < self._width
     
-
-    # TO DO: Board Setter
-    # will set board, clear board, etc.
-
-
-class PieceFactory:
-    def make(self, piece_kind: PieceKind,
-             tile: Tile) -> Piece | ProtectedPiece:
-        match piece_kind:
-            case PieceKind.EEVEE:
-                movement = EeveeMovement()
-                return Piece(piece_kind, tile, movement)
- 
-            case PieceKind.PIKACHU:
-                movement = PikachuMovement()
-                return Piece(piece_kind, tile, movement)
- 
-            case PieceKind.TURTWIG:
-                movement = TurtwigMovement()
-                return Piece(piece_kind, tile, movement)
- 
-            case PieceKind.LATIOS:
-                movement = LatiosMovement()
-                return ProtectedPiece(piece_kind, tile, movement)
- 
-            case PieceKind.LATIAS:
-                movement = LatiasMovement()
-                return ProtectedPiece(piece_kind, tile, movement)
-
 class Player:
     def __init__(self, number: PlayerNumber, deployed_pieces: list[Piece | ProtectedPiece], captured_pieces: list[Piece | ProtectedPiece]):
         self._number: PlayerNumber = number
@@ -176,25 +146,111 @@ class Player:
         Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piece
         """
         ...
+class PieceFactory:
+
+    @classmethod
+    def make(cls, piece_kind: PieceKind,
+             tile: Tile) -> Piece | ProtectedPiece:
+        match piece_kind:
+            case PieceKind.EEVEE:
+                movement = EeveeMovement()
+                return Piece(piece_kind, tile, movement)
+ 
+            case PieceKind.PIKACHU:
+                movement = PikachuMovement()
+                return Piece(piece_kind, tile, movement)
+ 
+            case PieceKind.TURTWIG:
+                movement = TurtwigMovement()
+                return Piece(piece_kind, tile, movement)
+ 
+            case PieceKind.LATIOS:
+                movement = LatiosMovement()
+                return ProtectedPiece(piece_kind, tile, movement)
+ 
+            case PieceKind.LATIAS:
+                movement = LatiasMovement()
+                return ProtectedPiece(piece_kind, tile, movement)
+
+class PlayerTwoPositions:
+    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Tile]]:
+
+        positions = [
+            (PlayerNumber.TWO, PieceKind.TURTWIG, Tile(0, 0)),
+            (PlayerNumber.TWO, PieceKind.PIKACHU, Tile(0, 1)),
+            (PlayerNumber.TWO, PieceKind.LATIOS, Tile(0, 3)),
+            (PlayerNumber.TWO, PieceKind.LATIAS, Tile(0, 4)),
+            (PlayerNumber.TWO, PieceKind.PIKACHU, Tile(0, 6)),
+            (PlayerNumber.TWO, PieceKind.TURTWIG, Tile(0, 7)),
+        ]
+
+        positions += [
+            (PlayerNumber.TWO, PieceKind.EEVEE, Tile(1, n)) for n in range(8)
+        ]
+
+        return positions
+
+class PlayerOnePositions:
+    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Tile]]:
+
+        positions = [
+            (PlayerNumber.ONE, PieceKind.TURTWIG, Tile(7, 0)),
+            (PlayerNumber.ONE, PieceKind.PIKACHU, Tile(7, 1)),
+            (PlayerNumber.ONE, PieceKind.LATIOS, Tile(7, 3)),
+            (PlayerNumber.ONE, PieceKind.LATIAS, Tile(7, 4)),
+            (PlayerNumber.ONE, PieceKind.PIKACHU, Tile(7, 6)),
+            (PlayerNumber.ONE, PieceKind.TURTWIG, Tile(7, 7)),
+        ]
+
+        positions += [
+            (PlayerNumber.ONE, PieceKind.EEVEE, Tile(6, n)) for n in range(8)
+        ]
+
+        return positions
+
+class BoardSetter:
+    def __init__(self, p1_positions: PiecePositions, p2_positions: PiecePositions):
+        self._positions = p1_positions.get_positions() + p2_positions.get_positions()
+    
+    def set_board(self, board: Board) -> tuple[list[Piece | ProtectedPiece], list[Piece | ProtectedPiece]]:
+        player1: list[Piece | ProtectedPiece] = []
+        player2: list[Piece | ProtectedPiece] = []
+
+        for player, kind, tile in self._positions:
+            piece = PieceFactory.make(kind, tile)
+            board.put(tile.row, tile.col, piece)
+
+            if player == PlayerNumber.ONE:
+                player1.append(piece)
+            else:
+                player2.append(piece)
+
+        return player1, player2
+
+
 
 class GameModel:
     @classmethod
     def default(cls) -> Self:
 
         board = Board(8, 8)
-        player1 = Player(PlayerNumber.ONE, [], [])
-        player2 = Player(PlayerNumber.TWO, [], [])
+
+        setter = BoardSetter(PlayerOnePositions(), PlayerTwoPositions())
+        player1_pieces, player2_pieces = setter.set_board(board)
+
+        player1 = Player(PlayerNumber.ONE, player1_pieces, [])
+        player2 = Player(PlayerNumber.TWO, player2_pieces, [])
 
         state = GameState(
             player_number = PlayerNumber.ONE,
             active_player = PlayerNumber.ONE,
             is_still_playable=True,
-            captured_pieces= {PlayerNumber.ONE: [], PlayerNumber.TWO: []},
-            board_pieces= board.get_pieces(),
+            captured_pieces= {PlayerNumber.ONE: player1.get_captured_pieces(), PlayerNumber.TWO: player2.get_captured_pieces()},
+            board_pieces={PlayerNumber.ONE: player1.get_deployed_pieces(), PlayerNumber.TWO: player2.get_deployed_pieces()},
             move_count=3
         )
 
-        return cls(state)
+        return cls(state, board, player1, player2)
 
 
     def __init__(self, state: GameState, board: Board, player1: Player, player2: Player):

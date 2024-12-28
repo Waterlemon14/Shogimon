@@ -56,6 +56,10 @@ class Movement(Protocol):
     def get_movement_range(self) -> list[tuple[int, int]]:
         ...
 
+class PiecePositions(Protocol):
+    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Tile]]:
+        ...
+
 class MakeTurnObserver(Protocol):
     """
     For view; Communicator between turn of each player
