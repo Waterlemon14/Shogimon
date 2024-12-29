@@ -58,24 +58,24 @@ import Config
 
 
 createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
-createBishop col row One    = Just {kind: Bishop,   position: {col:col,row:row},  image: "pikachu.png", player: One, isProtected: false}
-createBishop col row Two    = Just {kind: Bishop,   position: {col:col,row:row},  image: "pikachu-shiny.png", player: Two, isProtected: false}
+createBishop col row One    = Just {kind: Bishop,   position: {col:col,row:row},  image: "../../img/pikachu.png", player: One, isProtected: false}
+createBishop col row Two    = Just {kind: Bishop,   position: {col:col,row:row},  image: "../../img/pikachu-shiny.png", player: Two, isProtected: false}
 
 createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row One      = Just {kind: Pawn,     position: {col:col,row:row},  image: "eevee.png", player: One, isProtected: false}
-createPawn col row Two      = Just {kind: Pawn,     position: {col:col,row:row},  image: "eevee-shiny.png", player: Two, isProtected: false}
+createPawn col row One      = Just {kind: Pawn,     position: {col:col,row:row},  image: "../../img/eevee.png", player: One, isProtected: false}
+createPawn col row Two      = Just {kind: Pawn,     position: {col:col,row:row},  image: "../../img/eevee-shiny.png", player: Two, isProtected: false}
 
 createRook :: Int -> Int -> PlayerNum -> Maybe Piece
-createRook col row One      = Just {kind: Rook,     position: {col:col,row:row},  image: "turtwig.png", player: One, isProtected: false}
-createRook col row Two      = Just {kind: Rook,     position: {col:col,row:row},  image: "turtwig-shiny.png", player: Two, isProtected: false}
+createRook col row One      = Just {kind: Rook,     position: {col:col,row:row},  image: "../../img/turtwig.png", player: One, isProtected: false}
+createRook col row Two      = Just {kind: Rook,     position: {col:col,row:row},  image: "../../img/turtwig-shiny.png", player: Two, isProtected: false}
 
 createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrince col row One    = Just {kind: Prince,   position: {col:col,row:row},  image: "latios.png", player: One, isProtected: true}
-createPrince col row Two    = Just {kind: Prince,   position: {col:col,row:row},  image: "latios-shiny.png", player: Two, isProtected: true}
+createPrince col row One    = Just {kind: Prince,   position: {col:col,row:row},  image: "../../img/latios.png", player: One, isProtected: true}
+createPrince col row Two    = Just {kind: Prince,   position: {col:col,row:row},  image: "../../img/latios-shiny.png", player: Two, isProtected: true}
 
 createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  image: "latias.png", player: One, isProtected: true}
-createPrincess col row Two  = Just {kind: Princess, position: {col:col,row:row},  image: "latias-shiny.png", player: Two, isProtected: true}
+createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  image: "../../img/latias.png", player: One, isProtected: true}
+createPrincess col row Two  = Just {kind: Princess, position: {col:col,row:row},  image: "../../img/latias-shiny.png", player: Two, isProtected: true}
 
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
