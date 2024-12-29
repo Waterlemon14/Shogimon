@@ -81,7 +81,11 @@ class RenderableBoard:
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
         ]
-        self._tiles = [Tile(l) for l in self._tile_locations]
+
+        self._tiles = [
+            Tile(l)
+            for l in self._tile_locations
+        ]
 
     def render_to_screen(self, screen: pygame.Surface):
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
