@@ -1,6 +1,6 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece
+from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction
 
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
@@ -254,10 +254,15 @@ class GameModel:
 
     def __init__(self, state: GameState, board: Board, player1: Player, player2: Player):
         self.state = state
+        self._board = board
+        self._player1 = player1
+        self._player2 = player2
         
         ...
 
-    def make_turn(self, turn: Movement):
+    def make_turn(self, turn: PlayerAction):
+        player = turn.player_number
+        
         ...
 
     def new_game(self):

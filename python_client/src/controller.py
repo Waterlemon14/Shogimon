@@ -6,7 +6,7 @@ Something related to observing input from opposing player (and not input from vi
 
 from model import GameModel
 from view import GameView
-from project_types import GameState, GameStateChangeObserver, Movement
+from project_types import GameState, GameStateChangeObserver, PlayerAction
 
 class GameController:
     def __init__(self, model: GameModel, view: GameView):
@@ -26,7 +26,7 @@ class GameController:
     def register_game_state_change_observer(self, observer: GameStateChangeObserver):
         self._game_state_change_observers.append(observer)
 
-    def on_make_turn(self, turn: Movement):
+    def on_make_turn(self, turn: PlayerAction):
         self._model.make_turn(turn)
         self._on_state_change(self._model.state)
 
