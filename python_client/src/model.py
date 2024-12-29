@@ -113,7 +113,7 @@ class Board:
         self._height: int = height
         self._width: int = width
         self._live_pieces: dict[PlayerNumber, list[Piece | ProtectedPiece]] = {}
-        self._captured_pieces: dict[PlayerNumber, list[Piece | ProtectedPiece]] = {}
+        self._captured_pieces: dict[PlayerNumber, list[Piece]] = {}
         self._grid: list[list[Piece | ProtectedPiece | None]]
         ...
 
@@ -148,10 +148,15 @@ class Board:
         for piece in self._live_pieces[player]:
             if piece.id == id:
                 return piece
+            
+    def get_captured_piece(self, id: int, player: PlayerNumber) -> Piece | None:
+        for piece in self._captured_pieces[player]:
+            if piece.id == id:
+                return piece
     
     def _live_to_captured(self, id: int, captured_player: PlayerNumber, capturing_player: PlayerNumber):
         for piece in self._live_pieces[captured_player]:
-            if piece.id == id:
+            if piece.id == id and type(piece) == Piece:
                 self._live_pieces[captured_player].remove(piece)
                 self._captured_pieces[capturing_player].append(piece)
 
@@ -181,6 +186,10 @@ class Board:
         if captured_piece:
             self._live_to_captured(captured_piece.id, captured_player, capturing_player)
 
+    def drop(self, row: int, col: int, piece: Piece, player: PlayerNumber):
+        self._grid[row][col] = piece
+        piece.location = Location(row, col)
+        self._captured_to_live(piece.id, player)
 
     def can_capture(self, row: int, col: int) -> bool:
         piece = self._grid[row][col]
@@ -188,6 +197,10 @@ class Board:
             return True
         
         return False
+
+    def is_unoccupied(self, row: int, col: int) -> bool:
+        loc = self._grid[row][col]
+        return not loc
 """   
 class Player:
     def __init__(self, number: PlayerNumber, deployed_pieces: list[Piece | ProtectedPiece], captured_pieces: list[Piece | ProtectedPiece]):
@@ -309,7 +322,6 @@ class BoardSetter:
             piece = PieceFactory.make(kind, location)
             board.put(location.row, location.col, piece, player)
 
-
 class GameModel:
     @classmethod
     def default(cls) -> Self:
@@ -319,8 +331,6 @@ class GameModel:
         setter = BoardSetter(PlayerOnePositions(), PlayerTwoPositions())
         setter.set_board(board)
 
-        # player1 = Player(PlayerNumber.ONE, player1_pieces, [])
-        # player2 = Player(PlayerNumber.TWO, player2_pieces, [])
 
         state = GameState(
             player_number = PlayerNumber.ONE,
@@ -331,12 +341,13 @@ class GameModel:
             move_count=3
         )
 
-        return cls(state, board)
+        return cls(state, board, PlayerNumber.ONE)
 
 
-    def __init__(self, state: GameState, board: Board):
+    def __init__(self, state: GameState, board: Board, player: PlayerNumber):
         self._state = state
         self._board = board
+        self._active_player = player
     
     @property
     def state(self) -> GameState:
@@ -375,6 +386,11 @@ class GameModel:
 
 
             case ActionType.DROP:
+                piece_to_drop = board.get_captured_piece(id, player_number)
+
+                if piece_to_drop and board.is_unoccupied(target_row, target_col):
+                    board.drop(target_row, target_col, piece_to_drop, player_number)
+
 
 
     def new_game(self):
