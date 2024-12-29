@@ -40,7 +40,7 @@ class Piece:
     def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
         self._id = id
         self._kind = kind
-        self._location = location
+        self.location = location
         self._is_captured = False
         self._movement = movement
 
@@ -54,11 +54,11 @@ class Piece:
     
     @property
     def row(self) -> int:
-        return self._location.row
+        return self.location.row
     
     @property
     def col(self) -> int:
-        return self._location.col
+        return self.location.col
 
     @property
     def is_captured(self) -> bool:
@@ -78,7 +78,7 @@ class ProtectedPiece:
     def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
         self._id = id
         self._kind = kind
-        self._location = location
+        self.location = location
         self._movement = movement
     
     @property
@@ -91,11 +91,11 @@ class ProtectedPiece:
     
     @property
     def row(self) -> int:
-        return self._location.row
+        return self.location.row
     
     @property
     def col(self) -> int:
-        return self._location.col
+        return self.location.col
 
     def can_move(self, target: Location) -> bool:
         """
@@ -114,6 +114,7 @@ class Board:
         self._width: int = width
         self._live_pieces: dict[PlayerNumber, list[Piece | ProtectedPiece]] = {}
         self._captured_pieces: dict[PlayerNumber, list[Piece | ProtectedPiece]] = {}
+        self._grid: list[list[Piece | ProtectedPiece | None]]
         ...
 
     def get_live_pieces(self) -> dict[PlayerNumber, list[LivePiece]]:
@@ -142,19 +143,52 @@ class Board:
                 for piece in self._captured_pieces[PlayerNumber.TWO]
                 ]
             }
+
+    def get_live_piece(self, id: int, player: PlayerNumber) -> Piece | ProtectedPiece | None:
+        for piece in self._live_pieces[player]:
+            if piece.id == id:
+                return piece
+    
+    def _live_to_captured(self, id: int, captured_player: PlayerNumber, capturing_player: PlayerNumber):
+        for piece in self._live_pieces[captured_player]:
+            if piece.id == id:
+                self._live_pieces[captured_player].remove(piece)
+                self._captured_pieces[capturing_player].append(piece)
+
+    def _captured_to_live(self, id: int, player: PlayerNumber):
+        pass
     
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
         live_pieces.append(piece)
+        self._grid[row][col] = piece
 
-    def take(self, row: int, col: int, player: PlayerNumber):
-        live_pieces = self._live_pieces[player]
+    def take(self, row: int, col: int):
+        self._grid[row][col] = None
         
-
-    def is_valid_location(self, row: int, col: int) -> bool:
-        # To fix
-        return row < self._height and col < self._width
+    def move(self, row: int, col: int, piece: Piece | ProtectedPiece):
+        piece.location = Location(row, col)
+        self._grid[row][col] = piece
     
+    def capture(self, row: int, col: int, capturing_player: PlayerNumber, capturing_piece: Piece):
+        captured_player = PlayerNumber.TWO if capturing_player == PlayerNumber.ONE else PlayerNumber.ONE
+
+        captured_piece = self._grid[row][col]
+
+        capturing_piece.location = Location(row, col)
+        self._grid[row][col] = capturing_piece
+
+        if captured_piece:
+            self._live_to_captured(captured_piece.id, captured_player, capturing_player)
+
+
+    def can_capture(self, row: int, col: int) -> bool:
+        piece = self._grid[row][col]
+        if piece and type(piece) == Piece:
+            return True
+        
+        return False
+"""   
 class Player:
     def __init__(self, number: PlayerNumber, deployed_pieces: list[Piece | ProtectedPiece], captured_pieces: list[Piece | ProtectedPiece]):
         self._number: PlayerNumber = number
@@ -168,39 +202,36 @@ class Player:
     def get_captured_pieces(self) -> list[CapturedPiece]:
         return [CapturedPiece(piece.kind, piece.id) for piece in self._captured_pieces]
 
-    # def make_turn(self, board: Board, action: PlayerAction):
-    #     """
-    #     If turn of player, choose between _move_piece and _drop_piece
-    #     """
-    #     self._board = board
-    #     piece_id = action.piece_id
-    #     location = action.target_location
-    #     match action.action_type:
-    #         case ActionType.MOVE:
-    #             self._move_piece(piece_id, location)
-    #         case ActionType.DROP:
-    #             self._drop_piece(piece_id, location)
+    def make_turn(self, board: Board, action: PlayerAction):
 
-    # def _move_piece(self, id: int, loc: Location) -> bool:
-    #     """
-    #     Return TRUE if a piece is captured, else return FALSE
-    #     """
-    #     for piece in self._deployed_pieces:
-    #         if piece.id == id:
-    #             self._board.take(piece.row, piece.col)
+        If turn of player, choose between _move_piece and _drop_piece
+        self._board = board
+        piece_id = action.piece_id
+        location = action.target_location
+        match action.action_type:
+            case ActionType.MOVE:
+                self._move_piece(piece_id, location)
+            case ActionType.DROP:
+                self._drop_piece(piece_id, location)
+
+    def _move_piece(self, id: int, loc: Location) -> bool:
+        
+        Return TRUE if a piece is captured, else return FALSE
+        
+        for piece in self._deployed_pieces:
+            if piece.id == id:
+                self._board.take(piece.row, piece.col)
                 
-    #             if 
+                if 
 
-    #             break
+                break
 
-    # def _drop_piece(self, id: int, loc: Location) -> bool:
-    #     """
-    #     Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piece
-    #     """
-    #     ...
-
-    def update_pieces(self):
+    def _drop_piece(self, id: int, loc: Location) -> bool:
+        
+        Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piec
+        
         ...
+    """
 
 class PieceFactory:
     _piece_count = 0
@@ -304,14 +335,47 @@ class GameModel:
 
 
     def __init__(self, state: GameState, board: Board):
-        self.state = state
+        self._state = state
         self._board = board
+    
+    @property
+    def state(self) -> GameState:
+        return self._state
 
-        
-        ...
+    def _update_state(self):
+        pass
+
+    def _check_if_mate(self):
+        pass
 
     def make_turn(self, action: PlayerAction):
         board = self._board
+        target_row = action.target_location.row
+        target_col = action.target_location.col
+        player_number = action.player_number
+        id = action.piece_id
+
+        match action.action_type:
+
+            case ActionType.MOVE:
+                piece_to_move = board.get_live_piece(id, player_number)
+
+                # Narrow type down
+                if piece_to_move:   
+                    board.take(piece_to_move.row, piece_to_move.col)
+
+                    # Check if can capture
+                    if board.can_capture(target_row, target_col) and type(piece_to_move) == Piece:
+                        
+                        board.capture(target_row, target_col, player_number, piece_to_move)
+
+                    # Move piece simply  
+                    else:
+                        board.move(target_row, target_col, piece_to_move)
+
+
+            case ActionType.DROP:
+
 
     def new_game(self):
         ...
