@@ -28,12 +28,18 @@ class Captures:
         return self._capture_owner
     
     def render_to_screen(self, screen: pygame.Surface):
+        actual_captures = pygame.Surface((BOARD_WIDTH, TILE_PIXELS))
+
         match self._capture_owner:
             case PlayerNumber.ONE:
                 ...
+                _blittable = actual_captures.get_rect(midbottom=(...))
                 
             case PlayerNumber.TWO:
                 ...
+                _blittable = actual_captures.get_rect(midtop=(...))
+
+        screen.blit(actual_captures, _blittable)
 
 class Tile:
     """Renderable class for each tile inside board"""
@@ -70,7 +76,6 @@ class Tile:
         if self._targetable:
             ...
 
-        _blittable = ...
         board.blit(actual_tile, (0, 0))
 
 class RenderableBoard:
@@ -92,7 +97,8 @@ class RenderableBoard:
         for k in self._location_to_tile:
             self._location_to_tile[k].render_to_board(actual_board)
         
-        ...
+        _blittable = actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+        screen.blit(actual_board, _blittable)
 
 class GameView:
     """Actual MVC view class"""
