@@ -25,7 +25,7 @@ class Captures:
     def get_player_owner(self) -> PlayerNumber:
         return self._capture_owner
     
-    def render_captures(self):
+    def render_to_screen(self, screen: pygame.Surface):
         match self._capture_owner:
             case PlayerNumber.ONE:
                 ...
@@ -109,12 +109,6 @@ class GameView:
     def on_state_change(self, state: GameState):
         ...
 
-    def _render_board(self):
-        ...
-
-    def _render_captures(self):
-        ...
-
     def run(self):
         pygame.init()
 
@@ -130,17 +124,20 @@ class GameView:
 
                 elif event.type == pygame.KEYDOWN:
                     ...
+                    '''Should be something mouse movement/click'''
+                    ...
 
             self._screen.fill('#FFFFFF')
 
+            self._renderable_board.render_to_screen(self._screen)
+            self._captures_p1.render_to_screen(self._screen)
+            self._captures_p2.render_to_screen(self._screen)
+
             ...
-
-            self._render_board()
-            self._render_captures()
-
+            '''Insert code re: Evaluating user input'''
             ...
 
             pygame.display.flip()
-            self._clock.tick(30)
+            self._clock.tick(60)
 
         pygame.quit()
