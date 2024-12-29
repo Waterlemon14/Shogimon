@@ -62,11 +62,18 @@ class Tile:
         self._targetable = False
 
     def render_to_screen(self, screen: pygame.Surface):
-        ...
+        actual_tile = pygame.Rect(0,0,self._width, self._height)
         
         if self._occupier is None:
             ...
 
+        ...
+
+class Board:
+    def __init__(self):
+        ...
+
+    def render_board(self):
         ...
 
 class GameView:
@@ -78,6 +85,7 @@ class GameView:
 
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
+        self._board = pygame.image.load("../../img/board.png")
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
@@ -89,6 +97,7 @@ class GameView:
         ...
 
     def _render_board(self):
+        self._screen.blit(self._board)
         ...
 
     def _render_captures(self):
