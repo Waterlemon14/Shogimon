@@ -1,10 +1,14 @@
 import pygame
 
-from project_types import PieceKind, Location, GameState, Movement, MakeTurnObserver, NewGameObserver, PlayerNumber
+from project_types import (
+    TILE_SIZE,
+    PieceKind, Location, GameState, Movement,
+    PlayerNumber,
+    MakeTurnObserver, NewGameObserver,
+    )
 
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
-TILE_SIZE = 64
 TILE_COLOR = "#FFFFFF"
 
 class Captures:
@@ -54,14 +58,18 @@ class Tile:
     def unmark_targetable(self):
         self._targetable = False
 
-    def render_to_screen(self, screen: pygame.Surface):
-        actual_tile = pygame.Rect(0,0,self._width, self._height)
+    def render_to_board(self, board: pygame.Surface):
+        actual_tile = pygame.Surface((self._width, self._height))
+        pygame.draw.rect(actual_tile, 'white', (TILE_SIZE-1, TILE_SIZE-1))
         
         if self._occupier is None:
             ...
 
         else:
             ...
+
+        _blittable = ...
+        board.blit(actual_tile, (0, 0))
 
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
@@ -79,7 +87,7 @@ class RenderableBoard:
         
         self._tiles = [Tile(l) for l in self._tile_locations]
 
-    def render_board(self, screen: pygame.Surface):
+    def render_to_screen(self, screen: pygame.Surface):
         ...
 
 class GameView:
