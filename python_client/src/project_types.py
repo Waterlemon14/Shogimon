@@ -81,23 +81,16 @@ class PiecePositions(Protocol):
         ...
 
 class MakeTurnObserver(Protocol):
-    """
-    For view; Communicator between turn of each player
-    """
+    """For view; Communicator between turn of each player"""
     def on_make_turn(self, turn: Movement):
         ...
 
 class NewGameObserver(Protocol):
-    """
-    For view; Communicator for when new game start
-    """
+    """For view; Communicator for when new game start"""
     def on_new_game(self):
         ...
 
 class GameStateChangeObserver(Protocol):
-    """
-    For controller;
-    Communicator of change in game state (i.e., ongoing, player 1 win, player 1 lose)
-    """
+    """For controller; Communicator of change in game state (ongoing, player 1 win, player 1 lose)"""
     def on_state_change(self, state: GameState):
         ...

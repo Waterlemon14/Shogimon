@@ -1,6 +1,6 @@
 import pygame
 
-from project_types import (PieceKind, Location, GameState, Movement, MakeTurnObserver, NewGameObserver, PlayerNumber)
+from project_types import PieceKind, Location, GameState, Movement, MakeTurnObserver, NewGameObserver, PlayerNumber
 
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
@@ -8,6 +8,7 @@ TILE_SIZE = 64
 TILE_COLOR = "#FFFFFF"
 
 class Captures:
+    """Renderable class for player captures (top and bottom of game screen)"""
     def __init__(self, number: PlayerNumber):
         self._captures: list[PieceKind] = []
         self._capture_owner = number
@@ -29,6 +30,7 @@ class Captures:
                 ...
 
 class Tile:
+    """Renderable class for each tile inside board"""
     def __init__(self, location: Location):
         self._location = location
         self._width = TILE_SIZE
@@ -62,6 +64,7 @@ class Tile:
             ...
 
 class RenderableBoard:
+    """Renderable class for board; contains all tiles"""
     def __init__(self):
         self._board = pygame.image.load("../../img/board.png").convert()
         
@@ -80,6 +83,7 @@ class RenderableBoard:
         ...
 
 class GameView:
+    """Actual MVC view class"""
     def __init__(self):
         self._width = SCREEN_WIDTH
         self._height = SCREEN_HEIGHT
