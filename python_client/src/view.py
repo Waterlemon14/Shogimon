@@ -75,11 +75,11 @@ class RenderableBoard:
     """Renderable class for board; contains all tiles"""
     def __init__(self):
         self._board = pygame.image.load("../../img/board.png").convert()
-        
-        self._tile_locations = []
-        for i in range(8):
-            self._tile_locations += [Location(i, j) for j in range(8)]
-
+        self._tile_locations = [
+            Location(i, j)
+            for i in range(8)
+            for j in range(8)
+        ]
         self._tiles = [Tile(l) for l in self._tile_locations]
 
     def render_to_screen(self, screen: pygame.Surface):
