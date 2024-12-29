@@ -60,7 +60,7 @@ class Tile:
 
     def render_to_board(self, board: pygame.Surface):
         actual_tile = pygame.Surface((self._width, self._height))
-        pygame.draw.rect(actual_tile, 'white', (TILE_SIZE-1, TILE_SIZE-1))
+        pygame.draw.rect(actual_tile, 'white', (TILE_SIZE, TILE_SIZE))
         
         if self._occupier is None:
             ...
@@ -80,11 +80,6 @@ class RenderableBoard:
         for i in range(8):
             self._tile_locations += [Location(i, j) for j in range(8)]
 
-        self._tile_pixels = [
-            (l.row*TILE_SIZE, l.col*TILE_SIZE)
-            for l in self._tile_locations
-        ]
-        
         self._tiles = [Tile(l) for l in self._tile_locations]
 
     def render_to_screen(self, screen: pygame.Surface):
