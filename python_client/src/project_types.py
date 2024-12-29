@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from typing import Protocol
 from enum import Enum, StrEnum, auto
 
-TILE_SIZE = 64
+BOARD_ROWS = 8
+BOARD_COLS = 8
+TILE_PIXELS = 64
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
@@ -36,7 +38,7 @@ class Location:
     col: int
 
     def pixels(self) -> tuple[int, int]:
-        return (self.row * TILE_SIZE, self.col * TILE_SIZE)
+        return (self.row*TILE_PIXELS, self.col*TILE_PIXELS)
 
 @dataclass(frozen=True)
 class LivePiece:

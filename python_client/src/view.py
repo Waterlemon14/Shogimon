@@ -1,15 +1,17 @@
 import pygame
 
 from project_types import (
-    TILE_SIZE,
+    TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
     PieceKind, Location, GameState, Movement,
     PlayerNumber,
     MakeTurnObserver, NewGameObserver,
     )
 
-SCREEN_WIDTH = 700
-SCREEN_HEIGHT = 700
-TILE_COLOR = "#FFFFFF"
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+
+BOARD_WIDTH = TILE_PIXELS*BOARD_ROWS
+BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 
 class Captures:
     """Renderable class for player captures (top and bottom of game screen)"""
@@ -37,8 +39,8 @@ class Tile:
     """Renderable class for each tile inside board"""
     def __init__(self, location: Location):
         self._location = location
-        self._width = TILE_SIZE
-        self._height = TILE_SIZE
+        self._width = TILE_PIXELS
+        self._height = TILE_PIXELS
         self._occupier: PieceKind | None = None
         self._targetable = False
 
@@ -60,12 +62,12 @@ class Tile:
 
     def render_to_board(self, board: pygame.Surface):
         actual_tile = pygame.Surface((self._width, self._height))
-        pygame.draw.rect(actual_tile, 'white', (TILE_SIZE, TILE_SIZE))
+        pygame.Surface.fill(actual_tile, '#FFFFFF')
         
-        if self._occupier is None:
+        if self._occupier is not None:
             ...
 
-        else:
+        if self._targetable:
             ...
 
         _blittable = ...
@@ -74,16 +76,19 @@ class Tile:
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
     def __init__(self):
-        self._board = pygame.image.load("../../img/board.png").convert()
         self._tile_locations = [
             Location(i, j)
-            for i in range(8)
-            for j in range(8)
+            for i in range(BOARD_ROWS)
+            for j in range(BOARD_COLS)
         ]
         self._tiles = [Tile(l) for l in self._tile_locations]
 
     def render_to_screen(self, screen: pygame.Surface):
-        ...
+        actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
+        pygame.Surface.fill(actual_board, '#000000')
+
+        for l in self._tile_locations:
+            ...
 
 class GameView:
     """Actual MVC view class"""
@@ -112,7 +117,7 @@ class GameView:
     def run(self):
         pygame.init()
 
-        self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self._screen = pygame.display.set_mode((self._width, self._height))
         self._clock = pygame.time.Clock()
 
         _game_is_running = True
