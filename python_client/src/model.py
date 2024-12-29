@@ -359,7 +359,7 @@ class GameModel:
     def _check_if_mate(self):
         pass
 
-    def make_turn(self, action: PlayerAction):
+    def make_action(self, action: PlayerAction):
         board = self._board
         target_row = action.target_location.row
         target_col = action.target_location.col
@@ -391,7 +391,8 @@ class GameModel:
                 if piece_to_drop and board.is_unoccupied(target_row, target_col):
                     board.drop(target_row, target_col, piece_to_drop, player_number)
 
-
+        # will check if game over here
+        # will update game state here
 
     def new_game(self):
         ...

@@ -26,8 +26,8 @@ class GameController:
     def register_game_state_change_observer(self, observer: GameStateChangeObserver):
         self._game_state_change_observers.append(observer)
 
-    def on_make_turn(self, turn: PlayerAction):
-        self._model.make_turn(turn)
+    def on_make_turn(self, action: PlayerAction):
+        self._model.make_action(action)
         self._on_state_change(self._model.state)
 
     def on_new_game(self):
