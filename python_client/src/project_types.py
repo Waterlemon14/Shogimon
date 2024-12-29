@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from typing import Protocol
 from enum import Enum, StrEnum, auto
 
+TILE_SIZE = 64
+
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
     PLAYER_WIN = 'Round win'
@@ -32,6 +34,9 @@ class PlayerNumber(StrEnum):
 class Location:
     row: int
     col: int
+
+    def pixels(self) -> tuple[int, int]:
+        return (self.row * TILE_SIZE, self.col * TILE_SIZE)
 
 @dataclass(frozen=True)
 class LivePiece:
