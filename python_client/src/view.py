@@ -6,6 +6,7 @@ from model import Piece
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
 TILE_SIZE = 64
+TILE_COLOR = "#FFFFFF"
 
 class Captures:
     """
@@ -38,11 +39,11 @@ class Tile:
     load img in pygame:
     pygame.image.load("C:\\Users\\DELL\\Downloads\\gfg.png").convert()
     """
-    def __init__(self, kind: PieceKind, location: Location):
+    def __init__(self, location: Location):
         self._location = location
         self._width = TILE_SIZE
         self._height = TILE_SIZE
-        self._occupier: PieceKind | None = kind
+        self._occupier: PieceKind | None = None
         self._targetable = False
 
     @property
@@ -69,11 +70,22 @@ class Tile:
 
         ...
 
-class Board:
+class RenderableBoard:
     def __init__(self):
-        ...
+        self._board = pygame.image.load("../../img/board.png")
+        
+        self._tile_locations = []
+        for i in range(8):
+            self._tile_locations += [Location(i, j) for j in range(8)]
 
-    def render_board(self):
+        self._tile_pixels = [
+            (l.row*TILE_SIZE, l.col*TILE_SIZE)
+            for l in self._tile_locations
+        ]
+        
+        self._tiles = [Tile(l) for l in self._tile_locations]
+
+    def render_board(self, screen: pygame.Surface):
         ...
 
 class GameView:
@@ -83,9 +95,12 @@ class GameView:
         self._make_turn_observers: list[MakeTurnObserver] = []
         self._new_game_observers: list[NewGameObserver] = []
 
+        self._captures_p1 = Captures(PlayerNumber.ONE)
+        self._captures_p2 = Captures(PlayerNumber.TWO)
+        self._renderable_board = RenderableBoard()
+
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
-        self._board = pygame.image.load("../../img/board.png")
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
@@ -97,7 +112,6 @@ class GameView:
         ...
 
     def _render_board(self):
-        self._screen.blit(self._board)
         ...
 
     def _render_captures(self):
