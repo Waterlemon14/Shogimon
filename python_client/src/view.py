@@ -76,23 +76,23 @@ class Tile:
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
     def __init__(self):
-        self._tile_locations = [
-            Location(i, j)
+        self._location_to_tile = {
+            Location(i, j) : Tile(Location(i, j))
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
-        ]
+        }
 
-        self._tiles = [
-            Tile(l)
-            for l in self._tile_locations
-        ]
+    def get_tile(self, location) -> Tile:
+        return self._location_to_tile[location]
 
     def render_to_screen(self, screen: pygame.Surface):
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
         pygame.Surface.fill(actual_board, '#000000')
 
-        for l in self._tile_locations:
-            ...
+        for k in self._location_to_tile:
+            self._location_to_tile[k].render_to_board(actual_board)
+        
+        ...
 
 class GameView:
     """Actual MVC view class"""
