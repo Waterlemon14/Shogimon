@@ -161,7 +161,10 @@ class Board:
                 self._captured_pieces[capturing_player].append(piece)
 
     def _captured_to_live(self, id: int, player: PlayerNumber):
-        pass
+        for piece in self._captured_pieces[player]:
+            if piece.id == id:
+                self._captured_pieces[player].remove(piece)
+                self._live_pieces[player].append(piece)
     
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
