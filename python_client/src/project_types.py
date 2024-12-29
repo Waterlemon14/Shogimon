@@ -46,6 +46,7 @@ class LivePiece:
 
 @dataclass(frozen=True)
 class CapturedPiece:
+    """-> for this, peep my PM sa messenger"""
     piece_kind: PieceKind
     piece_id: int
 
@@ -64,6 +65,7 @@ class GameState:
     captured_pieces: dict[PlayerNumber, list[CapturedPiece]]
     live_pieces: dict[PlayerNumber, list[LivePiece]]
     move_count: int
+    """-> semantics; rename to action_count? to avoid ambiguity"""
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
