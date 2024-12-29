@@ -1,7 +1,6 @@
 import pygame
 
 from project_types import (PieceKind, Location, GameState, Movement, MakeTurnObserver, NewGameObserver, PlayerNumber)
-from model import Piece
 
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
@@ -9,9 +8,6 @@ TILE_SIZE = 64
 TILE_COLOR = "#FFFFFF"
 
 class Captures:
-    """
-    To show captured pieces of each player
-    """
     def __init__(self, number: PlayerNumber):
         self._captures: list[PieceKind] = []
         self._capture_owner = number
@@ -33,12 +29,6 @@ class Captures:
                 ...
 
 class Tile:
-    """
-    piece will be a link to an img
-
-    load img in pygame:
-    pygame.image.load("C:\\Users\\DELL\\Downloads\\gfg.png").convert()
-    """
     def __init__(self, location: Location):
         self._location = location
         self._width = TILE_SIZE
@@ -68,11 +58,12 @@ class Tile:
         if self._occupier is None:
             ...
 
-        ...
+        else:
+            ...
 
 class RenderableBoard:
     def __init__(self):
-        self._board = pygame.image.load("../../img/board.png")
+        self._board = pygame.image.load("../../img/board.png").convert()
         
         self._tile_locations = []
         for i in range(8):
