@@ -1,6 +1,6 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction
+from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, CapturedPiece
 
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
@@ -37,11 +37,16 @@ class Opponent:
     ...
 
 class Piece:
-    def __init__(self, kind: PieceKind, location: Location, movement: Movement):
+    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
+        self._id = id
         self._kind = kind
         self._location = location
         self._is_captured = False
         self._movement = movement
+
+    @property
+    def id(self) -> int:
+        return self._id
 
     @property
     def kind(self) -> PieceKind:
@@ -70,11 +75,16 @@ class Piece:
         )
 
 class ProtectedPiece:
-    def __init__(self, kind: PieceKind, location: Location, movement: Movement):
+    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
+        self._id = id
         self._kind = kind
         self._location = location
         self._movement = movement
     
+    @property
+    def id(self) -> int:
+        return self._id
+
     @property
     def kind(self) -> PieceKind:
         return self._kind
@@ -123,12 +133,12 @@ class Player:
         pass
 
     def get_deployed_pieces(self) -> list[LivePiece]:
-        return [LivePiece(piece.kind, Location(piece.row, piece.col)) for piece in self._deployed_pieces]
+        return [LivePiece(piece.kind, piece.id, Location(piece.row, piece.col)) for piece in self._deployed_pieces]
 
-    def get_captured_pieces(self) -> list[PieceKind]:
-        return [piece.kind for piece in self._captured_pieces]
+    def get_captured_pieces(self) -> list[CapturedPiece]:
+        return [CapturedPiece(piece.kind, piece.id) for piece in self._captured_pieces]
 
-    def make_turn(self):
+    def make_turn(self, board: Board, action: PlayerAction):
         """
         If turn of player, choose between _move_piece and _drop_piece
         """
@@ -146,30 +156,34 @@ class Player:
         """
         ...
 class PieceFactory:
+    _piece_count = 0
 
     @classmethod
     def make(cls, piece_kind: PieceKind,
              location: Location) -> Piece | ProtectedPiece:
+        piece_id = cls._piece_count
+        cls._piece_count += 1
+
         match piece_kind:
             case PieceKind.EEVEE:
                 movement = EeveeMovement()
-                return Piece(piece_kind, location, movement)
+                return Piece(piece_id, piece_kind, location, movement)
  
             case PieceKind.PIKACHU:
                 movement = PikachuMovement()
-                return Piece(piece_kind, location, movement)
+                return Piece(piece_id, piece_kind, location, movement)
  
             case PieceKind.TURTWIG:
                 movement = TurtwigMovement()
-                return Piece(piece_kind, location, movement)
+                return Piece(piece_id, piece_kind, location, movement)
  
             case PieceKind.LATIOS:
                 movement = LatiosMovement()
-                return ProtectedPiece(piece_kind, location, movement)
+                return ProtectedPiece(piece_id, piece_kind, location, movement)
  
             case PieceKind.LATIAS:
                 movement = LatiasMovement()
-                return ProtectedPiece(piece_kind, location, movement)
+                return ProtectedPiece(piece_id, piece_kind, location, movement)
 
 class PlayerTwoPositions:
     def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
@@ -260,10 +274,16 @@ class GameModel:
         
         ...
 
-    def make_turn(self, turn: PlayerAction):
-        player = turn.player_number
-        
-        ...
+    def make_turn(self, action: PlayerAction):
+        board = self._board
+        player1 = self._player1
+        player2 = self._player2
+
+        match action.player_number:
+            case PlayerNumber.ONE:
+                player1.make_turn(board, action)
+            case PlayerNumber.TWO:
+                player2.make_turn(board, action)
 
     def new_game(self):
         ...

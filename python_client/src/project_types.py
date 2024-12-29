@@ -41,25 +41,29 @@ class Location:
 @dataclass(frozen=True)
 class LivePiece:
     piece_kind: PieceKind
-    tile: Location
+    piece_id: int
+    location: Location
+
+@dataclass(frozen=True)
+class CapturedPiece:
+    piece_kind: PieceKind
+    piece_id: int
 
 @dataclass(frozen=True)
 class PlayerAction:
     action_type: ActionType
     player_number: PlayerNumber
-    piece_kind: PieceKind
-    location: Location
+    piece_id: int
+    target_location: Location
 
 @dataclass(frozen=True)
 class GameState:
     player_number: PlayerNumber
     active_player: PlayerNumber
     is_still_playable: bool
-    captured_pieces: dict[PlayerNumber, list[PieceKind]]
+    captured_pieces: dict[PlayerNumber, list[CapturedPiece]]
     board_pieces: dict[PlayerNumber, list[LivePiece]]
     move_count: int
-
-    # we probs need more methods
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
@@ -87,7 +91,7 @@ class PiecePositions(Protocol):
 
 class MakeTurnObserver(Protocol):
     """For view; Communicator between turn of each player"""
-    def on_make_turn(self, turn: Movement):
+    def on_make_turn(self, action: PlayerAction):
         ...
 
 class NewGameObserver(Protocol):
