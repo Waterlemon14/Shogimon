@@ -62,7 +62,7 @@ class GameState:
     active_player: PlayerNumber
     is_still_playable: bool
     captured_pieces: dict[PlayerNumber, list[CapturedPiece]]
-    board_pieces: dict[PlayerNumber, list[LivePiece]]
+    live_pieces: dict[PlayerNumber, list[LivePiece]]
     move_count: int
 
 class MovePossibilities(Enum):

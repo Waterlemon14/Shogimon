@@ -112,14 +112,44 @@ class Board:
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
-        self._grid: list[list[Piece | ProtectedPiece]]
+        self._live_pieces: dict[PlayerNumber, list[Piece | ProtectedPiece]] = {}
+        self._captured_pieces: dict[PlayerNumber, list[Piece | ProtectedPiece]] = {}
         ...
 
-    def put(self, row: int, col: int, piece: Piece | ProtectedPiece):
-        self._grid[row][col] = piece
+    def get_live_pieces(self) -> dict[PlayerNumber, list[LivePiece]]:
+        return {
+            PlayerNumber.ONE: [
+                LivePiece(piece.kind, piece.id, Location(piece.row, piece.col)) 
+                for piece in self._live_pieces[PlayerNumber.ONE]
+                ], 
+            
+            PlayerNumber.TWO: [
+                LivePiece(piece.kind, piece.id, Location(piece.row, piece.col)) 
+                for piece in self._live_pieces[PlayerNumber.TWO]
+                ]
+            }
+        
 
-    def take(self, row: int, col: int) -> Piece | None:
-        ...
+    def get_captured_pieces(self) -> dict[PlayerNumber, list[CapturedPiece]]:
+        return {
+            PlayerNumber.ONE: [
+                CapturedPiece(piece.kind, piece.id) 
+                for piece in self._captured_pieces[PlayerNumber.ONE]
+                ], 
+            
+            PlayerNumber.TWO: [
+                CapturedPiece(piece.kind, piece.id) 
+                for piece in self._captured_pieces[PlayerNumber.TWO]
+                ]
+            }
+    
+    def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
+        live_pieces = self._live_pieces[player]
+        live_pieces.append(piece)
+
+    def take(self, row: int, col: int, player: PlayerNumber):
+        live_pieces = self._live_pieces[player]
+        
 
     def is_valid_location(self, row: int, col: int) -> bool:
         # To fix
@@ -138,23 +168,40 @@ class Player:
     def get_captured_pieces(self) -> list[CapturedPiece]:
         return [CapturedPiece(piece.kind, piece.id) for piece in self._captured_pieces]
 
-    def make_turn(self, board: Board, action: PlayerAction):
-        """
-        If turn of player, choose between _move_piece and _drop_piece
-        """
+    # def make_turn(self, board: Board, action: PlayerAction):
+    #     """
+    #     If turn of player, choose between _move_piece and _drop_piece
+    #     """
+    #     self._board = board
+    #     piece_id = action.piece_id
+    #     location = action.target_location
+    #     match action.action_type:
+    #         case ActionType.MOVE:
+    #             self._move_piece(piece_id, location)
+    #         case ActionType.DROP:
+    #             self._drop_piece(piece_id, location)
+
+    # def _move_piece(self, id: int, loc: Location) -> bool:
+    #     """
+    #     Return TRUE if a piece is captured, else return FALSE
+    #     """
+    #     for piece in self._deployed_pieces:
+    #         if piece.id == id:
+    #             self._board.take(piece.row, piece.col)
+                
+    #             if 
+
+    #             break
+
+    # def _drop_piece(self, id: int, loc: Location) -> bool:
+    #     """
+    #     Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piece
+    #     """
+    #     ...
+
+    def update_pieces(self):
         ...
 
-    def _move_piece(self) -> bool:
-        """
-        Return TRUE if a piece is captured, else return FALSE
-        """
-        ...
-
-    def _drop_piece(self) -> bool:
-        """
-        Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piece
-        """
-        ...
 class PieceFactory:
     _piece_count = 0
 
@@ -225,21 +272,11 @@ class BoardSetter:
     def __init__(self, p1_positions: PiecePositions, p2_positions: PiecePositions):
         self._positions = p1_positions.get_positions() + p2_positions.get_positions()
     
-    def set_board(self, board: Board) -> tuple[list[Piece | ProtectedPiece], list[Piece | ProtectedPiece]]:
-        player1: list[Piece | ProtectedPiece] = []
-        player2: list[Piece | ProtectedPiece] = []
+    def set_board(self, board: Board):
 
         for player, kind, location in self._positions:
             piece = PieceFactory.make(kind, location)
-            board.put(location.row, location.col, piece)
-
-            if player == PlayerNumber.ONE:
-                player1.append(piece)
-            else:
-                player2.append(piece)
-
-        return player1, player2
-
+            board.put(location.row, location.col, piece, player)
 
 
 class GameModel:
@@ -249,41 +286,32 @@ class GameModel:
         board = Board(8, 8)
 
         setter = BoardSetter(PlayerOnePositions(), PlayerTwoPositions())
-        player1_pieces, player2_pieces = setter.set_board(board)
+        setter.set_board(board)
 
-        player1 = Player(PlayerNumber.ONE, player1_pieces, [])
-        player2 = Player(PlayerNumber.TWO, player2_pieces, [])
+        # player1 = Player(PlayerNumber.ONE, player1_pieces, [])
+        # player2 = Player(PlayerNumber.TWO, player2_pieces, [])
 
         state = GameState(
             player_number = PlayerNumber.ONE,
             active_player = PlayerNumber.ONE,
             is_still_playable=True,
-            captured_pieces= {PlayerNumber.ONE: player1.get_captured_pieces(), PlayerNumber.TWO: player2.get_captured_pieces()},
-            board_pieces={PlayerNumber.ONE: player1.get_deployed_pieces(), PlayerNumber.TWO: player2.get_deployed_pieces()},
+            captured_pieces= board.get_captured_pieces(),
+            live_pieces=board.get_live_pieces(),
             move_count=3
         )
 
-        return cls(state, board, player1, player2)
+        return cls(state, board)
 
 
-    def __init__(self, state: GameState, board: Board, player1: Player, player2: Player):
+    def __init__(self, state: GameState, board: Board):
         self.state = state
         self._board = board
-        self._player1 = player1
-        self._player2 = player2
+
         
         ...
 
     def make_turn(self, action: PlayerAction):
         board = self._board
-        player1 = self._player1
-        player2 = self._player2
-
-        match action.player_number:
-            case PlayerNumber.ONE:
-                player1.make_turn(board, action)
-            case PlayerNumber.TWO:
-                player2.make_turn(board, action)
 
     def new_game(self):
         ...
