@@ -1,4 +1,4 @@
-from python_client.src.view import GameView
+from view import GameView
 
 if __name__ == '__main__':
     view = GameView()
