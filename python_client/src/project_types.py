@@ -37,7 +37,7 @@ class Location:
     row: int
     col: int
 
-    def pixels(self) -> tuple[int, int]:
+    def get_pixels(self) -> tuple[int, int]:
         return (self.row*TILE_PIXELS, self.col*TILE_PIXELS)
 
 @dataclass(frozen=True)
