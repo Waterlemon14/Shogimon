@@ -10,7 +10,16 @@ class EeveeMovement(Movement):
             for dr, dc in MovePossibilities.FORWARD.value
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
         ]
-    
+
+class EeveeShinyMovement(Movement):
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+        
+        return [
+            (row + dr, col + dc)
+            for dr, dc in MovePossibilities.FORWARD_OPPOSITE.value
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
+        ]
+
 class PikachuMovement(Movement):
     def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
         diagonals: list[tuple[int, int]] = []
@@ -119,10 +128,10 @@ class Board:
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
-        self._protected_pieces: dict[PlayerNumber, list[ProtectedPiece]] = {}
-        self._live_pieces: dict[PlayerNumber, list[Piece]] = {}
-        self._captured_pieces: dict[PlayerNumber, list[Piece]] = {}
-        self._grid: list[list[Piece | ProtectedPiece | None]]
+        self._protected_pieces: dict[PlayerNumber, list[ProtectedPiece]] = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
+        self._live_pieces: dict[PlayerNumber, list[Piece]] = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
+        self._captured_pieces: dict[PlayerNumber, list[Piece]] = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
+        self._grid: list[list[Piece | ProtectedPiece | None]] = [[ None for _ in range(width)] for _ in range(height)]
         ...
 
     def get_live_pieces(self) -> list[LivePiece]:
@@ -226,6 +235,7 @@ class Board:
         locations: list[tuple[int, int]] = []
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
+            print(player.value, piece.kind.value, piece.get_movement_range(self.get_grid_mapping()))
             locations.extend(piece.get_movement_range(self.get_grid_mapping()))
 
         return locations
@@ -280,7 +290,11 @@ class PieceFactory:
             case PieceKind.EEVEE:
                 movement = EeveeMovement()
                 return Piece(piece_id, piece_kind, location, movement)
- 
+
+            case PieceKind.EEVEE_SHINY:
+                movement = EeveeShinyMovement()
+                return Piece(piece_id, piece_kind, location, movement)
+
             case PieceKind.PIKACHU:
                 movement = PikachuMovement()
                 return Piece(piece_id, piece_kind, location, movement)
@@ -310,7 +324,7 @@ class PlayerTwoPositions:
         ]
 
         positions += [
-            (PlayerNumber.TWO, PieceKind.EEVEE, Location(1, n)) for n in range(8)
+            (PlayerNumber.TWO, PieceKind.EEVEE_SHINY, Location(1, n)) for n in range(8)
         ]
 
         return positions
@@ -338,6 +352,7 @@ class BoardSetter:
         self._positions = p1_positions.get_positions() + p2_positions.get_positions()
     
     def set_board(self, board: Board):
+
 
         for player, kind, location in self._positions:
             piece = PieceFactory.make(kind, location)

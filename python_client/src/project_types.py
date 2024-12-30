@@ -15,6 +15,7 @@ class GameStatus(StrEnum):
 
 class PieceKind(StrEnum):
     EEVEE = auto()
+    EEVEE_SHINY = auto()
     PIKACHU = auto()
     LATIAS = auto()
     LATIOS = auto()
@@ -64,6 +65,7 @@ class GameState:
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
+    FORWARD_OPPOSITE = [(1, 0)]
     DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
     ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
 
