@@ -8,7 +8,7 @@ from project_types import (
     MakeTurnObserver, NewGameObserver,
     )
 
-SCREEN_WIDTH = 1280
+SCREEN_WIDTH = 768
 SCREEN_HEIGHT = 720
 BOARD_WIDTH = TILE_PIXELS*BOARD_ROWS
 BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
@@ -56,7 +56,7 @@ class Captures:
 
     def _render_row(self) -> pygame.Surface:
         '''UNTESTED'''
-        returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS*2))
+        returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
         _counted_list = Counter(self._captures)
 
         order_in_screen = 0
@@ -107,7 +107,7 @@ class Tile:
         '''UNTESTED'''
         actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
         pygame.Surface.fill(actual_tile, '#FFFFFF')
-        pygame.draw.rect(actual_tile, "#000000", (0,0), 1)
+        pygame.draw.rect(actual_tile, "#000000", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
         
         if self._occupier is not None:
             _path = get_image_path(self._occupier)
@@ -127,6 +127,17 @@ class RenderableBoard:
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
         }
+
+        self._init_state()
+
+    def _init_state(self):
+        for i in range(8):
+            self._location_to_tile[Location(6, i)].mark_occupied(
+                LivePiece(PieceKind.EEVEE, -1, PlayerNumber.ONE, Location(6, i))
+            )
+            self._location_to_tile[Location(1, i)].mark_occupied(
+                LivePiece(PieceKind.EEVEE, -1, PlayerNumber.TWO, Location(1, i))
+            )
 
     def get_tile(self, location) -> Tile:
         return self._location_to_tile[location]
