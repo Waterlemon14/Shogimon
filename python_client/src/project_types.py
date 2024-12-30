@@ -67,8 +67,8 @@ class GameState:
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
-    SINGLE_DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
-    SINGLE_ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
+    DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
+    ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
 
 class Movement(Protocol):    
     def get_movement_range(self) -> list[tuple[int, int]]:
