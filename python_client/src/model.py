@@ -112,7 +112,8 @@ class Board:
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
-        self._live_pieces: dict[PlayerNumber, list[Piece | ProtectedPiece]] = {}
+        self._protected_pieces: dict[PlayerNumber, list[ProtectedPiece]] = {}
+        self._live_pieces: dict[PlayerNumber, list[Piece]] = {}
         self._captured_pieces: dict[PlayerNumber, list[Piece]] = {}
         self._grid: list[list[Piece | ProtectedPiece | None]]
         ...
@@ -167,7 +168,11 @@ class Board:
     
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
-        live_pieces.append(piece)
+        protected_pieces = self._protected_pieces[player]
+        if type(piece) == Piece:
+            live_pieces.append(piece)
+        elif type(piece) == ProtectedPiece:
+            protected_pieces.append(piece)
         self._grid[row][col] = piece
 
     def take(self, row: int, col: int):
@@ -314,6 +319,8 @@ class GameModel:
         pass
 
     def _check_if_mate(self):
+
+
         pass
 
     def make_action(self, action: PlayerAction):
