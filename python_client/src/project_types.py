@@ -18,12 +18,6 @@ class PieceKind(StrEnum):
     LATIOS = auto()
     TURTWIG = auto()
 
-    def get_image_path(self, shiny: bool) -> str:
-        if shiny:
-            return "../../img/" + self.value + "-shiny.png"
-        
-        return "../../img/" + self.value + ".png"
-    
 class ActionType(StrEnum):
     MOVE = auto()
     DROP = auto()

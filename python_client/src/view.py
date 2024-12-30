@@ -3,7 +3,7 @@ from collections import Counter
 
 from project_types import (
     TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
-    LivePiece, Location, GameState,
+    LivePiece, Location, GameState, PieceKind,
     PlayerNumber,
     MakeTurnObserver, NewGameObserver,
     )
@@ -12,6 +12,14 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 BOARD_WIDTH = TILE_PIXELS*BOARD_ROWS
 BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
+
+
+def get_image_path(piece: LivePiece) -> str:
+    if piece.piece_owner == PlayerNumber.TWO:
+        return "../../img/" + piece.piece_kind.value + "-shiny.png"
+    
+    return "../../img/" + piece.piece_kind.value + ".png"
+
 
 class Captures:
     """Renderable class for player captures (top and bottom of game screen)"""
@@ -39,9 +47,12 @@ class Captures:
         screen.blit(actual_captures, _blittable)
 
     def _render_row(self) -> pygame.Surface:
-        returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
+        returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS*2))
+        _counted_list = Counter(self._captures)
 
-        for piece in self._captures:
+        for piece in _counted_list:
+            path = get_image_path(piece)
+            pygame.image.load(path).convert()
             ...
 
         return returnable
@@ -76,10 +87,9 @@ class Tile:
         pygame.Surface.fill(actual_tile, '#FFFFFF')
         
         if self._occupier is not None:
-            _kind = self._occupier.piece_kind
-            _is_shiny = (self._occupier.piece_owner == PlayerNumber.TWO)
-            path = _kind.get_image_path(_is_shiny)
+            path = get_image_path(self._occupier)
             pygame.image.load(path).convert()
+            ...
 
         if self._is_targetable:
             pygame.draw.circle(actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
