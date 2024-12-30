@@ -190,7 +190,7 @@ class Board:
                 self._live_pieces[player].append(piece)
 
     def get_grid_mapping(self) -> list[list[bool]]:
-        return [[True if loc else False for loc in row] for row in self._grid]
+        return [[True if piece and piece.id  else False for piece in row] for row in self._grid]
     
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
@@ -207,6 +207,7 @@ class Board:
     def move(self, row: int, col: int, piece: Piece | ProtectedPiece):
         piece.location = Location(row, col)
         self._grid[row][col] = piece
+
     
     def capture(self, row: int, col: int, capturing_player: PlayerNumber, capturing_piece: Piece):
         captured_player = PlayerNumber.TWO if capturing_player == PlayerNumber.ONE else PlayerNumber.ONE
@@ -235,7 +236,6 @@ class Board:
         locations: list[tuple[int, int]] = []
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
-            print(player.value, piece.kind.value, piece.get_movement_range(self.get_grid_mapping()))
             locations.extend(piece.get_movement_range(self.get_grid_mapping()))
 
         return locations
@@ -441,6 +441,7 @@ class GameModel:
 
                         # Move piece simply  
                         else:
+                            print("Moving piece " + piece_to_move.kind.value)
                             board.move(target_row, target_col, piece_to_move)
 
                     # If protected piece, check if target location is valid
