@@ -18,7 +18,7 @@ class PieceKind(StrEnum):
     LATIOS = auto()
     TURTWIG = auto()
 
-    def image_path(self, shiny: bool) -> str:
+    def get_image_path(self, shiny: bool) -> str:
         if shiny:
             return "../../img/" + self.value + "-shiny.png"
         
@@ -37,6 +37,7 @@ class Location:
     row: int
     col: int
 
+    @property
     def pixels(self) -> tuple[int, int]:
         return (self.row*TILE_PIXELS, self.col*TILE_PIXELS)
 

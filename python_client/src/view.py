@@ -1,7 +1,7 @@
 import pygame
 
 from project_types import (
-    TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
+    TILE_PIXELS, BOARD_ROWS, BOARD_COLS, LivePiece,
     PieceKind, Location, GameState, Movement,
     PlayerNumber,
     MakeTurnObserver, NewGameObserver,
@@ -45,17 +45,19 @@ class Tile:
     """Renderable class for each tile inside board"""
     def __init__(self, location: Location):
         self._location = location
+        self._x_coord = location.pixels[0]
+        self._y_coord = location.pixels[1]
         self._width = TILE_PIXELS
         self._height = TILE_PIXELS
-        self._occupier: PieceKind | None = None
+        self._occupier: LivePiece | None = None
         self._targetable = False
 
     @property
-    def occupier(self) -> PieceKind | None:
+    def occupier(self) -> LivePiece | None:
         return self._occupier
 
-    def mark_occupied(self, kind: PieceKind):
-        self._occupier = kind
+    def mark_occupied(self, piece: LivePiece):
+        self._occupier = piece
 
     def mark_empty(self):
         self._occupier = None
@@ -71,12 +73,13 @@ class Tile:
         pygame.Surface.fill(actual_tile, '#FFFFFF')
         
         if self._occupier is not None:
-            ...
+            kind = self._occupier.piece_kind
+            owner = ...
 
         if self._targetable:
             ...
 
-        board.blit(actual_tile, (0, 0))
+        board.blit(actual_tile, (self._x_coord, self._y_coord))
 
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
