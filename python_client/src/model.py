@@ -190,7 +190,7 @@ class Board:
                 self._live_pieces[player].append(piece)
 
     def get_grid_mapping(self) -> list[list[bool]]:
-        return [[True if piece and piece.id  else False for piece in row] for row in self._grid]
+        return [[True if piece else False for piece in row] for row in self._grid]
     
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
@@ -239,7 +239,7 @@ class Board:
             locations.extend(piece.get_movement_range(self.get_grid_mapping()))
 
         return locations
-    
+
     def is_valid_location(self, row: int, col: int) -> bool:
         loc = self._grid[row][col]
 
@@ -460,6 +460,14 @@ class GameModel:
         self._action_count -= 1
         self._check_if_game_over()
         self._update_state()
+        
+        """
+        Notes for tomorrow self:
+        
+        fix movement range: 
+            - include first encounter of opponent piece
+            - change get_grid_mapping logic to fix above
 
+        """
     def new_game(self):
         ...
