@@ -1,6 +1,6 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, CapturedPiece
+from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType
 
 class EeveeMovement(Movement):
     def get_movement_range(self) -> list[tuple[int, int]]:
@@ -117,32 +117,31 @@ class Board:
         self._grid: list[list[Piece | ProtectedPiece | None]]
         ...
 
-    def get_live_pieces(self) -> dict[PlayerNumber, list[LivePiece]]:
-        return {
-            PlayerNumber.ONE: [
-                LivePiece(piece.kind, piece.id, Location(piece.row, piece.col)) 
-                for piece in self._live_pieces[PlayerNumber.ONE]
-                ], 
-            
-            PlayerNumber.TWO: [
-                LivePiece(piece.kind, piece.id, Location(piece.row, piece.col)) 
-                for piece in self._live_pieces[PlayerNumber.TWO]
-                ]
-            }
-        
+    def get_live_pieces(self) -> list[LivePiece]:
+        return [
 
-    def get_captured_pieces(self) -> dict[PlayerNumber, list[CapturedPiece]]:
-        return {
-            PlayerNumber.ONE: [
-                CapturedPiece(piece.kind, piece.id) 
-                for piece in self._captured_pieces[PlayerNumber.ONE]
-                ], 
+                LivePiece(piece.kind, piece.id, PlayerNumber.ONE, Location(piece.row, piece.col)) 
+                for piece in self._live_pieces[PlayerNumber.ONE]
+
+            ] + [
+
+                LivePiece(piece.kind, piece.id, PlayerNumber.TWO, Location(piece.row, piece.col)) 
+                for piece in self._live_pieces[PlayerNumber.TWO]
+                
+            ]
+
+    def get_captured_pieces(self) -> list[LivePiece]:
+        return [
             
-            PlayerNumber.TWO: [
-                CapturedPiece(piece.kind, piece.id) 
+                LivePiece(piece.kind, piece.id, PlayerNumber.ONE, None) 
+                for piece in self._captured_pieces[PlayerNumber.ONE]
+
+            ] + [
+
+                LivePiece(piece.kind, piece.id, PlayerNumber.TWO, None) 
                 for piece in self._captured_pieces[PlayerNumber.TWO]
-                ]
-            }
+                
+            ]
 
     def get_live_piece(self, id: int, player: PlayerNumber) -> Piece | ProtectedPiece | None:
         for piece in self._live_pieces[player]:
@@ -341,7 +340,7 @@ class GameModel:
             is_still_playable=True,
             captured_pieces= board.get_captured_pieces(),
             live_pieces=board.get_live_pieces(),
-            move_count=3
+            action_count=3
         )
 
         return cls(state, board, PlayerNumber.ONE)

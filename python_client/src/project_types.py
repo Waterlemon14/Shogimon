@@ -44,13 +44,8 @@ class Location:
 class LivePiece:
     piece_kind: PieceKind
     piece_id: int
-    location: Location
-
-@dataclass(frozen=True)
-class CapturedPiece:
-    """-> for this, peep my PM sa messenger"""
-    piece_kind: PieceKind
-    piece_id: int
+    piece_owner: PlayerNumber
+    location: Location | None
 
 @dataclass(frozen=True)
 class PlayerAction:
@@ -64,9 +59,9 @@ class GameState:
     player_number: PlayerNumber
     active_player: PlayerNumber
     is_still_playable: bool
-    captured_pieces: dict[PlayerNumber, list[CapturedPiece]]
-    live_pieces: dict[PlayerNumber, list[LivePiece]]
-    move_count: int
+    captured_pieces: list[LivePiece]
+    live_pieces: list[LivePiece]
+    action_count: int
     """-> semantics; rename to action_count? to avoid ambiguity"""
 
 class MovePossibilities(Enum):
