@@ -27,6 +27,9 @@ class Captures:
         self._captures: list[LivePiece] = []
         self._owner = number
 
+        pygame.font.init()
+        self._font = pygame.font.SysFont('Arial', 25)
+
     @property
     def captures(self) -> list[LivePiece]:
         return self._captures
@@ -37,6 +40,7 @@ class Captures:
     
     def render_to_screen(self, screen: pygame.Surface):
         '''
+        UNTESTED
         NOTICE: this implementation has a certain level of coupling with view's screen;
         lmk how you feel about this
         '''
@@ -51,13 +55,26 @@ class Captures:
         screen.blit(actual_captures, _blittable)
 
     def _render_row(self) -> pygame.Surface:
+        '''UNTESTED'''
         returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS*2))
         _counted_list = Counter(self._captures)
 
+        order_in_screen = 0
+
         for piece in _counted_list:
-            path = get_image_path(piece)
-            pygame.image.load(path).convert()
-            ...
+            _path = get_image_path(piece)
+            returnable.blit(
+                pygame.image.load(_path).convert(),
+                (TILE_PIXELS*order_in_screen, 0)
+            )
+
+            _count = self._font.render(
+                "x" + str(_counted_list[piece]),
+                True, "#FFFFFF"
+            )
+            returnable.blit(_count, (TILE_PIXELS*order_in_screen, TILE_PIXELS))
+
+            order_in_screen += 1
 
         return returnable
 
@@ -87,13 +104,15 @@ class Tile:
         self._is_targetable = False
 
     def render_to_board(self, board: pygame.Surface):
+        '''UNTESTED'''
         actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
         pygame.Surface.fill(actual_tile, '#FFFFFF')
+        pygame.draw.rect(actual_tile, "#000000", (0,0), 1)
         
         if self._occupier is not None:
-            path = get_image_path(self._occupier)
-            pygame.image.load(path).convert()
-            ...
+            _path = get_image_path(self._occupier)
+            _image = pygame.image.load(_path).convert()
+            actual_tile.blit(_image, (0,0))
 
         if self._is_targetable:
             pygame.draw.circle(actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
@@ -113,6 +132,7 @@ class RenderableBoard:
         return self._location_to_tile[location]
 
     def render_to_screen(self, screen: pygame.Surface):
+        '''UNTESTED'''
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
         pygame.Surface.fill(actual_board, '#000000')
 
