@@ -119,10 +119,10 @@ class Board:
     def __init__(self, height: int, width: int):
         self._height: int = height
         self._width: int = width
-        self._protected_pieces: dict[PlayerNumber, list[ProtectedPiece]] = {}
-        self._live_pieces: dict[PlayerNumber, list[Piece]] = {}
-        self._captured_pieces: dict[PlayerNumber, list[Piece]] = {}
-        self._grid: list[list[Piece | ProtectedPiece | None]]
+        self._protected_pieces: dict[PlayerNumber, list[ProtectedPiece]] = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
+        self._live_pieces: dict[PlayerNumber, list[Piece]] = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
+        self._captured_pieces: dict[PlayerNumber, list[Piece]] = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
+        self._grid: list[list[Piece | ProtectedPiece | None]] = [[ None for _ in range(width)] for _ in range(height)]
         ...
 
     def get_live_pieces(self) -> list[LivePiece]:
@@ -226,6 +226,7 @@ class Board:
         locations: list[tuple[int, int]] = []
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
+            print(player.value, piece.kind.value, piece.get_movement_range(self.get_grid_mapping()))
             locations.extend(piece.get_movement_range(self.get_grid_mapping()))
 
         return locations
@@ -338,6 +339,7 @@ class BoardSetter:
         self._positions = p1_positions.get_positions() + p2_positions.get_positions()
     
     def set_board(self, board: Board):
+
 
         for player, kind, location in self._positions:
             piece = PieceFactory.make(kind, location)
