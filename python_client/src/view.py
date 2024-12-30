@@ -1,8 +1,9 @@
 import pygame
+from collections import Counter
 
 from project_types import (
     TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
-    LivePiece, Location, GameState,
+    LivePiece, Location, GameState, PieceKind,
     PlayerNumber,
     MakeTurnObserver, NewGameObserver,
     )
@@ -11,6 +12,14 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 BOARD_WIDTH = TILE_PIXELS*BOARD_ROWS
 BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
+
+
+def get_image_path(piece: LivePiece) -> str:
+    if piece.piece_owner == PlayerNumber.TWO:
+        return "../../img/" + piece.piece_kind.value + "-shiny.png"
+    
+    return "../../img/" + piece.piece_kind.value + ".png"
+
 
 class Captures:
     """Renderable class for player captures (top and bottom of game screen)"""
@@ -27,18 +36,30 @@ class Captures:
         return self._owner
     
     def render_to_screen(self, screen: pygame.Surface):
-        actual_captures = pygame.Surface((BOARD_WIDTH, TILE_PIXELS))
+        '''
+        NOTICE: this implementation has a certain level of coupling with view's screen;
+        lmk how you feel about this
+        '''
+        actual_captures = self._render_row()
 
         match self._owner:
             case PlayerNumber.ONE:
-                ...
-                _blittable = actual_captures.get_rect(midbottom=(...))
-                
+                _blittable = actual_captures.get_rect(midbottom=(SCREEN_WIDTH//2, SCREEN_HEIGHT))
             case PlayerNumber.TWO:
-                ...
-                _blittable = actual_captures.get_rect(midtop=(...))
+                _blittable = actual_captures.get_rect(midtop=(SCREEN_WIDTH//2, 0))
 
         screen.blit(actual_captures, _blittable)
+
+    def _render_row(self) -> pygame.Surface:
+        returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS*2))
+        _counted_list = Counter(self._captures)
+
+        for piece in _counted_list:
+            path = get_image_path(piece)
+            pygame.image.load(path).convert()
+            ...
+
+        return returnable
 
 class Tile:
     """Renderable class for each tile inside board"""
@@ -70,8 +91,9 @@ class Tile:
         pygame.Surface.fill(actual_tile, '#FFFFFF')
         
         if self._occupier is not None:
-            kind = self._occupier.piece_kind
-            owner = ...
+            path = get_image_path(self._occupier)
+            pygame.image.load(path).convert()
+            ...
 
         if self._is_targetable:
             pygame.draw.circle(actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)

@@ -2,9 +2,11 @@ from dataclasses import dataclass
 from typing import Protocol
 from enum import Enum, StrEnum, auto
 
+
 BOARD_ROWS = 8
 BOARD_COLS = 8
 TILE_PIXELS = 64
+
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
@@ -18,12 +20,6 @@ class PieceKind(StrEnum):
     LATIOS = auto()
     TURTWIG = auto()
 
-    def get_image_path(self, shiny: bool) -> str:
-        if shiny:
-            return "../../img/" + self.value + "-shiny.png"
-        
-        return "../../img/" + self.value + ".png"
-    
 class ActionType(StrEnum):
     MOVE = auto()
     DROP = auto()
@@ -31,6 +27,7 @@ class ActionType(StrEnum):
 class PlayerNumber(StrEnum):
     ONE = auto()
     TWO = auto()
+
 
 @dataclass(frozen=True)
 class Location:
@@ -63,12 +60,13 @@ class GameState:
     captured_pieces: list[LivePiece]
     live_pieces: list[LivePiece]
     action_count: int
-    """-> semantics; rename to action_count? to avoid ambiguity"""
+
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
     DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
     ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
+
 
 class Movement(Protocol):    
     def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
