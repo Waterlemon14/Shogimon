@@ -63,7 +63,6 @@ class GameState:
     captured_pieces: list[LivePiece]
     live_pieces: list[LivePiece]
     action_count: int
-    """-> semantics; rename to action_count? to avoid ambiguity"""
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
