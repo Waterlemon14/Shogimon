@@ -10,7 +10,16 @@ class EeveeMovement(Movement):
             for dr, dc in MovePossibilities.FORWARD.value
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
         ]
-    
+
+class EeveeShinyMovement(Movement):
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+        
+        return [
+            (row + dr, col + dc)
+            for dr, dc in MovePossibilities.FORWARD_OPPOSITE.value
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
+        ]
+
 class PikachuMovement(Movement):
     def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
         diagonals: list[tuple[int, int]] = []

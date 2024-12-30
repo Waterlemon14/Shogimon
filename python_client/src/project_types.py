@@ -64,6 +64,7 @@ class GameState:
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
+    FORWARD_OPPOSITE = [(1, 0)]
     DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
     ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
 
