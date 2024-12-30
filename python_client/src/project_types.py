@@ -67,17 +67,6 @@ class GameState:
 
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
-    ORTHOGONALS = [
-        (dr, dc)
-        for dr in {-1, 0 +1}
-        for dc in {-1, 0 +1}
-        if 0 in {dr, dc}
-    ]
-    DIAGONALS = [
-        (dr, dc)
-        for dr in {-1, +1}
-        for dc in {-1, +1}
-    ]
     SINGLE_DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
     SINGLE_ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
 
