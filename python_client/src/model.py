@@ -3,24 +3,57 @@ from typing import Self
 from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType
 
 class EeveeMovement(Movement):
-    def get_movement_range(self) -> list[tuple[int, int]]:
-        return MovePossibilities.FORWARD.value
+    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+        
+        return [
+            (row + dr, col + dc)
+            for dr, dc in MovePossibilities.FORWARD.value
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8  
+        ]
     
 class PikachuMovement(Movement):
-    def get_movement_range(self) -> list[tuple[int, int]]:
-        return MovePossibilities.DIAGONALS.value
+    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+        diagonals: list[tuple[int, int]] = []
+        
+        for dr, dc in MovePossibilities.DIAGONALS.value:
+
+            temp_row, temp_col = row, col
+            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8:
+                temp_row += dr
+                temp_col += dc
+                diagonals.append((temp_row, temp_col))
+        
+        return diagonals
 
 class TurtwigMovement(Movement):
-    def get_movement_range(self) -> list[tuple[int, int]]:
-        return MovePossibilities.ORTHOGONALS.value
+    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+        orthogonals: list[tuple[int, int]] = []
+        
+        for dr, dc in MovePossibilities.ORTHOGONALS.value:
+
+            temp_row, temp_col = row, col
+            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8:
+                temp_row += dr
+                temp_col += dc
+                orthogonals.append((temp_row, temp_col))
+        
+        return orthogonals
 
 class LatiosMovement(Movement):
-    def get_movement_range(self) -> list[tuple[int, int]]:
-        return MovePossibilities.SINGLE_ORTHOGONALS.value
+    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+        return [
+            (row + dr, col + dc)
+            for dr, dc in MovePossibilities.ORTHOGONALS.value
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8  
+        ]
     
 class LatiasMovement(Movement):
-    def get_movement_range(self) -> list[tuple[int, int]]:
-        return MovePossibilities.SINGLE_ORTHOGONALS.value
+    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+         return [
+            (row + dr, col + dc)
+            for dr, dc in MovePossibilities.DIAGONALS.value
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8  
+        ]
 
 class CurrentPlayer:
     """
@@ -65,20 +98,12 @@ class Piece:
         return self._is_captured
 
     def can_move(self, row: int, col: int) -> bool:
-        return any(
-            True for dr, dc in self._movement.get_movement_range()
-            if self.row + dr == row and
-            self.col + dc == col
-        )
+        
+        return (row, col) in self._movement.get_movement_range(self.row, self.col)
     
-    def get_possible_moves(self) -> list[tuple[int, int]]:
-
-        possible_moves: list[tuple[int, int]] = []
-
-        for dr, dc in self._movement.get_movement_range():
-            possible_moves.append((self.row + dr, self.col + dc))
-
-        return possible_moves
+    def get_movement_range(self) -> list[tuple[int, int]]:
+        return self._movement.get_movement_range(self.row, self.col)
+  
 
 class ProtectedPiece:
     def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
@@ -105,20 +130,10 @@ class ProtectedPiece:
 
     def can_move(self, row: int, col: int) -> bool:
         
-        return any(
-            True for dr, dc in self._movement.get_movement_range()
-            if self.row + dr == row and
-            self.col + dc == col
-        )
+        return (row, col) in self._movement.get_movement_range(self.row, self.col)
     
-    def get_possible_moves(self) -> list[tuple[int, int]]:
-
-        possible_moves: list[tuple[int, int]] = []
-
-        for dr, dc in self._movement.get_movement_range():
-            possible_moves.append((self.row + dr, self.col + dc))
-
-        return possible_moves
+    def get_movement_range(self) -> list[tuple[int, int]]:
+        return self._movement.get_movement_range(self.row, self.col)
 
 class Board:
     def __init__(self, height: int, width: int):
@@ -228,7 +243,7 @@ class Board:
         loc = self._grid[row][col]
 
         for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
-            if (row, col) in piece.get_possible_moves():
+            if (row, col) in piece.get_movement_range():
                 return False
             
         return not loc
@@ -237,20 +252,27 @@ class Board:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
 
         for piece in self._live_pieces[opponent]:
-            if (row, col) in piece.get_possible_moves():
+            if (row, col) in piece.get_movement_range():
                 return False
             
         return True
 
     
-    def is_checkmate(self) -> bool:
+    def is_checkmate(self, curr_player: PlayerNumber) -> bool:
+        opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
         """
         Checks if Latias and Latios of each player can still move
         """
-        # player1_protected = self._protected_pieces[PlayerNumber.ONE]
-        # player2_protected = self._protected_pieces[PlayerNumber.TWO]
-        
-        return True
+
+        for attacking_piece in self._live_pieces[curr_player]:
+
+            enemy_sight = attacking_piece.get_movement_range()
+
+            for protected in self._protected_pieces[opponent]:
+                if (protected.row, protected.col) in enemy_sight:
+                    return True
+            
+        return False
 
 class PieceFactory:
     _piece_count = 0
