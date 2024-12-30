@@ -47,8 +47,6 @@ class Tile:
         self._location = location
         self._x_coord = location.pixels[0]
         self._y_coord = location.pixels[1]
-        self._width = TILE_PIXELS
-        self._height = TILE_PIXELS
         self._occupier: LivePiece | None = None
         self._is_targetable = False
 
@@ -69,7 +67,7 @@ class Tile:
         self._is_targetable = False
 
     def render_to_board(self, board: pygame.Surface):
-        actual_tile = pygame.Surface((self._width, self._height))
+        actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
         pygame.Surface.fill(actual_tile, '#FFFFFF')
         
         if self._occupier is not None:
@@ -77,7 +75,7 @@ class Tile:
             owner = ...
 
         if self._is_targetable:
-            ...
+            pygame.draw.circle(actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
 
         board.blit(actual_tile, (self._x_coord, self._y_coord))
 
@@ -106,8 +104,6 @@ class RenderableBoard:
 class GameView:
     """Actual MVC view class"""
     def __init__(self):
-        self._width = SCREEN_WIDTH
-        self._height = SCREEN_HEIGHT
         self._make_turn_observers: list[MakeTurnObserver] = []
         self._new_game_observers: list[NewGameObserver] = []
 
@@ -130,7 +126,7 @@ class GameView:
     def run(self):
         pygame.init()
 
-        self._screen = pygame.display.set_mode((self._width, self._height))
+        self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self._clock = pygame.time.Clock()
 
         _game_is_running = True
