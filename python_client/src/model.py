@@ -290,7 +290,11 @@ class PieceFactory:
             case PieceKind.EEVEE:
                 movement = EeveeMovement()
                 return Piece(piece_id, piece_kind, location, movement)
- 
+
+            case PieceKind.EEVEE_SHINY:
+                movement = EeveeShinyMovement()
+                return Piece(piece_id, piece_kind, location, movement)
+
             case PieceKind.PIKACHU:
                 movement = PikachuMovement()
                 return Piece(piece_id, piece_kind, location, movement)
@@ -320,7 +324,7 @@ class PlayerTwoPositions:
         ]
 
         positions += [
-            (PlayerNumber.TWO, PieceKind.EEVEE, Location(1, n)) for n in range(8)
+            (PlayerNumber.TWO, PieceKind.EEVEE_SHINY, Location(1, n)) for n in range(8)
         ]
 
         return positions

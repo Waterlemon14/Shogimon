@@ -15,6 +15,7 @@ class GameStatus(StrEnum):
 
 class PieceKind(StrEnum):
     EEVEE = auto()
+    EEVEE_SHINY = auto()
     PIKACHU = auto()
     LATIAS = auto()
     LATIOS = auto()
