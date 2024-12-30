@@ -1,36 +1,35 @@
 import pygame
 
 from project_types import (
-    TILE_PIXELS, BOARD_ROWS, BOARD_COLS, LivePiece,
-    PieceKind, Location, GameState, Movement,
+    TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
+    LivePiece, Location, GameState,
     PlayerNumber,
     MakeTurnObserver, NewGameObserver,
     )
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-
 BOARD_WIDTH = TILE_PIXELS*BOARD_ROWS
 BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 
 class Captures:
     """Renderable class for player captures (top and bottom of game screen)"""
     def __init__(self, number: PlayerNumber):
-        self._captures: list[PieceKind] = []
-        self._capture_owner = number
+        self._captures: list[LivePiece] = []
+        self._owner = number
 
     @property
-    def get_captures(self) -> list[PieceKind]:
+    def captures(self) -> list[LivePiece]:
         return self._captures
     
     @property
-    def get_player_owner(self) -> PlayerNumber:
-        return self._capture_owner
+    def owner(self) -> PlayerNumber:
+        return self._owner
     
     def render_to_screen(self, screen: pygame.Surface):
         actual_captures = pygame.Surface((BOARD_WIDTH, TILE_PIXELS))
 
-        match self._capture_owner:
+        match self._owner:
             case PlayerNumber.ONE:
                 ...
                 _blittable = actual_captures.get_rect(midbottom=(...))
