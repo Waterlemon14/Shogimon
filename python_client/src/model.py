@@ -203,51 +203,6 @@ class Board:
     def is_unoccupied(self, row: int, col: int) -> bool:
         loc = self._grid[row][col]
         return not loc
-"""   
-class Player:
-    def __init__(self, number: PlayerNumber, deployed_pieces: list[Piece | ProtectedPiece], captured_pieces: list[Piece | ProtectedPiece]):
-        self._number: PlayerNumber = number
-        self._deployed_pieces: list[Piece | ProtectedPiece] = deployed_pieces
-        self._captured_pieces: list[Piece | ProtectedPiece] = captured_pieces
-        pass
-
-    def get_deployed_pieces(self) -> list[LivePiece]:
-        return [LivePiece(piece.kind, piece.id, Location(piece.row, piece.col)) for piece in self._deployed_pieces]
-
-    def get_captured_pieces(self) -> list[CapturedPiece]:
-        return [CapturedPiece(piece.kind, piece.id) for piece in self._captured_pieces]
-
-    def make_turn(self, board: Board, action: PlayerAction):
-
-        If turn of player, choose between _move_piece and _drop_piece
-        self._board = board
-        piece_id = action.piece_id
-        location = action.target_location
-        match action.action_type:
-            case ActionType.MOVE:
-                self._move_piece(piece_id, location)
-            case ActionType.DROP:
-                self._drop_piece(piece_id, location)
-
-    def _move_piece(self, id: int, loc: Location) -> bool:
-        
-        Return TRUE if a piece is captured, else return FALSE
-        
-        for piece in self._deployed_pieces:
-            if piece.id == id:
-                self._board.take(piece.row, piece.col)
-                
-                if 
-
-                break
-
-    def _drop_piece(self, id: int, loc: Location) -> bool:
-        
-        Return (a) if (r,c) is occupied; and (b) if (r,c) is in movement range of protected piec
-        
-        ...
-    """
-
 class PieceFactory:
     _piece_count = 0
 
