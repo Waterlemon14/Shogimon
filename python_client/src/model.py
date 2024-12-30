@@ -3,16 +3,16 @@ from typing import Self
 from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType
 
 class EeveeMovement(Movement):
-    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
         
         return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.FORWARD.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8  
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
         ]
     
 class PikachuMovement(Movement):
-    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
         diagonals: list[tuple[int, int]] = []
         
         for dr, dc in MovePossibilities.DIAGONALS.value:
@@ -21,12 +21,14 @@ class PikachuMovement(Movement):
             while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8:
                 temp_row += dr
                 temp_col += dc
+                if grid[temp_row][temp_col]:
+                    break
                 diagonals.append((temp_row, temp_col))
         
         return diagonals
 
 class TurtwigMovement(Movement):
-    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
         orthogonals: list[tuple[int, int]] = []
         
         for dr, dc in MovePossibilities.ORTHOGONALS.value:
@@ -35,24 +37,26 @@ class TurtwigMovement(Movement):
             while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8:
                 temp_row += dr
                 temp_col += dc
+                if grid[temp_row][temp_col]:
+                    break
                 orthogonals.append((temp_row, temp_col))
         
         return orthogonals
 
 class LatiosMovement(Movement):
-    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
         return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.ORTHOGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8  
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
         ]
     
 class LatiasMovement(Movement):
-    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
          return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.DIAGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8  
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8  and not grid[row + dr][col + dc]
         ]
 
 class CurrentPlayer:
@@ -97,44 +101,18 @@ class Piece:
     def is_captured(self) -> bool:
         return self._is_captured
 
-    def can_move(self, row: int, col: int) -> bool:
+    def can_move(self, row: int, col: int, grid: list[list[bool]]) -> bool:
         
-        return (row, col) in self._movement.get_movement_range(self.row, self.col)
+        return (row, col) in self._movement.get_movement_range(self.row, self.col, grid)
     
-    def get_movement_range(self) -> list[tuple[int, int]]:
-        return self._movement.get_movement_range(self.row, self.col)
+    def get_movement_range(self, grid: list[list[bool]]) -> list[tuple[int, int]]:
+        return self._movement.get_movement_range(self.row, self.col, grid)
   
 
-class ProtectedPiece:
+class ProtectedPiece(Piece):
     def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
-        self._id = id
-        self._kind = kind
-        self.location = location
-        self._movement = movement
+        super().__init__(id, kind, location, movement)
         self.is_immobile = False
-    
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def kind(self) -> PieceKind:
-        return self._kind
-    
-    @property
-    def row(self) -> int:
-        return self.location.row
-    
-    @property
-    def col(self) -> int:
-        return self.location.col
-
-    def can_move(self, row: int, col: int) -> bool:
-        
-        return (row, col) in self._movement.get_movement_range(self.row, self.col)
-    
-    def get_movement_range(self) -> list[tuple[int, int]]:
-        return self._movement.get_movement_range(self.row, self.col)
     
 
 class Board:
@@ -201,6 +179,9 @@ class Board:
             if piece.id == id:
                 self._captured_pieces[player].remove(piece)
                 self._live_pieces[player].append(piece)
+
+    def get_grid_mapping(self) -> list[list[bool]]:
+        return [[True if loc else False for loc in row] for row in self._grid]
     
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
@@ -241,21 +222,19 @@ class Board:
         
         return False
     
-    def get_movable_locations(self, player: PlayerNumber) -> list[tuple[int, int]]:
+    def get_all_movable_locations(self, player: PlayerNumber) -> list[tuple[int, int]]:
         locations: list[tuple[int, int]] = []
+
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
-            for row, col in piece.get_movement_range():
-                if not self._grid[row][col]:
-                    locations.append((row, col))
-                #condition that checks if row, col is blocked by a piece in lower row, col
+            locations.extend(piece.get_movement_range(self.get_grid_mapping()))
 
         return locations
-
+    
     def is_valid_location(self, row: int, col: int) -> bool:
         loc = self._grid[row][col]
 
         for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
-            if (row, col) in piece.get_movement_range():
+            if (row, col) in piece.get_movement_range(self.get_grid_mapping()):
                 return False
             
         return not loc
@@ -263,7 +242,7 @@ class Board:
     def is_safe_location(self, row: int, col: int, curr_player: PlayerNumber) -> bool:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
 
-        unsafe_locations = self.get_movable_locations(opponent)
+        unsafe_locations = self.get_all_movable_locations(opponent)
         if (row, col) in unsafe_locations:
             return False
             
@@ -274,17 +253,16 @@ class Board:
         """
         Checks if Latias and Latios of each player can still move
         """
-        unsafe_locations = self.get_movable_locations(curr_player)
+        unsafe_locations = self.get_all_movable_locations(curr_player)
 
         for protected in self._protected_pieces[opponent]:
-            possible_moves = protected.get_movement_range()
+            possible_moves = protected.get_movement_range(self.get_grid_mapping())
             danger: list[bool] = []
 
             for r, c in possible_moves:
                 if (r, c) in unsafe_locations:
                     danger.append(True)
 
-            
             protected.is_immobile = True  if all(danger) else False
             
         return all([piece.is_immobile for piece in self._protected_pieces[opponent]])
@@ -419,7 +397,7 @@ class GameModel:
                 piece_to_move = board.get_live_piece(id, player_number)
 
                 # Narrow type down
-                if piece_to_move and piece_to_move.can_move(target_row, target_col):
+                if piece_to_move and piece_to_move.can_move(target_row, target_col, board.get_grid_mapping()):
                     
                     # If regular piece, capture or move
                     if type(piece_to_move) == Piece:
