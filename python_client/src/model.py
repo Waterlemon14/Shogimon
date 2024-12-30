@@ -64,15 +64,21 @@ class Piece:
     def is_captured(self) -> bool:
         return self._is_captured
 
-    def can_move(self, target: Location) -> bool:
-        """
-        To verifiy, from Lecture 15
-        """
+    def can_move(self, row: int, col: int) -> bool:
         return any(
             True for dr, dc in self._movement.get_movement_range()
-            if self.row + dr == target.row and
-            self.col + dc == target.col
+            if self.row + dr == row and
+            self.col + dc == col
         )
+    
+    def get_possible_moves(self) -> list[tuple[int, int]]:
+
+        possible_moves: list[tuple[int, int]] = []
+
+        for dr, dc in self._movement.get_movement_range():
+            possible_moves.append((self.row + dr, self.col + dc))
+
+        return possible_moves
 
 class ProtectedPiece:
     def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
@@ -97,16 +103,13 @@ class ProtectedPiece:
     def col(self) -> int:
         return self.location.col
 
-    def can_move(self, target: Location) -> bool:
-        """
-        To verifiy, from Lecture 15
-        """
+    def can_move(self, row: int, col: int) -> bool:
+        
         return any(
             True for dr, dc in self._movement.get_movement_range()
-            if self.row + dr == target.row and
-            self.col + dc == target.col
+            if self.row + dr == row and
+            self.col + dc == col
         )
-    # TO DO: Board Class
 
 class Board:
     def __init__(self, height: int, width: int):
@@ -119,19 +122,25 @@ class Board:
         ...
 
     def get_live_pieces(self) -> list[LivePiece]:
+        """
+        For GameState
+        """
         return [
 
                 LivePiece(piece.kind, piece.id, PlayerNumber.ONE, Location(piece.row, piece.col)) 
-                for piece in self._live_pieces[PlayerNumber.ONE]
+                for piece in (self._live_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.ONE])
 
             ] + [
 
                 LivePiece(piece.kind, piece.id, PlayerNumber.TWO, Location(piece.row, piece.col)) 
-                for piece in self._live_pieces[PlayerNumber.TWO]
+                for piece in (self._live_pieces[PlayerNumber.TWO] + self._protected_pieces[PlayerNumber.TWO])
                 
             ]
 
     def get_captured_pieces(self) -> list[LivePiece]:
+        """
+        For GameState
+        """
         return [
             
                 LivePiece(piece.kind, piece.id, PlayerNumber.ONE, None) 
@@ -144,8 +153,9 @@ class Board:
                 
             ]
 
+
     def get_live_piece(self, id: int, player: PlayerNumber) -> Piece | ProtectedPiece | None:
-        for piece in self._live_pieces[player]:
+        for piece in self._live_pieces[player] + self._protected_pieces[player]:
             if piece.id == id:
                 return piece
             
@@ -208,6 +218,26 @@ class Board:
     def is_unoccupied(self, row: int, col: int) -> bool:
         loc = self._grid[row][col]
         return not loc
+
+    def is_safe(self, row: int, col: int, curr_player: PlayerNumber) -> bool:
+        opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
+
+        for piece in self._live_pieces[opponent]:
+            if (row, col) in piece.get_possible_moves():
+                return False
+            
+        return True
+
+    
+    def is_checkmate(self) -> bool:
+        """
+        Checks if Latias and Latios of each player can still move
+        """
+        # player1_protected = self._protected_pieces[PlayerNumber.ONE]
+        # player2_protected = self._protected_pieces[PlayerNumber.TWO]
+        
+        return True
+
 class PieceFactory:
     _piece_count = 0
 
@@ -318,8 +348,8 @@ class GameModel:
     def _update_state(self):
         pass
 
-    def _check_if_mate(self):
-
+    def _check_if_game_over(self) -> PlayerNumber | None:
+        board = self._board
 
         pass
 
@@ -336,16 +366,25 @@ class GameModel:
                 piece_to_move = board.get_live_piece(id, player_number)
 
                 # Narrow type down
-                if piece_to_move:   
-                    board.take(piece_to_move.row, piece_to_move.col)
+                if piece_to_move and piece_to_move.can_move(target_row, target_col):
+                    
+                    # If regular piece, capture or move
+                    if type(piece_to_move) == Piece:
+                        board.take(piece_to_move.row, piece_to_move.col)
 
-                    # Check if can capture
-                    if board.can_capture(target_row, target_col) and type(piece_to_move) == Piece:
-                        
-                        board.capture(target_row, target_col, player_number, piece_to_move)
+                        # Check if can capture
+                        if board.can_capture(target_row, target_col):
+                            
+                            board.capture(target_row, target_col, player_number, piece_to_move)
 
-                    # Move piece simply  
-                    else:
+                        # Move piece simply  
+                        else:
+                            board.move(target_row, target_col, piece_to_move)
+
+                    # If protected piece, check if target location is valid
+                    elif type(piece_to_move) == ProtectedPiece and board.is_safe(target_row, target_col, player_number):
+
+                        board.take(piece_to_move.row, piece_to_move.col)
                         board.move(target_row, target_col, piece_to_move)
 
 
