@@ -2,9 +2,11 @@ from dataclasses import dataclass
 from typing import Protocol
 from enum import Enum, StrEnum, auto
 
+
 BOARD_ROWS = 8
 BOARD_COLS = 8
 TILE_PIXELS = 64
+
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
@@ -25,6 +27,7 @@ class ActionType(StrEnum):
 class PlayerNumber(StrEnum):
     ONE = auto()
     TWO = auto()
+
 
 @dataclass(frozen=True)
 class Location:
@@ -58,10 +61,12 @@ class GameState:
     live_pieces: list[LivePiece]
     action_count: int
 
+
 class MovePossibilities(Enum):
     FORWARD = [(-1, 0)]
     DIAGONALS = [(-1, -1), (-1, +1), (+1, +1), (+1, -1)]
     ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
+
 
 class Movement(Protocol):    
     def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:

@@ -36,6 +36,10 @@ class Captures:
         return self._owner
     
     def render_to_screen(self, screen: pygame.Surface):
+        '''
+        NOTICE: this implementation has a certain level of coupling with view's screen;
+        lmk how you feel about this
+        '''
         actual_captures = self._render_row()
 
         match self._owner:
