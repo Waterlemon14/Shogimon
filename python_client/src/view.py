@@ -50,7 +50,7 @@ class Tile:
         self._width = TILE_PIXELS
         self._height = TILE_PIXELS
         self._occupier: LivePiece | None = None
-        self._targetable = False
+        self._is_targetable = False
 
     @property
     def occupier(self) -> LivePiece | None:
@@ -63,10 +63,10 @@ class Tile:
         self._occupier = None
 
     def mark_targetable(self):
-        self._targetable = True
+        self._is_targetable = True
 
     def unmark_targetable(self):
-        self._targetable = False
+        self._is_targetable = False
 
     def render_to_board(self, board: pygame.Surface):
         actual_tile = pygame.Surface((self._width, self._height))
@@ -76,7 +76,7 @@ class Tile:
             kind = self._occupier.piece_kind
             owner = ...
 
-        if self._targetable:
+        if self._is_targetable:
             ...
 
         board.blit(actual_tile, (self._x_coord, self._y_coord))
