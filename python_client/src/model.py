@@ -111,6 +111,7 @@ class ProtectedPiece:
         self._kind = kind
         self.location = location
         self._movement = movement
+        self.is_immobile = False
     
     @property
     def id(self) -> int:
@@ -134,6 +135,7 @@ class ProtectedPiece:
     
     def get_movement_range(self) -> list[tuple[int, int]]:
         return self._movement.get_movement_range(self.row, self.col)
+    
 
 class Board:
     def __init__(self, height: int, width: int):
@@ -238,6 +240,16 @@ class Board:
             return True
         
         return False
+    
+    def get_movable_locations(self, player: PlayerNumber) -> list[tuple[int, int]]:
+        locations: list[tuple[int, int]] = []
+        for piece in self._live_pieces[player] + self._protected_pieces[player]:
+            for row, col in piece.get_movement_range():
+                if not self._grid[row][col]:
+                    locations.append((row, col))
+                #condition that checks if row, col is blocked by a piece in lower row, col
+
+        return locations
 
     def is_valid_location(self, row: int, col: int) -> bool:
         loc = self._grid[row][col]
@@ -251,29 +263,32 @@ class Board:
     def is_safe_location(self, row: int, col: int, curr_player: PlayerNumber) -> bool:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
 
-        for piece in self._live_pieces[opponent]:
-            if (row, col) in piece.get_movement_range():
-                return False
+        unsafe_locations = self.get_movable_locations(opponent)
+        if (row, col) in unsafe_locations:
+            return False
             
         return True
 
-    
     def is_checkmate(self, curr_player: PlayerNumber) -> bool:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
         """
         Checks if Latias and Latios of each player can still move
         """
+        unsafe_locations = self.get_movable_locations(curr_player)
 
-        for attacking_piece in self._live_pieces[curr_player]:
+        for protected in self._protected_pieces[opponent]:
+            possible_moves = protected.get_movement_range()
+            danger: list[bool] = []
 
-            enemy_sight = attacking_piece.get_movement_range()
+            for r, c in possible_moves:
+                if (r, c) in unsafe_locations:
+                    danger.append(True)
 
-            for protected in self._protected_pieces[opponent]:
-                if (protected.row, protected.col) in enemy_sight:
-                    return True
             
-        return False
-
+            protected.is_immobile = True  if all(danger) else False
+            
+        return all([piece.is_immobile for piece in self._protected_pieces[opponent]])
+    
 class PieceFactory:
     _piece_count = 0
 
@@ -376,6 +391,7 @@ class GameModel:
         self._state = state
         self._board = board
         self._active_player = player
+        self._winner: PlayerNumber
     
     @property
     def state(self) -> GameState:
@@ -386,7 +402,8 @@ class GameModel:
 
     def _check_if_game_over(self) -> PlayerNumber | None:
         board = self._board
-
+        if board.is_checkmate(self._active_player):
+            self._winner = self._active_player
         pass
 
     def make_action(self, action: PlayerAction):
