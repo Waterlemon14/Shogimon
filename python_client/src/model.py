@@ -362,13 +362,15 @@ class GameModel:
             action_count=3
         )
 
-        return cls(state, board, PlayerNumber.ONE)
+        return cls(state, board, PlayerNumber.ONE, 3)
 
 
-    def __init__(self, state: GameState, board: Board, player: PlayerNumber):
+    def __init__(self, state: GameState, board: Board, player: PlayerNumber, action_count: int):
         self._state = state
         self._board = board
         self._active_player = player
+        self._action_count = action_count
+        self._is_game_over = False
         self._winner: PlayerNumber
     
     @property
@@ -376,13 +378,27 @@ class GameModel:
         return self._state
 
     def _update_state(self):
-        pass
+
+        if self._action_count == 0:
+            self._active_player = PlayerNumber.ONE if self._active_player == PlayerNumber.TWO else PlayerNumber.TWO
+            self._action_count = 3
+
+        self._state = GameState(
+            player_number = PlayerNumber.ONE,
+            active_player = self._active_player,
+            is_still_playable= not self._is_game_over,
+            captured_pieces= self._board.get_captured_pieces(),
+            live_pieces=self._board.get_live_pieces(),
+            action_count=self._action_count
+        )
+
 
     def _check_if_game_over(self) -> PlayerNumber | None:
         board = self._board
         if board.is_checkmate(self._active_player):
             self._winner = self._active_player
-        pass
+
+        self._is_game_over = True
 
     def make_action(self, action: PlayerAction):
         board = self._board
@@ -397,7 +413,7 @@ class GameModel:
                 piece_to_move = board.get_live_piece(id, player_number)
 
                 # Narrow type down
-                if piece_to_move and piece_to_move.can_move(target_row, target_col, board.get_grid_mapping()):
+                if piece_to_move:
                     
                     # If regular piece, capture or move
                     if type(piece_to_move) == Piece:
@@ -425,8 +441,9 @@ class GameModel:
                 if piece_to_drop and board.is_valid_location(target_row, target_col):
                     board.drop(target_row, target_col, piece_to_drop, player_number)
 
-        # will check if game over here
-        # will update game state here
+        self._action_count -= 1
+        self._check_if_game_over()
+        self._update_state()
 
     def new_game(self):
         ...
