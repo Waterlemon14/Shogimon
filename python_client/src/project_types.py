@@ -70,7 +70,7 @@ class MovePossibilities(Enum):
     ORTHOGONALS = [(0, -1), (0, +1), (-1, 0), (+1, 0),]
 
 class Movement(Protocol):    
-    def get_movement_range(self, row: int, col: int) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
         ...
 
 class PiecePositions(Protocol):
