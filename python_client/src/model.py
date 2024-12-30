@@ -110,6 +110,15 @@ class ProtectedPiece:
             if self.row + dr == row and
             self.col + dc == col
         )
+    
+    def get_possible_moves(self) -> list[tuple[int, int]]:
+
+        possible_moves: list[tuple[int, int]] = []
+
+        for dr, dc in self._movement.get_movement_range():
+            possible_moves.append((self.row + dr, self.col + dc))
+
+        return possible_moves
 
 class Board:
     def __init__(self, height: int, width: int):
@@ -215,11 +224,16 @@ class Board:
         
         return False
 
-    def is_unoccupied(self, row: int, col: int) -> bool:
+    def is_valid_location(self, row: int, col: int) -> bool:
         loc = self._grid[row][col]
+
+        for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
+            if (row, col) in piece.get_possible_moves():
+                return False
+            
         return not loc
 
-    def is_safe(self, row: int, col: int, curr_player: PlayerNumber) -> bool:
+    def is_safe_location(self, row: int, col: int, curr_player: PlayerNumber) -> bool:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
 
         for piece in self._live_pieces[opponent]:
@@ -382,7 +396,7 @@ class GameModel:
                             board.move(target_row, target_col, piece_to_move)
 
                     # If protected piece, check if target location is valid
-                    elif type(piece_to_move) == ProtectedPiece and board.is_safe(target_row, target_col, player_number):
+                    elif type(piece_to_move) == ProtectedPiece and board.is_safe_location(target_row, target_col, player_number):
 
                         board.take(piece_to_move.row, piece_to_move.col)
                         board.move(target_row, target_col, piece_to_move)
@@ -391,7 +405,7 @@ class GameModel:
             case ActionType.DROP:
                 piece_to_drop = board.get_captured_piece(id, player_number)
 
-                if piece_to_drop and board.is_unoccupied(target_row, target_col):
+                if piece_to_drop and board.is_valid_location(target_row, target_col):
                     board.drop(target_row, target_col, piece_to_drop, player_number)
 
         # will check if game over here
