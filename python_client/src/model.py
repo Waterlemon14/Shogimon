@@ -123,6 +123,9 @@ class Piece:
     
     def get_movement_range(self, grid: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         return self._movement.get_movement_range(self.row, self.col, grid)
+    
+    def switch_ownership(self):
+        self._owner = PlayerNumber.ONE if self._owner == PlayerNumber.TWO else PlayerNumber.ONE
   
 
 class ProtectedPiece(Piece):
@@ -238,6 +241,7 @@ class Board:
         self._grid[row][col] = capturing_piece
 
         if captured_piece:
+            captured_piece.switch_ownership()
             self._live_to_captured(captured_piece.id, captured_player, capturing_player)
 
     def drop(self, row: int, col: int, piece: Piece, player: PlayerNumber):
