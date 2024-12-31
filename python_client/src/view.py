@@ -17,7 +17,6 @@ BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 def get_image_path(piece: LivePiece) -> str:
     if piece.piece_owner == PlayerNumber.TWO:
         return "../../img/" + piece.piece_kind.value + "-shiny.png"
-    
     return "../../img/" + piece.piece_kind.value + ".png"
 
 
@@ -39,11 +38,6 @@ class Captures:
         return self._owner
     
     def render_to_screen(self, screen: pygame.Surface):
-        '''
-        UNTESTED
-        NOTICE: this implementation has a certain level of coupling with view's screen;
-        lmk how you feel about this
-        '''
         actual_captures = self._render_row()
 
         match self._owner:
@@ -55,7 +49,6 @@ class Captures:
         screen.blit(actual_captures, _blittable)
 
     def _render_row(self) -> pygame.Surface:
-        '''UNTESTED'''
         returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
         _counted_list = Counter(self._captures)
 
@@ -104,7 +97,6 @@ class Tile:
         self._is_targetable = False
 
     def render_to_board(self, board: pygame.Surface):
-        '''UNTESTED'''
         actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
         pygame.Surface.fill(actual_tile, '#FFFFFF')
         pygame.draw.rect(actual_tile, "#000000", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
@@ -143,7 +135,6 @@ class RenderableBoard:
         return self._location_to_tile[location]
 
     def render_to_screen(self, screen: pygame.Surface):
-        '''UNTESTED'''
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
         pygame.Surface.fill(actual_board, '#000000')
 
