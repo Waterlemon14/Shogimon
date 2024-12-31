@@ -123,13 +123,34 @@ class RenderableBoard:
         self._init_state()
 
     def _init_state(self):
-        for i in range(8):
-            self._location_to_tile[Location(6, i)].mark_occupied(
-                LivePiece(PieceKind.EEVEE, -1, PlayerNumber.ONE, Location(6, i))
-            )
-            self._location_to_tile[Location(1, i)].mark_occupied(
-                LivePiece(PieceKind.EEVEE, -1, PlayerNumber.TWO, Location(1, i))
-            )
+        '''
+        Need to replace ellipses, piece_id's
+        '''
+        for i in range(BOARD_COLS):
+            self._location_to_tile[Location(6, i)].\
+                mark_occupied(LivePiece(PieceKind.EEVEE, -1, PlayerNumber.ONE, Location(6, i)))
+            self._location_to_tile[Location(1, i)].\
+                mark_occupied(LivePiece(PieceKind.EEVEE, -1, PlayerNumber.TWO, Location(1, i)))
+
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.PIKACHU, -1, PlayerNumber.ONE, ...))
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.PIKACHU, -1, PlayerNumber.TWO, ...))
+
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.TURTWIG, -1, PlayerNumber.ONE, ...))
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.TURTWIG, -1, PlayerNumber.TWO, ...))
+        
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.LATIOS, -1, PlayerNumber.ONE, ...))
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.LATIOS, -1, PlayerNumber.TWO, ...))
+        
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.LATIAS, -1, PlayerNumber.ONE, ...))
+        self._location_to_tile[...].\
+            mark_occupied(LivePiece(PieceKind.LATIAS, -1, PlayerNumber.TWO, ...))
 
     def get_tile(self, location) -> Tile:
         return self._location_to_tile[location]
