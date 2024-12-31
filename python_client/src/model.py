@@ -83,12 +83,13 @@ class Opponent:
     ...
 
 class Piece:
-    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
+    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
         self._id = id
         self._kind = kind
         self.location = location
         self._is_captured = False
         self._movement = movement
+        self._owner = owner
 
     @property
     def id(self) -> int:
@@ -119,8 +120,8 @@ class Piece:
   
 
 class ProtectedPiece(Piece):
-    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement):
-        super().__init__(id, kind, location, movement)
+    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
+        super().__init__(id, kind, location, movement, owner)
         self.is_immobile = False
     
 
@@ -282,34 +283,34 @@ class PieceFactory:
 
     @classmethod
     def make(cls, piece_kind: PieceKind,
-             location: Location) -> Piece | ProtectedPiece:
+             location: Location, owner: PlayerNumber) -> Piece | ProtectedPiece:
         piece_id = cls._piece_count
         cls._piece_count += 1
 
         match piece_kind:
             case PieceKind.EEVEE:
                 movement = EeveeMovement()
-                return Piece(piece_id, piece_kind, location, movement)
+                return Piece(piece_id, piece_kind, location, movement, owner)
 
             case PieceKind.EEVEE_SHINY:
                 movement = EeveeShinyMovement()
-                return Piece(piece_id, piece_kind, location, movement)
+                return Piece(piece_id, piece_kind, location, movement, owner)
 
             case PieceKind.PIKACHU:
                 movement = PikachuMovement()
-                return Piece(piece_id, piece_kind, location, movement)
+                return Piece(piece_id, piece_kind, location, movement, owner)
  
             case PieceKind.TURTWIG:
                 movement = TurtwigMovement()
-                return Piece(piece_id, piece_kind, location, movement)
+                return Piece(piece_id, piece_kind, location, movement, owner)
  
             case PieceKind.LATIOS:
                 movement = LatiosMovement()
-                return ProtectedPiece(piece_id, piece_kind, location, movement)
+                return ProtectedPiece(piece_id, piece_kind, location, movement, owner)
  
             case PieceKind.LATIAS:
                 movement = LatiasMovement()
-                return ProtectedPiece(piece_id, piece_kind, location, movement)
+                return ProtectedPiece(piece_id, piece_kind, location, movement, owner)
 
 class PlayerTwoPositions:
     def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
@@ -355,7 +356,7 @@ class BoardSetter:
 
 
         for player, kind, location in self._positions:
-            piece = PieceFactory.make(kind, location)
+            piece = PieceFactory.make(kind, location, player)
             board.put(location.row, location.col, piece, player)
 
 class GameModel:
