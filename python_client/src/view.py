@@ -163,7 +163,9 @@ class RenderableBoard:
 
 class GameView:
     """Actual MVC view class"""
-    def __init__(self):
+    def __init__(self, state: GameState):
+        self.on_state_change(state)
+
         self._make_turn_observers: list[MakeTurnObserver] = []
         self._new_game_observers: list[NewGameObserver] = []
 
@@ -181,7 +183,11 @@ class GameView:
         self._new_game_observers.append(observer)
 
     def on_state_change(self, state: GameState):
-        ...
+        self.active_player = state.active_player
+        self.is_still_playable = state.is_still_playable
+        self.captured_pieces = state.captured_pieces
+        self.live_pieces = state.live_pieces
+        self.action_count = state.action_count
 
     def run(self):
         pygame.init()
