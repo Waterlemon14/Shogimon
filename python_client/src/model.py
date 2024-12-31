@@ -30,7 +30,7 @@ class PikachuMovement(Movement):
             while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8 and (temp_row + dr, temp_col + dc) in valid_locations:
                 temp_row += dr
                 temp_col += dc
-                if not valid_locations[(temp_row,temp_col)]:
+                if not valid_locations[(temp_row,temp_col)]: # if encounters a location with opponent piece (False), block the range
                     diagonals.append((temp_row, temp_col))
                     break
                 diagonals.append((temp_row, temp_col))
@@ -47,7 +47,7 @@ class TurtwigMovement(Movement):
             while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8 and (temp_row + dr, temp_col + dc) in valid_locations:
                 temp_row += dr
                 temp_col += dc
-                if not valid_locations[(temp_row,temp_col)]:
+                if not valid_locations[(temp_row,temp_col)]: # if encounters a location with opponent piece (False), block the range
                     orthogonals.append((temp_row, temp_col))
                     break
                 orthogonals.append((temp_row, temp_col))
@@ -59,7 +59,7 @@ class LatiosMovement(Movement):
         return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.ORTHOGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)]
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)] # Latios cannot capture hence only locations with True values are considered
         ]
     
 class LatiasMovement(Movement):
@@ -68,6 +68,7 @@ class LatiasMovement(Movement):
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.DIAGONALS.value
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)]
+            # Latias cannot capture hence only locations with True values are considered
         ]
 
 class CurrentPlayer:
@@ -199,10 +200,14 @@ class Board:
                 self._captured_pieces[player].remove(piece)
                 self._live_pieces[player].append(piece)
 
-    def get_player_pieces_mapping(self, owner: PlayerNumber) -> dict[tuple[int, int], bool]:
+    def get_movable_locations_mapping(self, owner: PlayerNumber) -> dict[tuple[int, int], bool]:
 
         grid = self._grid
         locations: dict[tuple[int, int], bool] = {}
+        """
+        Location will be true if empty 
+        Location will be false if opponent piece
+        """
 
         for row in range(self._height):
             for col in range(self._width):
@@ -261,10 +266,10 @@ class Board:
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
             
-            locations.extend(piece.get_movement_range(self.get_player_pieces_mapping(player)))
+            locations.extend(piece.get_movement_range(self.get_movable_locations_mapping(player)))
 
             if piece.id == 19:
-                print(piece.get_movement_range(self.get_player_pieces_mapping(player)))
+                print(piece.get_movement_range(self.get_movable_locations_mapping(player)))
 
         return locations
 
@@ -272,7 +277,7 @@ class Board:
         loc = self._grid[row][col]
 
         for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
-            if (row, col) in piece.get_movement_range(self.get_player_pieces_mapping(piece.owner)):
+            if (row, col) in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner)):
                 return False
             
         return not loc
@@ -294,7 +299,7 @@ class Board:
         unsafe_locations = self.get_all_movable_locations(curr_player)
 
         for protected in self._protected_pieces[opponent]:
-            possible_moves = protected.get_movement_range(self.get_player_pieces_mapping(opponent))
+            possible_moves = protected.get_movement_range(self.get_movable_locations_mapping(opponent))
             danger: list[bool] = []
 
             for r, c in possible_moves:
