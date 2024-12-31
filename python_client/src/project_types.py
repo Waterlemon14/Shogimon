@@ -71,7 +71,7 @@ class MovePossibilities(Enum):
 
 
 class Movement(Protocol):    
-    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         ...
 
 class PiecePositions(Protocol):

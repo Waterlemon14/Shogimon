@@ -3,69 +3,71 @@ from typing import Self
 from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType
 
 class EeveeMovement(Movement):
-    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         
         return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.FORWARD.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
         ]
 
 class EeveeShinyMovement(Movement):
-    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         
         return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.FORWARD_OPPOSITE.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
         ]
 
 class PikachuMovement(Movement):
-    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         diagonals: list[tuple[int, int]] = []
         
         for dr, dc in MovePossibilities.DIAGONALS.value:
 
             temp_row, temp_col = row, col
-            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8:
+            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8 and (temp_row + dr, temp_col + dc) in valid_locations:
                 temp_row += dr
                 temp_col += dc
-                if grid[temp_row][temp_col]:
+                if not valid_locations[(temp_row,temp_col)]:
+                    diagonals.append((temp_row, temp_col))
                     break
                 diagonals.append((temp_row, temp_col))
         
         return diagonals
 
 class TurtwigMovement(Movement):
-    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         orthogonals: list[tuple[int, int]] = []
         
         for dr, dc in MovePossibilities.ORTHOGONALS.value:
 
             temp_row, temp_col = row, col
-            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8:
+            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8 and (temp_row + dr, temp_col + dc) in valid_locations:
                 temp_row += dr
                 temp_col += dc
-                if grid[temp_row][temp_col]:
+                if not valid_locations[(temp_row,temp_col)]:
+                    orthogonals.append((temp_row, temp_col))
                     break
                 orthogonals.append((temp_row, temp_col))
         
         return orthogonals
 
 class LatiosMovement(Movement):
-    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.ORTHOGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not grid[row + dr][col + dc]
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
         ]
     
 class LatiasMovement(Movement):
-    def get_movement_range(self, row: int, col: int, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
          return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.DIAGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8  and not grid[row + dr][col + dc]
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8  and (row + dr, col + dc) in valid_locations
         ]
 
 class CurrentPlayer:
@@ -106,16 +108,20 @@ class Piece:
     @property
     def col(self) -> int:
         return self.location.col
+    
+    @property
+    def owner(self) -> PlayerNumber:
+        return self._owner
 
     @property
     def is_captured(self) -> bool:
         return self._is_captured
 
-    def can_move(self, row: int, col: int, grid: list[list[bool]]) -> bool:
+    def can_move(self, row: int, col: int, grid: dict[tuple[int, int], bool]) -> bool:
         
         return (row, col) in self._movement.get_movement_range(self.row, self.col, grid)
     
-    def get_movement_range(self, grid: list[list[bool]]) -> list[tuple[int, int]]:
+    def get_movement_range(self, grid: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         return self._movement.get_movement_range(self.row, self.col, grid)
   
 
@@ -141,12 +147,12 @@ class Board:
         """
         return [
 
-                LivePiece(piece.kind, piece.id, PlayerNumber.ONE, Location(piece.row, piece.col)) 
+                LivePiece(piece.kind, piece.id, piece.owner, Location(piece.row, piece.col)) 
                 for piece in (self._live_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.ONE])
 
             ] + [
 
-                LivePiece(piece.kind, piece.id, PlayerNumber.TWO, Location(piece.row, piece.col)) 
+                LivePiece(piece.kind, piece.id, piece.owner, Location(piece.row, piece.col)) 
                 for piece in (self._live_pieces[PlayerNumber.TWO] + self._protected_pieces[PlayerNumber.TWO])
                 
             ]
@@ -157,12 +163,12 @@ class Board:
         """
         return [
             
-                LivePiece(piece.kind, piece.id, PlayerNumber.ONE, None) 
+                LivePiece(piece.kind, piece.id, piece.owner, None) 
                 for piece in self._captured_pieces[PlayerNumber.ONE]
 
             ] + [
 
-                LivePiece(piece.kind, piece.id, PlayerNumber.TWO, None) 
+                LivePiece(piece.kind, piece.id, piece.owner, None) 
                 for piece in self._captured_pieces[PlayerNumber.TWO]
                 
             ]
@@ -190,8 +196,21 @@ class Board:
                 self._captured_pieces[player].remove(piece)
                 self._live_pieces[player].append(piece)
 
-    def get_grid_mapping(self) -> list[list[bool]]:
-        return [[True if piece else False for piece in row] for row in self._grid]
+    def get_player_pieces_mapping(self, owner: PlayerNumber) -> dict[tuple[int, int], bool]:
+
+        grid = self._grid
+        locations: dict[tuple[int, int], bool] = {}
+
+        for row in range(self._height):
+            for col in range(self._width):
+                piece = grid[row][col]
+
+                if not piece:
+                    locations[(row, col)] = True
+                elif piece.owner != owner:
+                    locations[(row, col)] = False
+
+        return locations
     
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
@@ -237,7 +256,11 @@ class Board:
         locations: list[tuple[int, int]] = []
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
-            locations.extend(piece.get_movement_range(self.get_grid_mapping()))
+            
+            locations.extend(piece.get_movement_range(self.get_player_pieces_mapping(player)))
+
+            if piece.id == 19:
+                print(piece.get_movement_range(self.get_player_pieces_mapping(player)))
 
         return locations
 
@@ -245,7 +268,7 @@ class Board:
         loc = self._grid[row][col]
 
         for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
-            if (row, col) in piece.get_movement_range(self.get_grid_mapping()):
+            if (row, col) in piece.get_movement_range(self.get_player_pieces_mapping(piece.owner)):
                 return False
             
         return not loc
@@ -267,7 +290,7 @@ class Board:
         unsafe_locations = self.get_all_movable_locations(curr_player)
 
         for protected in self._protected_pieces[opponent]:
-            possible_moves = protected.get_movement_range(self.get_grid_mapping())
+            possible_moves = protected.get_movement_range(self.get_player_pieces_mapping(opponent))
             danger: list[bool] = []
 
             for r, c in possible_moves:
@@ -442,7 +465,6 @@ class GameModel:
 
                         # Move piece simply  
                         else:
-                            print("Moving piece " + piece_to_move.kind.value)
                             board.move(target_row, target_col, piece_to_move)
 
                     # If protected piece, check if target location is valid
@@ -467,7 +489,7 @@ class GameModel:
         
         fix movement range: 
             - include first encounter of opponent piece
-            - change get_grid_mapping logic to fix above
+            - change get_player_pieces_mapping logic to fix above
 
         """
     def new_game(self):
