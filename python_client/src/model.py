@@ -59,7 +59,7 @@ class LatiosMovement(Movement):
         return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.ORTHOGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)]
         ]
     
 class LatiasMovement(Movement):
@@ -67,7 +67,7 @@ class LatiasMovement(Movement):
          return [
             (row + dr, col + dc)
             for dr, dc in MovePossibilities.DIAGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8  and (row + dr, col + dc) in valid_locations
+            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)]
         ]
 
 class CurrentPlayer:
