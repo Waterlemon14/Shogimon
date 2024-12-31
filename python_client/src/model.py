@@ -344,9 +344,10 @@ class PieceFactory:
                 movement = LatiasMovement()
                 return ProtectedPiece(piece_id, piece_kind, location, movement, owner)
 
-class PlayerTwoPositions:
+class DefaultPositions:
     def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
 
+        # Player Two
         positions = [
             (PlayerNumber.TWO, PieceKind.TURTWIG, Location(0, 0)),
             (PlayerNumber.TWO, PieceKind.PIKACHU, Location(0, 1)),
@@ -360,12 +361,8 @@ class PlayerTwoPositions:
             (PlayerNumber.TWO, PieceKind.EEVEE_SHINY, Location(1, n)) for n in range(8)
         ]
 
-        return positions
-
-class PlayerOnePositions:
-    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
-
-        positions = [
+        # Player One
+        positions += [
             (PlayerNumber.ONE, PieceKind.TURTWIG, Location(7, 0)),
             (PlayerNumber.ONE, PieceKind.PIKACHU, Location(7, 1)),
             (PlayerNumber.ONE, PieceKind.LATIOS, Location(7, 3)),
@@ -380,9 +377,11 @@ class PlayerOnePositions:
 
         return positions
 
+# If we need to add game pieces, we create another PiecePosition Class
+
 class BoardSetter:
-    def __init__(self, p1_positions: PiecePositions, p2_positions: PiecePositions):
-        self._positions = p1_positions.get_positions() + p2_positions.get_positions()
+    def __init__(self, positions: PiecePositions):
+        self._positions = positions.get_positions()
     
     def set_board(self, board: Board):
 
@@ -397,7 +396,7 @@ class GameModel:
 
         board = Board(8, 8)
 
-        setter = BoardSetter(PlayerOnePositions(), PlayerTwoPositions())
+        setter = BoardSetter(DefaultPositions())
         setter.set_board(board)
 
 
