@@ -196,9 +196,9 @@ class GameView:
                 if event.type == pygame.QUIT:
                     _game_is_running = False
 
-                elif event.type == pygame.KEYDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     ...
-                    '''Should be something mouse movement/click'''
+                    '''Something something button collide with position'''
                     ...
 
             self._screen.fill('#FFFFFF')
