@@ -1,6 +1,6 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType
+from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, GameStatus
 
 class EeveeMovement(Movement):
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
@@ -305,6 +305,8 @@ class Board:
             for r, c in possible_moves:
                 if (r, c) in unsafe_locations:
                     danger.append(True)
+                else:
+                    danger.append(False)
 
             protected.is_immobile = True  if all(danger) else False
             
@@ -403,10 +405,10 @@ class GameModel:
         state = GameState(
             player_number = PlayerNumber.ONE,
             active_player = PlayerNumber.ONE,
-            is_still_playable=True,
             captured_pieces= board.get_captured_pieces(),
             live_pieces=board.get_live_pieces(),
-            action_count=3
+            action_count=3,
+            game_status=GameStatus.ONGOING
         )
 
         return cls(state, board, PlayerNumber.ONE, 3)
@@ -433,10 +435,10 @@ class GameModel:
         self._state = GameState(
             player_number = PlayerNumber.ONE,
             active_player = self._active_player,
-            is_still_playable= not self._is_game_over,
             captured_pieces= self._board.get_captured_pieces(),
             live_pieces=self._board.get_live_pieces(),
-            action_count=self._action_count
+            action_count=self._action_count,
+            game_status=GameStatus.PLAYER_WIN if self._winner == PlayerNumber.ONE else GameStatus.PLAYER_LOSE
         )
 
 
@@ -492,13 +494,5 @@ class GameModel:
         self._check_if_game_over()
         self._update_state()
         
-        """
-        Notes for tomorrow self:
-        
-        fix movement range: 
-            - include first encounter of opponent piece
-            - change get_player_pieces_mapping logic to fix above
-
-        """
     def new_game(self):
         ...
