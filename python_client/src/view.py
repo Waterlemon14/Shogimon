@@ -139,7 +139,7 @@ class RenderableBoard:
 
 class GameView:
     """Actual MVC view class"""
-    def __init__(self, state: GameState, board: Board):
+    def __init__(self, state: GameState):
         self.on_state_change(state)
 
         self._make_turn_observers: list[MakeTurnObserver] = []
