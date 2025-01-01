@@ -15,14 +15,22 @@ BOARD_WIDTH = TILE_PIXELS*BOARD_ROWS
 BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 
 
-def get_image_path(piece: LivePiece) -> str:
+def get_blittable(piece: LivePiece) -> pygame.Surface:
     """
     Return image directory from piece;
     Help with this? It's not rendering on my end for some reason
     """
-    if piece.piece_owner == PlayerNumber.TWO:
-        return "../../img/" + piece.piece_kind.value + "-shiny.png"
-    return "../../img/" + piece.piece_kind.value + ".png"
+    if piece.piece_kind == PieceKind.EEVEE_SHINY:
+        _path = "../../img/eevee-shiny.png"
+    elif piece.piece_owner == PlayerNumber.TWO:
+        _path = "../../img/" + piece.piece_kind.value + "-shiny.png"
+    else:
+        _path = "../../img/" + piece.piece_kind.value + ".png"
+
+    _transformable = pygame.image.load(_path).convert()
+    returnable = pygame.transform.scale(_transformable, (64, 64))
+
+    return returnable
 
 
 class Captures:
@@ -60,11 +68,8 @@ class Captures:
         order_in_screen = 0
 
         for piece in _counted_list:
-            _path = get_image_path(piece)
-            returnable.blit(
-                pygame.image.load(_path).convert(),
-                (TILE_PIXELS*order_in_screen, 0)
-            )
+            _blittable = get_blittable(piece)
+            returnable.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
 
             _count = self._font.render(
                 "x" + str(_counted_list[piece]),
@@ -115,9 +120,8 @@ class Tile:
         pygame.draw.rect(actual_tile, "#000000", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
         
         if self._occupier is not None:
-            _path = get_image_path(self._occupier)
-            _image = pygame.image.load(_path).convert()
-            actual_tile.blit(_image, (0,0))
+            _blittable = get_blittable(self._occupier)
+            actual_tile.blit(_blittable, (0,0))
 
         if self._is_targetable:
             pygame.draw.circle(actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
