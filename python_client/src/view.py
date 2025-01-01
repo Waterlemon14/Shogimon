@@ -208,7 +208,8 @@ class GameView:
             self._captures_p1.render_to_screen(self._screen)
             self._captures_p2.render_to_screen(self._screen)
 
-            self._evaluate_winner()
+            if not self.is_still_playable:
+                self._evaluate_winner()
 
             pygame.display.flip()
             self._clock.tick(60)
