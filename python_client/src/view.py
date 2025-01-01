@@ -165,7 +165,10 @@ class GameView:
         self._init_view_state()
 
     def _init_view_state(self):
-        """Initialize view-specific properties --- Might need to add viewing player?"""
+        """
+        Initialize view-specific properties
+        --- Might need to add viewing player?
+        """
         self._renderable_board = RenderableBoard(self._live_pieces)
 
         self._captures_p1 = Captures(PlayerNumber.ONE)
@@ -185,7 +188,10 @@ class GameView:
         self._new_game_observers.append(observer)
 
     def _evaluate_winner(self):
-        """Evaluate game-end on-screen printout --- Might need viewing player?"""
+        """
+        Evaluate game-end on-screen printout
+        --- Might need viewing player?
+        """
         if self._game_status == GameStatus.PLAYER_WIN:
             self._render_text_result("YOU WIN")
         elif self._game_status == GameStatus.PLAYER_LOSE:
