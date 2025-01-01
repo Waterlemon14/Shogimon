@@ -286,11 +286,10 @@ class Board:
     def is_safe_location(self, row: int, col: int, curr_player: PlayerNumber) -> bool:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
 
-        unsafe_locations = self.get_all_movable_locations(opponent)
+        unsafe_locations = [(loc.row, loc.col) for loc in self.get_all_movable_locations(opponent)]
 
-        for loc in unsafe_locations:
-            if loc.row == row and loc.col == col:   # unwrap Location object
-                return False
+        if (row, col) in unsafe_locations:
+            return False
             
         return True
 
@@ -299,14 +298,14 @@ class Board:
         """
         Checks if Latias and Latios of each player can still move
         """
-        unsafe_locations = self.get_all_movable_locations(curr_player)
+        unsafe_locations = [(loc.row, loc.col) for loc in self.get_all_movable_locations(curr_player)]
 
         for protected in self._protected_pieces[opponent]:
             possible_moves = protected.get_movement_range(self.get_movable_locations_mapping(opponent))
             danger: list[bool] = []
 
             for r, c in possible_moves:
-                if (r, c) in [(loc.row, loc.col) for loc in unsafe_locations]: # unwrap Location object
+                if (r, c) in unsafe_locations:
                     danger.append(True)
                 else:
                     danger.append(False)
