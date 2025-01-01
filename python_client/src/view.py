@@ -158,7 +158,6 @@ class GameView:
 
     def on_state_change(self, state: GameState):
         self._active_player = state.active_player
-        self._is_still_playable = state.is_still_playable
         self._captured_pieces = state.captured_pieces
         self._live_pieces = state.live_pieces
         self._action_count = state.action_count
@@ -170,7 +169,12 @@ class GameView:
         self._new_game_observers.append(observer)
 
     def _evaluate_winner(self):
-        ...
+        if ...:
+            self._render_text_result("PLAYER 1 WON")
+        elif ...:
+            self._render_text_result("PLAYER 2 WON")
+        else:
+            self._render_text_result("STALEMATE")
 
     def _make_turn(self):
         for observer in self._make_turn_observers:
@@ -180,8 +184,11 @@ class GameView:
         for observer in self._new_game_observers:
             observer.on_new_game()
 
-    def _render_game_over(self, winner: PlayerNumber):
-        ...
+    def _render_text_result(self, text: str):
+        result_text = self._font.render(text, True, '#000000')
+        _blittable = result_text.get_rect(center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+
+        self._screen.blit(result_text, _blittable)
 
     def _on_mouse_press(self, event: pygame.Event):
         curr_player = self._active_player
