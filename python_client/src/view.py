@@ -147,12 +147,16 @@ class GameView:
         self._make_turn_observers: list[MakeTurnObserver] = []
         self._new_game_observers: list[NewGameObserver] = []
 
-        self._captures_p1 = Captures(PlayerNumber.ONE)
-        self._captures_p2 = Captures(PlayerNumber.TWO)
-        self._renderable_board = RenderableBoard(board)
-
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
+
+        self._init_view_state(board)
+
+    def _init_view_state(self, board: Board):
+        self._renderable_board = RenderableBoard(board)
+        
+        self._captures_p1 = Captures(PlayerNumber.ONE)
+        self._captures_p2 = Captures(PlayerNumber.TWO)
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
