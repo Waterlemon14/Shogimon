@@ -169,6 +169,23 @@ class GameView:
     def register_new_game_observer(self, observer: NewGameObserver):
         self._new_game_observers.append(observer)
 
+    def _evaluate_winner(self):
+        ...
+
+    def _make_turn(self):
+        for observer in self._make_turn_observers:
+            observer.on_make_turn()
+
+    def _new_game(self):
+        for observer in self._new_game_observers:
+            observer.on_new_game()
+
+    def _on_mouse_press(self, event: pygame.Event):
+        ...
+
+    def _render_game_over(self, winner: PlayerNumber):
+        ...
+
     def run(self):
         pygame.init()
 
@@ -183,9 +200,7 @@ class GameView:
                     _game_is_running = False
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    ...
-                    '''Something something button collide with position'''
-                    ...
+                    self._on_mouse_press(event)
 
             self._screen.fill('#FFFFFF')
 
@@ -193,9 +208,7 @@ class GameView:
             self._captures_p1.render_to_screen(self._screen)
             self._captures_p2.render_to_screen(self._screen)
 
-            ...
-            '''Insert code re: Evaluating user input'''
-            ...
+            self._evaluate_winner()
 
             pygame.display.flip()
             self._clock.tick(60)
