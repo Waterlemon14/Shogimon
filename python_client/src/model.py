@@ -261,16 +261,12 @@ class Board:
 
         return locations
     
-    def get_all_movable_locations(self, player: PlayerNumber) -> list[tuple[int, int]]:
-        locations: list[tuple[int, int]] = []
+    def get_all_movable_locations(self, player: PlayerNumber) -> list[Location]:
+        locations: list[Location] = []
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
             
-            
-            locations.extend(piece.get_movement_range(self.get_movable_locations_mapping(player)))
-
-            if piece.id == 19:
-                print(piece.get_movement_range(self.get_movable_locations_mapping(player)))
+            locations.extend([Location(row, int) for row, int in piece.get_movement_range(self.get_movable_locations_mapping(player))])
 
         return locations
     
@@ -292,8 +288,9 @@ class Board:
 
         unsafe_locations = self.get_all_movable_locations(opponent)
 
-        if (row, col) in unsafe_locations:
-            return False
+        for loc in unsafe_locations:
+            if loc.row == row and loc.col == col:   # unwrap Location object
+                return False
             
         return True
 
@@ -309,7 +306,7 @@ class Board:
             danger: list[bool] = []
 
             for r, c in possible_moves:
-                if (r, c) in unsafe_locations:
+                if (r, c) in [(loc.row, loc.col) for loc in unsafe_locations]: # unwrap Location object
                     danger.append(True)
                 else:
                     danger.append(False)
