@@ -28,11 +28,11 @@ data Kind
   | Princess
 
 instance Show Kind where
-  show Pawn     = "Pawn"
-  show Bishop   = "Bishop"
-  show Rook     = "Rook"
-  show Prince   = "Prince"
-  show Princess = "Princess"
+  show Pawn     = "Pawn"      -- p
+  show Bishop   = "Bishop"    -- b
+  show Rook     = "Rook"      -- r
+  show Prince   = "Prince"    -- k
+  show Princess = "Princess"  -- q
 
 derive instance Eq Kind
 
@@ -102,4 +102,6 @@ type GameState =
   , playerTwoCaptures :: List Captured   -- List of pieces captured by player two
   , winner :: Maybe Winner
   , moveCount :: Int
+  , columns :: Int
+  , rows :: Int
   }

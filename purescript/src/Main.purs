@@ -14,11 +14,12 @@ import Prelude
 import CS150241Project.GameEngine (startNetworkGame)
 import CS150241Project.Graphics (clearCanvas, drawImageScaled, drawText, drawRect, drawCircle)
 import CS150241Project.Networking (Message)
-import Data.Int (toNumber, floor)
+import Data.Int (toNumber, floor, fromString)
+import Data.String (Pattern(..), split, take, drop, trim, stripSuffix, stripPrefix)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.List (List(..), index, null, concat, (:)) -- , (:), concat, length, snoc)
-import Data.Array (replicate, (!!))
+import Data.Array (replicate, (!!), length)
 import Data.Foldable (elem)
 import Effect (Effect)
 import Effect.Console (log)
@@ -113,6 +114,8 @@ initialState = do
   , playerTwoCaptures : Nil
   , winner : Nothing
   , moveCount : 3
+  , rows : rows
+  , columns : columns
   }
 
 
@@ -257,6 +260,66 @@ onTick send gameState = do
       else if null (protectedPieceMovementCells 0 0 state.board Two) 
         then state { winner = Just Player1 } 
         else state
+    
+    -- can be used to send the board, although currently not implemented yet
+    -- sendBoardMessage :: GameState -> Effect GameState
+    -- sendBoardMessage state = do
+    --   let
+    --     board = state.board
+
+    --     helper :: Int -> Int -> String
+    --     helper col row
+    --       | col >= columns = " " <> helper 0 (row+1)
+    --       | row >= rows    = ""
+    --       | otherwise = case accessCell col row board of
+    --         Nothing -> "xx" <> helper (col+1) row
+    --         Just piece -> case piece.kind of
+    --           Pawn     -> "p" <> if piece.player == One then "1" <> helper (col+1) row else "2" <> helper (col+1) row
+    --           Bishop   -> "b" <> if piece.player == One then "1" <> helper (col+1) row else "2" <> helper (col+1) row
+    --           Rook     -> "r" <> if piece.player == One then "1" <> helper (col+1) row else "2" <> helper (col+1) row
+    --           Prince   -> "k" <> if piece.player == One then "1" <> helper (col+1) row else "2" <> helper (col+1) row
+    --           Princess -> "q" <> if piece.player == One then "1" <> helper (col+1) row else "2" <> helper (col+1) row
+      
+    --   send $ trim $ helper 0 0
+    --   pure state
+    
+    -- readBoardMessage :: GameState -> GameState
+    -- readBoardMessage state = do
+    --   let
+    --     board = case state.lastReceivedMessage of
+    --       Nothing -> []
+    --       Just message -> if (show message.playerId == "Player1" && state.currentPlayer == One) || show message.playerId == "Player2" && state.currentPlayer == Two
+    --       then split (Pattern " ") $ drop 2 message.payload
+    --       else []
+        
+    --     constructBoard :: Int -> Board
+    --     constructBoard row = case board !! row of
+    --       Nothing -> []
+    --       Just current_row -> [constructRow 0 current_row] <> constructBoard (row+1)
+    --         where
+    --           constructRow :: Int -> String -> Array (Maybe Piece)
+    --           constructRow col row_string
+    --             | col >= columns || row_string == "" = []
+    --             | otherwise = [new_piece] <> constructRow (col + 1) (drop 2 row_string)
+    --               where
+    --                 piece = take 1 row_string
+    --                 player_num = case take 1 $ drop 1 row_string of
+    --                   "1" -> One
+    --                   _ -> Two    -- Assume valid piece always, check later if invalid
+
+    --                 new_piece = case piece of
+    --                   "p" -> createPawn     col row player_num
+    --                   "b" -> createBishop   col row player_num
+    --                   "r" -> createRook     col row player_num
+    --                   "k" -> createPrince   col row player_num
+    --                   "q" -> createPrincess col row player_num
+    --                   _   -> Nothing
+                      
+    --     newBoard = if length board == state.rows
+    --     then constructBoard 0
+    --     else state.board
+      
+    --   state { board = newBoard }
 
     -- mapper :: List Position -> String
     -- mapper Nil str = str
@@ -267,17 +330,17 @@ onTick send gameState = do
   --     --show gameState.currentPlayer <> "\n" <> 
   --     -- showBoard gameState.board --<> "\n" 
   --   else pure unit
-
+  
   case gameState.winner of 
-    Nothing -> 
-      pure $ gameState
-        # makeMove
-        # updateActivePiece clicked_piece
-        # updatePossibleMoves clicked_piece
-        # updateTickCount
-        # updateGameOver
-    Just _ ->
-      pure gameState
+      Nothing -> 
+        pure $ gameState
+          # makeMove
+          # updateActivePiece clicked_piece
+          # updatePossibleMoves clicked_piece
+          # updateTickCount
+          # updateGameOver
+      Just _ ->
+        pure $ gameState
 
 onMouseDown :: (String -> Effect Unit) -> { x :: Int, y :: Int } -> GameState -> Effect GameState
 onMouseDown send { x, y } gameState = do
@@ -288,14 +351,14 @@ onMouseDown send { x, y } gameState = do
     cell_col = floor $ (toNumber x - canvas_offset_x-cell_width) / cell_width
     cell_row = floor $ (toNumber y - canvas_offset_y-cell_height) / cell_height
 
-  -- send $ "Clicked Cell: col " <> show cell_col <> ", row " <> show cell_row
-  pure gameState {clickedCell = {col: cell_col, row: cell_row}}
+  send $ "click " <> show cell_col <> " " <> show cell_row
+  pure gameState
 
 -- Not sure if we will be using this? Didn't remove it first
 -- since I just buit on the demo
 onKeyDown :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
 onKeyDown send key gameState = do
-  send $ "I pressed " <> key <> show gameState.playerOneCaptures
+  send $ "I pressed " <> key
   pure gameState
 
 -- Not sure if we will be using this? Didn't remove it first
@@ -303,11 +366,34 @@ onKeyDown send key gameState = do
 onKeyUp :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
 onKeyUp _ _ gameState = pure gameState
 
--- Haven't used this yet, please update this comment when utilized
+-- Used to update clicks depending on received messages
 onMessage :: (String -> Effect Unit) -> Message -> GameState -> Effect GameState
 onMessage _ message gameState = do
-  log $ "Received message: " <> show message
-  pure $ gameState { lastReceivedMessage = Just message }
+  log $ "Received message: " <> message.payload
+
+  if (show message.playerId == "Player1" && gameState.currentPlayer == One) || (show message.playerId == "Player2" && gameState.currentPlayer == Two)
+  then do
+    let
+      command = split (Pattern " ") message.payload
+    case command !! 0 of
+      Nothing -> pure $ gameState { lastReceivedMessage = Just message }
+      Just action -> if action == "click"
+        then do
+          let
+            cell_col = case command !! 1 of
+              Nothing -> -2
+              Just col -> case fromString col of
+                Nothing -> -2
+                Just num -> num
+            cell_row = case command !! 2 of
+              Nothing -> -2
+              Just col -> case fromString col of
+                Nothing -> -2
+                Just num -> num
+          pure $ gameState { lastReceivedMessage = Just message , clickedCell = {col: cell_col, row: cell_row}}
+        else do
+          pure $ gameState { lastReceivedMessage = Just message }
+  else pure $ gameState { lastReceivedMessage = Just message }
 
 -- Draws the game on the screen using information from the GameState
 onRender :: Map.Map String Canvas.CanvasImageSource -> Canvas.Context2D -> GameState -> Effect Unit
