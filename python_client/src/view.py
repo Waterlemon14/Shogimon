@@ -7,6 +7,7 @@ from project_types import (
     PlayerNumber,
     MakeTurnObserver, NewGameObserver,
     )
+from model import Board
 
 SCREEN_WIDTH = 768
 SCREEN_HEIGHT = 720
@@ -113,40 +114,17 @@ class Tile:
 
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
-    def __init__(self):
+    def __init__(self, board: Board):
         self._location_to_tile = {
             Location(i, j) : Tile(Location(i, j))
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
         }
 
-        self._init_state()
+        self._init_state(board)
 
-    def _init_state(self):
-        '''
-        Need to replace piece_id's
-        '''
-        for i in range(BOARD_COLS):
-            self._location_to_tile[Location(6, i)]. \
-                mark_occupied(LivePiece(PieceKind.EEVEE, -1, PlayerNumber.ONE, Location(6,i)))
-            self._location_to_tile[Location(1, i)]. \
-                mark_occupied(LivePiece(PieceKind.EEVEE, -1, PlayerNumber.TWO, Location(1,i)))
-
-        for row, p_num in [(7, PlayerNumber.ONE), (0, PlayerNumber.TWO)]:
-            self._location_to_tile[Location(row, 1)]. \
-                mark_occupied(LivePiece(PieceKind.PIKACHU, -1, p_num, Location(row, 1)))
-            self._location_to_tile[Location(row, 6)]. \
-                mark_occupied(LivePiece(PieceKind.PIKACHU, -1, p_num, Location(row, 6)))
-            
-            self._location_to_tile[Location(row, 0)]. \
-                mark_occupied(LivePiece(PieceKind.TURTWIG, -1, p_num, Location(row, 7)))
-            self._location_to_tile[Location(row, 7)]. \
-                mark_occupied(LivePiece(PieceKind.TURTWIG, -1, p_num, Location(row, 7)))
-            
-            self._location_to_tile[Location(row, 3)]. \
-                mark_occupied(LivePiece(PieceKind.LATIOS, -1, p_num, Location(row, 3)))
-            self._location_to_tile[Location(row, 4)]. \
-                mark_occupied(LivePiece(PieceKind.LATIAS, -1, p_num, Location(row, 4)))
+    def _init_state(self, board: Board):
+        ...
 
     def get_tile(self, location) -> Tile:
         return self._location_to_tile[location]
@@ -163,7 +141,7 @@ class RenderableBoard:
 
 class GameView:
     """Actual MVC view class"""
-    def __init__(self, state: GameState):
+    def __init__(self, state: GameState, board: Board):
         self.on_state_change(state)
 
         self._make_turn_observers: list[MakeTurnObserver] = []
@@ -171,7 +149,7 @@ class GameView:
 
         self._captures_p1 = Captures(PlayerNumber.ONE)
         self._captures_p2 = Captures(PlayerNumber.TWO)
-        self._renderable_board = RenderableBoard()
+        self._renderable_board = RenderableBoard(board)
 
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
