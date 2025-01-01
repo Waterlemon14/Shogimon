@@ -121,9 +121,9 @@ class RenderableBoard:
             for j in range(BOARD_COLS)
         }
 
-        self._init_state(board)
+        self._init_board_state(board)
 
-    def _init_state(self, board: Board):
+    def _init_board_state(self, board: Board):
         ...
 
     def get_tile(self, location) -> Tile:
@@ -154,7 +154,7 @@ class GameView:
 
     def _init_view_state(self, board: Board):
         self._renderable_board = RenderableBoard(board)
-        
+
         self._captures_p1 = Captures(PlayerNumber.ONE)
         self._captures_p2 = Captures(PlayerNumber.TWO)
 
