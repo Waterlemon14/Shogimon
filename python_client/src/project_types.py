@@ -58,10 +58,10 @@ class PlayerAction:
 class GameState:
     player_number: PlayerNumber
     active_player: PlayerNumber
-    is_still_playable: bool
     captured_pieces: list[LivePiece]
     live_pieces: list[LivePiece]
     action_count: int
+    game_status: GameStatus
 
 
 class MovePossibilities(Enum):
