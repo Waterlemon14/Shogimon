@@ -127,9 +127,6 @@ class RenderableBoard:
         for piece in live_pieces:
             self._location_to_tile[piece.location] = piece
 
-    def get_tile(self, location) -> Tile:
-        return self._location_to_tile[location]
-
     def render_to_screen(self, screen: pygame.Surface):
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
         pygame.Surface.fill(actual_board, '#000000')
@@ -171,9 +168,6 @@ class GameView:
 
     def register_new_game_observer(self, observer: NewGameObserver):
         self._new_game_observers.append(observer)
-
-    def _convert(self, tile: Tile) -> Location:
-        ...
 
     def run(self):
         pygame.init()
