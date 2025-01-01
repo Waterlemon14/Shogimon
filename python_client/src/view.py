@@ -79,6 +79,10 @@ class Captures:
 class Tile:
     """Renderable class for each tile inside board"""
     def __init__(self, location: Location):
+        """
+        Infer implicit info from occupier:
+        type LivePiece => occupied, type None => unoccupied
+        """
         self._location = location
         self._x_coord = location.pixels[0]
         self._y_coord = location.pixels[1]
