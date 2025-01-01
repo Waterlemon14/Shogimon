@@ -151,17 +151,17 @@ class GameView:
         self._init_view_state()
 
     def _init_view_state(self):
-        self._renderable_board = RenderableBoard(self.live_pieces)
+        self._renderable_board = RenderableBoard(self._live_pieces)
 
         self._captures_p1 = Captures(PlayerNumber.ONE)
         self._captures_p2 = Captures(PlayerNumber.TWO)
 
     def on_state_change(self, state: GameState):
-        self.active_player = state.active_player
-        self.is_still_playable = state.is_still_playable
-        self.captured_pieces = state.captured_pieces
-        self.live_pieces = state.live_pieces
-        self.action_count = state.action_count
+        self._active_player = state.active_player
+        self._is_still_playable = state.is_still_playable
+        self._captured_pieces = state.captured_pieces
+        self._live_pieces = state.live_pieces
+        self._action_count = state.action_count
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
@@ -208,7 +208,7 @@ class GameView:
             self._captures_p1.render_to_screen(self._screen)
             self._captures_p2.render_to_screen(self._screen)
 
-            if not self.is_still_playable:
+            if not self._is_still_playable:
                 self._evaluate_winner()
 
             pygame.display.flip()
