@@ -115,7 +115,7 @@ class Tile:
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
     def __init__(self, board: Board):
-        self._location_to_tile = {
+        self._location_to_tile: dict[Location: Tile] = {
             Location(i, j) : Tile(Location(i, j))
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
@@ -125,7 +125,7 @@ class RenderableBoard:
 
     def set_board_state(self, live_pieces: list[LivePiece]):
         for piece in live_pieces:
-            self._location_to_tile[piece.location] = piece
+            self._location_to_tile[piece.location].mark_occupied(piece)
 
     def render_to_screen(self, screen: pygame.Surface):
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
@@ -180,11 +180,14 @@ class GameView:
         for observer in self._new_game_observers:
             observer.on_new_game()
 
-    def _on_mouse_press(self, event: pygame.Event):
-        ...
-
     def _render_game_over(self, winner: PlayerNumber):
         ...
+
+    def _on_mouse_press(self, event: pygame.Event):
+        curr_player = self._active_player
+
+        if self._is_still_playable:
+            ...
 
     def run(self):
         pygame.init()
