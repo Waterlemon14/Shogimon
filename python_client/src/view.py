@@ -121,10 +121,11 @@ class RenderableBoard:
             for j in range(BOARD_COLS)
         }
 
-        self._init_board_state(board)
+        self.set_board_state(board)
 
-    def _init_board_state(self, board: Board):
-        ...
+    def set_board_state(self, live_pieces: list[LivePiece]):
+        for piece in live_pieces:
+            self._location_to_tile[piece.location] = piece
 
     def get_tile(self, location) -> Tile:
         return self._location_to_tile[location]
@@ -150,19 +151,13 @@ class GameView:
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
 
-        self._init_view_state(board)
+        self._init_view_state()
 
-    def _init_view_state(self, board: Board):
-        self._renderable_board = RenderableBoard(board)
+    def _init_view_state(self):
+        self._renderable_board = RenderableBoard(self.live_pieces)
 
         self._captures_p1 = Captures(PlayerNumber.ONE)
         self._captures_p2 = Captures(PlayerNumber.TWO)
-
-    def register_make_turn_observer(self, observer: MakeTurnObserver):
-        self._make_turn_observers.append(observer)
-
-    def register_new_game_observer(self, observer: NewGameObserver):
-        self._new_game_observers.append(observer)
 
     def on_state_change(self, state: GameState):
         self.active_player = state.active_player
@@ -170,6 +165,15 @@ class GameView:
         self.captured_pieces = state.captured_pieces
         self.live_pieces = state.live_pieces
         self.action_count = state.action_count
+
+    def register_make_turn_observer(self, observer: MakeTurnObserver):
+        self._make_turn_observers.append(observer)
+
+    def register_new_game_observer(self, observer: NewGameObserver):
+        self._new_game_observers.append(observer)
+
+    def _convert(self, tile: Tile) -> Location:
+        ...
 
     def run(self):
         pygame.init()
