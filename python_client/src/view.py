@@ -150,6 +150,7 @@ class GameView:
         """Initialize observers, Pygame font"""
         self.on_state_change(state)
 
+        self._mouse_click_observers: list[MouseClickObserver] = []
         self._make_turn_observers: list[MakeTurnObserver] = []
         self._new_game_observers: list[NewGameObserver] = []
 
@@ -175,6 +176,9 @@ class GameView:
         self._action_count = state.action_count
         self._game_status = state.game_status
 
+    def register_make_turn_observer(self, observer: MouseClickObserver):
+        self._mouse_click_observers.append(observer)
+
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
 
@@ -193,6 +197,10 @@ class GameView:
         elif self._game_status == GameStatus.GAME_DRAW:
             self._render_text_result("GAME RESULTED IN STALEMATE")
 
+    def _mouse_click(self):
+        for observer in self._mouse_click_observers:
+            observer.on_mouse_click()
+    
     def _make_turn(self):
         for observer in self._make_turn_observers:
             observer.on_make_turn()
