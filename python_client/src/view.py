@@ -16,10 +16,7 @@ BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 
 
 def get_blittable(piece: LivePiece) -> pygame.Surface:
-    """
-    Return image directory from piece;
-    Help with this? It's not rendering on my end for some reason
-    """
+    """Return surface from piece, for use with blit"""
     if piece.piece_kind == PieceKind.EEVEE_SHINY:
         _path = "../../img/eevee-shiny.png"
     elif piece.piece_owner == PlayerNumber.TWO:
