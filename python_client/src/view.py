@@ -3,9 +3,8 @@ from collections import Counter
 
 from project_types import (
     TILE_PIXELS, BOARD_ROWS, BOARD_COLS, GameStatus,
-    LivePiece, Location, GameState, PieceKind,
-    PlayerNumber,
-    MakeTurnObserver, NewGameObserver,
+    LivePiece, Location, GameState, PieceKind, PlayerNumber,
+    MouseClickObserver, MakeTurnObserver, NewGameObserver,
     )
 from model import Board
 
