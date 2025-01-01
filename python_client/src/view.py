@@ -170,12 +170,12 @@ class GameView:
         self._new_game_observers.append(observer)
 
     def _evaluate_winner(self):
-        if ...:
-            self._render_text_result("PLAYER 1 WON")
-        elif ...:
-            self._render_text_result("PLAYER 2 WON")
-        else:
-            self._render_text_result("STALEMATE")
+        if self._game_status == GameStatus.PLAYER_WIN:
+            self._render_text_result("YOU WIN")
+        elif self._game_status == GameStatus.PLAYER_LOSE:
+            self._render_text_result("YOU LOSE")
+        elif self._game_status == GameStatus.GAME_DRAW:
+            self._render_text_result("GAME RESULTED IN STALEMATE")
 
     def _make_turn(self):
         for observer in self._make_turn_observers:
