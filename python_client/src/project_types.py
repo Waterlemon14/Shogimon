@@ -43,10 +43,7 @@ class Location:
 
 @dataclass(frozen=True)
 class LivePiece:
-    """
-    Infer implicit type from location:
-    type Location => piece is on board, type None => piece is captured
-    """
+    """Infer implicit type from location: type Location => piece is on board, type None => piece is captured"""
     piece_kind: PieceKind
     piece_id: int
     piece_owner: PlayerNumber

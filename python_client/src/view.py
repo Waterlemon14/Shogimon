@@ -81,10 +81,7 @@ class Captures:
 class Tile:
     """Renderable class for each tile inside board"""
     def __init__(self, location: Location):
-        """
-        Infer implicit info from occupier:
-        type LivePiece => occupied, type None => unoccupied
-        """
+        """Infer implicit info from occupier: type LivePiece => occupied, type None => unoccupied"""
         self._location = location
         self._x_coord = location.pixels[0]
         self._y_coord = location.pixels[1]
@@ -108,10 +105,6 @@ class Tile:
         self._is_targetable = False
 
     def render_to_board(self, board: pygame.Surface):
-        """
-        Render tile (and assigned attributes) to board surface;
-        Help with the _image part, I think that's where the rendering issue is coming from?
-        """
         actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
         pygame.Surface.fill(actual_tile, '#FFFFFF')
         pygame.draw.rect(actual_tile, "#000000", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
