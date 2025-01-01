@@ -493,6 +493,9 @@ class GameModel:
         self._action_count -= 1
         self._check_if_game_over()
         self._update_state()
+
+    def mouse_click(self, id: int):
+        
         
     def new_game(self):
         ...

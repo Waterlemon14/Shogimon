@@ -20,6 +20,7 @@ class GameController:
         self.register_game_state_change_observer(view)
         view.register_make_turn_observer(self)
         view.register_new_game_observer(self)
+        view.register_mouse_click_observer(self)
 
         view.run()
 
@@ -37,3 +38,7 @@ class GameController:
     def _on_state_change(self, state: GameState):
         for observer in self._game_state_change_observers:
             observer.on_state_change(state)
+    
+    def on_mouse_click(self, id: int):
+        self._model.mouse_click(id)
+        self._on_state_change(self._model.state)

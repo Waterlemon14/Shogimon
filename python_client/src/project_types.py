@@ -95,3 +95,8 @@ class GameStateChangeObserver(Protocol):
     """For controller; Communicator of change in game state (ongoing, player 1 win, player 1 lose)"""
     def on_state_change(self, state: GameState):
         ...
+
+class MouseClickObserver(Protocol):
+    """For view; Communicator betweem mouse clicks and piece movements"""
+    def on_mouse_click(self, id: int, ): # id = piece.id
+        ...
