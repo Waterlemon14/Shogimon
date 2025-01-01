@@ -2,7 +2,7 @@ from typing import Self
 
 from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, GameStatus
 
-class EeveeMovement(Movement):
+class EeveeMovement:
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         
         return [
@@ -11,7 +11,7 @@ class EeveeMovement(Movement):
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
         ]
 
-class EeveeShinyMovement(Movement):
+class EeveeShinyMovement:
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         
         return [
@@ -20,7 +20,7 @@ class EeveeShinyMovement(Movement):
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
         ]
 
-class PikachuMovement(Movement):
+class PikachuMovement:
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         diagonals: list[tuple[int, int]] = []
         
@@ -37,7 +37,7 @@ class PikachuMovement(Movement):
         
         return diagonals
 
-class TurtwigMovement(Movement):
+class TurtwigMovement:
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         orthogonals: list[tuple[int, int]] = []
         
@@ -54,7 +54,7 @@ class TurtwigMovement(Movement):
         
         return orthogonals
 
-class LatiosMovement(Movement):
+class LatiosMovement:
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
         return [
             (row + dr, col + dc)
@@ -62,7 +62,7 @@ class LatiosMovement(Movement):
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)] # Latios cannot capture hence only locations with True values are considered
         ]
     
-class LatiasMovement(Movement):
+class LatiasMovement:
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
          return [
             (row + dr, col + dc)

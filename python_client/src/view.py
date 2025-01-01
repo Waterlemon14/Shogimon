@@ -16,12 +16,12 @@ BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 
 def get_blittable(piece: LivePiece) -> pygame.Surface:
     """Return surface from piece, for use with blit"""
-    if piece.piece_kind == PieceKind.EEVEE_SHINY:
-        _path = "../../img/eevee-shiny.png"
-    elif piece.piece_owner == PlayerNumber.TWO:
-        _path = "../../img/" + piece.piece_kind.value + "-shiny.png"
+    if piece.kind == PieceKind.EEVEE_SHINY:
+        _path = "../img/eevee-shiny.png"
+    elif piece.owner == PlayerNumber.TWO:
+        _path = "../img/" + piece.kind.value + "-shiny.png"
     else:
-        _path = "../../img/" + piece.piece_kind.value + ".png"
+        _path = "../img/" + piece.kind.value + ".png"
 
     _transformable = pygame.image.load(_path).convert_alpha()
     returnable = pygame.transform.scale(_transformable, (64, 64))
@@ -120,7 +120,7 @@ class Tile:
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
     def __init__(self, board: Board):
-        self._location_to_tile: dict[Location: Tile] = {
+        self._location_to_tile: dict[Location, Tile] = {
             Location(i, j) : Tile(Location(i, j))
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
@@ -131,7 +131,8 @@ class RenderableBoard:
     def set_board_state(self, live_pieces: list[LivePiece]):
         """Set board according to current live pieces (preferably take from game state instance)"""
         for piece in live_pieces:
-            self._location_to_tile[piece.location].mark_occupied(piece)
+            if piece.location:
+                self._location_to_tile[piece.location].mark_occupied(piece)
 
     def mark_nearby_targetable(self, location: Location):
         ...
@@ -217,13 +218,13 @@ class GameView:
 
         self._screen.blit(result_text, _blittable)
 
-    def _mouse_press_on_board(self, event: pygame.Event):
+    def _mouse_press_on_board(self, event: pygame.event):
         curr_player = self._active_player
 
         if self._game_status == GameStatus.ONGOING:
             ...
 
-    def _mouse_press_on_captures(self, event: pygame.Event):
+    def _mouse_press_on_captures(self, event: pygame.event):
         ...
 
     def run(self):
