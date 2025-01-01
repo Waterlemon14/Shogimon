@@ -69,7 +69,7 @@ class Captures:
 
             _count = self._font.render(
                 "x" + str(_counted_list[piece]),
-                True, "#FFFFFF"
+                True, "white"
             )
             returnable.blit(_count, (TILE_PIXELS*order_in_screen, TILE_PIXELS))
 
@@ -105,8 +105,8 @@ class Tile:
 
     def render_to_board(self, board: pygame.Surface):
         actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
-        pygame.Surface.fill(actual_tile, '#FFFFFF')
-        pygame.draw.rect(actual_tile, "#000000", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
+        pygame.Surface.fill(actual_tile, 'white')
+        pygame.draw.rect(actual_tile, "black", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
         
         if self._occupier is not None:
             _blittable = get_blittable(self._occupier)
@@ -135,7 +135,7 @@ class RenderableBoard:
 
     def render_to_screen(self, screen: pygame.Surface):
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
-        pygame.Surface.fill(actual_board, '#000000')
+        pygame.Surface.fill(actual_board, 'black')
 
         for k in self._location_to_tile:
             self._location_to_tile[k].render_to_board(actual_board)
@@ -175,7 +175,7 @@ class GameView:
         self._action_count = state.action_count
         self._game_status = state.game_status
 
-    def register_make_turn_observer(self, observer: MouseClickObserver):
+    def register_mouse_click_observer(self, observer: MouseClickObserver):
         self._mouse_click_observers.append(observer)
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
@@ -209,7 +209,7 @@ class GameView:
             observer.on_new_game()
 
     def _render_text_result(self, text: str):
-        result_text = self._font.render(text, True, '#000000')
+        result_text = self._font.render(text, True, 'black')
         _blittable = result_text.get_rect(center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
 
         self._screen.blit(result_text, _blittable)
@@ -237,7 +237,7 @@ class GameView:
                 # elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 #     self._on_mouse_press(event)
 
-            self._screen.fill('#FFFFFF')
+            self._screen.fill('black')
 
             self._renderable_board.render_to_screen(self._screen)
             self._captures_p1.render_to_screen(self._screen)
