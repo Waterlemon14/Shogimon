@@ -39,7 +39,7 @@ class Location:
 
     @property
     def pixels(self) -> tuple[int, int]:
-        return (self.row*TILE_PIXELS, self.col*TILE_PIXELS)
+        return (self.col * TILE_PIXELS, self.row * TILE_PIXELS)
 
 @dataclass(frozen=True)
 class LivePiece:
