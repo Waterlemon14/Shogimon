@@ -10,8 +10,9 @@ TILE_PIXELS = 64
 
 class GameStatus(StrEnum):
     ONGOING = 'Ongoing'
-    PLAYER_WIN = 'Round win'
-    PLAYER_LOSE = 'Round lose'
+    PLAYER_WIN = 'Game win'
+    PLAYER_LOSE = 'Game lose'
+    GAME_DRAW = 'Game draw'
 
 class PieceKind(StrEnum):
     EEVEE = auto()
