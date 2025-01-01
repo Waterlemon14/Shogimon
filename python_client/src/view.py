@@ -2,7 +2,7 @@ import pygame
 from collections import Counter
 
 from project_types import (
-    TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
+    TILE_PIXELS, BOARD_ROWS, BOARD_COLS, GameStatus,
     LivePiece, Location, GameState, PieceKind,
     PlayerNumber,
     MakeTurnObserver, NewGameObserver,
@@ -161,6 +161,7 @@ class GameView:
         self._captured_pieces = state.captured_pieces
         self._live_pieces = state.live_pieces
         self._action_count = state.action_count
+        self._game_status = state.game_status
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
@@ -193,7 +194,7 @@ class GameView:
     def _on_mouse_press(self, event: pygame.Event):
         curr_player = self._active_player
 
-        if self._is_still_playable:
+        if self._game_status == GameStatus.ONGOING:
             ...
 
     def run(self):
