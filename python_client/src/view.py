@@ -133,6 +133,9 @@ class RenderableBoard:
         for piece in live_pieces:
             self._location_to_tile[piece.location].mark_occupied(piece)
 
+    def mark_nearby_targetable(self, location: Location):
+        ...
+
     def render_to_screen(self, screen: pygame.Surface):
         actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
         pygame.Surface.fill(actual_board, 'black')
@@ -214,11 +217,14 @@ class GameView:
 
         self._screen.blit(result_text, _blittable)
 
-    def _on_mouse_press(self, event: pygame.Event):
+    def _mouse_press_on_board(self, event: pygame.Event):
         curr_player = self._active_player
 
         if self._game_status == GameStatus.ONGOING:
             ...
+
+    def _mouse_press_on_captures(self, event: pygame.Event):
+        ...
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
@@ -234,8 +240,11 @@ class GameView:
                 if event.type == pygame.QUIT:
                     _game_is_running = False
 
-                # elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                #     self._on_mouse_press(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if ...:
+                        self._mouse_press_on_board(event)
+                    elif ...:
+                        self._mouse_press_on_captures(event)
 
             self._screen.fill('black')
 
