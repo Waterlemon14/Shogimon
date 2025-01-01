@@ -424,10 +424,6 @@ class GameModel:
     def state(self) -> GameState:
         return self._state
     
-    @property
-    def board(self) -> Board:
-        return self._board
-
     def _update_state(self):
 
         if self._action_count == 0:
