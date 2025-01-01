@@ -24,7 +24,7 @@ def get_blittable(piece: LivePiece) -> pygame.Surface:
     else:
         _path = "../../img/" + piece.piece_kind.value + ".png"
 
-    _transformable = pygame.image.load(_path).convert()
+    _transformable = pygame.image.load(_path).convert_alpha()
     returnable = pygame.transform.scale(_transformable, (64, 64))
 
     return returnable
