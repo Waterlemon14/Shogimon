@@ -151,12 +151,12 @@ class Board:
         """
         return [
 
-                LivePiece(piece.kind, piece.id, piece.owner, Location(piece.row, piece.col)) 
+                LivePiece(piece.kind, piece.id, piece.owner, self.get_piece_movable_locations(piece), Location(piece.row, piece.col)) 
                 for piece in (self._live_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.ONE])
 
             ] + [
 
-                LivePiece(piece.kind, piece.id, piece.owner, Location(piece.row, piece.col)) 
+                LivePiece(piece.kind, piece.id, piece.owner, self.get_piece_movable_locations(piece), Location(piece.row, piece.col)) 
                 for piece in (self._live_pieces[PlayerNumber.TWO] + self._protected_pieces[PlayerNumber.TWO])
                 
             ]
@@ -167,12 +167,12 @@ class Board:
         """
         return [
             
-                LivePiece(piece.kind, piece.id, piece.owner, None) 
+                LivePiece(piece.kind, piece.id, piece.owner, None, None) 
                 for piece in self._captured_pieces[PlayerNumber.ONE]
 
             ] + [
 
-                LivePiece(piece.kind, piece.id, piece.owner, None) 
+                LivePiece(piece.kind, piece.id, piece.owner, None, None) 
                 for piece in self._captured_pieces[PlayerNumber.TWO]
                 
             ]
@@ -200,26 +200,6 @@ class Board:
                 self._captured_pieces[player].remove(piece)
                 self._live_pieces[player].append(piece)
 
-    def get_movable_locations_mapping(self, owner: PlayerNumber) -> dict[tuple[int, int], bool]:
-
-        grid = self._grid
-        locations: dict[tuple[int, int], bool] = {}
-        """
-        Location will be true if empty 
-        Location will be false if opponent piece
-        """
-
-        for row in range(self._height):
-            for col in range(self._width):
-                piece = grid[row][col]
-
-                if not piece:
-                    locations[(row, col)] = True
-                elif piece.owner != owner:
-                    locations[(row, col)] = False
-
-        return locations
-    
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
         protected_pieces = self._protected_pieces[player]
@@ -261,10 +241,31 @@ class Board:
         
         return False
     
+    def get_movable_locations_mapping(self, owner: PlayerNumber) -> dict[tuple[int, int], bool]:
+
+        grid = self._grid
+        locations: dict[tuple[int, int], bool] = {}
+        """
+        Location will be true if empty 
+        Location will be false if opponent piece
+        """
+
+        for row in range(self._height):
+            for col in range(self._width):
+                piece = grid[row][col]
+
+                if not piece:
+                    locations[(row, col)] = True
+                elif piece.owner != owner:
+                    locations[(row, col)] = False
+
+        return locations
+    
     def get_all_movable_locations(self, player: PlayerNumber) -> list[tuple[int, int]]:
         locations: list[tuple[int, int]] = []
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
+            
             
             locations.extend(piece.get_movement_range(self.get_movable_locations_mapping(player)))
 
@@ -272,7 +273,11 @@ class Board:
                 print(piece.get_movement_range(self.get_movable_locations_mapping(player)))
 
         return locations
+    
+    def get_piece_movable_locations(self, piece: Piece | ProtectedPiece) -> list[Location]:
 
+        return [Location(row, int) for row, int in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner))]
+    
     def is_valid_location(self, row: int, col: int) -> bool:
         loc = self._grid[row][col]
 
@@ -286,6 +291,7 @@ class Board:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
 
         unsafe_locations = self.get_all_movable_locations(opponent)
+
         if (row, col) in unsafe_locations:
             return False
             
@@ -495,7 +501,7 @@ class GameModel:
         self._update_state()
 
     def mouse_click(self, id: int):
-        
+        ...
         
     def new_game(self):
         ...
