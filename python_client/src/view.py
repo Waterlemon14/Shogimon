@@ -16,6 +16,10 @@ BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 
 
 def get_image_path(piece: LivePiece) -> str:
+    """
+    Return image directory from piece;
+    Help with this? It's not rendering on my end for some reason
+    """
     if piece.piece_owner == PlayerNumber.TWO:
         return "../../img/" + piece.piece_kind.value + "-shiny.png"
     return "../../img/" + piece.piece_kind.value + ".png"
@@ -98,6 +102,10 @@ class Tile:
         self._is_targetable = False
 
     def render_to_board(self, board: pygame.Surface):
+        """
+        Render tile (and assigned attributes) to board surface;
+        Help with the _image part, I think that's where the rendering issue is coming from?
+        """
         actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
         pygame.Surface.fill(actual_tile, '#FFFFFF')
         pygame.draw.rect(actual_tile, "#000000", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
@@ -124,6 +132,7 @@ class RenderableBoard:
         self.set_board_state(board)
 
     def set_board_state(self, live_pieces: list[LivePiece]):
+        """Set board according to current live pieces (preferably take from game state instance)"""
         for piece in live_pieces:
             self._location_to_tile[piece.location].mark_occupied(piece)
 
@@ -140,6 +149,7 @@ class RenderableBoard:
 class GameView:
     """Actual MVC view class"""
     def __init__(self, state: GameState):
+        """Initialize observers, Pygame font"""
         self.on_state_change(state)
 
         self._make_turn_observers: list[MakeTurnObserver] = []
@@ -151,6 +161,7 @@ class GameView:
         self._init_view_state()
 
     def _init_view_state(self):
+        """Initialize view-specific properties --- Might need to add viewing player?"""
         self._renderable_board = RenderableBoard(self._live_pieces)
 
         self._captures_p1 = Captures(PlayerNumber.ONE)
@@ -170,6 +181,7 @@ class GameView:
         self._new_game_observers.append(observer)
 
     def _evaluate_winner(self):
+        """Evaluate game-end on-screen printout --- Might need viewing player?"""
         if self._game_status == GameStatus.PLAYER_WIN:
             self._render_text_result("YOU WIN")
         elif self._game_status == GameStatus.PLAYER_LOSE:
@@ -198,6 +210,7 @@ class GameView:
             ...
 
     def run(self):
+        """Main game running logic; Equivalent to main()"""
         pygame.init()
 
         self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))

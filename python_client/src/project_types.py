@@ -27,6 +27,7 @@ class ActionType(StrEnum):
     DROP = auto()
 
 class PlayerNumber(StrEnum):
+    """Default (i.e. first one to launch): player one"""
     ONE = auto()
     TWO = auto()
 
@@ -42,6 +43,10 @@ class Location:
 
 @dataclass(frozen=True)
 class LivePiece:
+    """
+    Infer implicit type from location:
+    type Location => piece is on board, type None => piece is captured
+    """
     piece_kind: PieceKind
     piece_id: int
     piece_owner: PlayerNumber
