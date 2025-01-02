@@ -185,8 +185,8 @@ onTick send gameState = do
       then case state.activePiece of
         Nothing -> state
         Just activePiece -> if state.currentPlayer == One
-          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = capturedPieces state.playerOneCaptures activePiece, moveCount = checker, clickedCell = clicked_cell }
-          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = capturedPieces state.playerTwoCaptures activePiece, moveCount = checker, clickedCell = clicked_cell }
+          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = capturedPieces state.playerOneCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
+          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = capturedPieces state.playerTwoCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
           where 
             next_player = if state.moveCount == 1 
               then if state.currentPlayer == One then Two else One
@@ -195,11 +195,6 @@ onTick send gameState = do
             checker = if state.moveCount == 1 
               then 3
               else state.moveCount - 1
-            
-            clicked_cell = if next_player /= state.currentPlayer
-              then { col: -2, row: -2 }
-              else state.clickedCell
-  
 
       else state
       where
