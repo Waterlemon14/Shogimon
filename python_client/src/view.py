@@ -162,17 +162,23 @@ class RenderableBoard:
 
         tile = self._location_to_tile[Location(_row,_col)]
 
-        if tile.occupier is not None and ...:
+        if tile.occupier is not None and tile.occupier.owner == player:
             self._mark_nearby_targetable(Location(_row,_col))
-        elif ...:
+        
+        elif tile._is_targetable:
             self._move_piece_to_tile(Location(_row,_col))
 
     def _mark_nearby_targetable(self, location: Location):
         selected_piece = self._location_to_tile[location].occupier
 
         if selected_piece is not None:
+            self._unmark_all()
             for loc in selected_piece.moves:
                 self._location_to_tile[loc].mark_targetable()
+
+    def _unmark_all(self):
+        for loc in self._location_to_tile:
+            self._location_to_tile[loc].unmark_targetable()
 
     def _move_piece_to_tile(self, location: Location):
         ...
