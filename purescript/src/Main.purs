@@ -29,6 +29,7 @@ import Movements
   ( getPossibleMoves
   , accessCell
   , protectedPieceMovementCells
+  , removeMovesWithConflict
   )
 
 import ProjectTypes
@@ -171,7 +172,12 @@ onTick send gameState = do
     updatePossibleMoves :: GameState -> GameState
     updatePossibleMoves state = case pieceFinder state.clickedCell.col state.clickedCell.row state.currentPlayer of
       Nothing -> state { possibleMoves = Nil }
-      Just piece -> state { possibleMoves = getPossibleMoves piece.kind gameState.board piece.position piece.player piece.isProtected (piece.position.col == (-1) && piece.position.row == (-1)) }
+      Just piece -> if piece.isProtected /= true
+        then state { possibleMoves = getPossibleMoves piece.kind state.board piece.position piece.player piece.isProtected (piece.position.col == (-1) && piece.position.row == (-1)) }
+        else state { possibleMoves = removeMovesWithConflict 0 0 state.board piece.player base_moves }
+          where
+            base_moves = getPossibleMoves piece.kind state.board piece.position piece.player piece.isProtected (piece.position.col == (-1) && piece.position.row == (-1))
+
 
     -- Update the board if a valid move is made (clicked cell is a possible move)
     makeMove :: GameState -> GameState

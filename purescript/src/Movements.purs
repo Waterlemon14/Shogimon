@@ -1,15 +1,16 @@
 module Movements
-  ( class Movement
+  ( accessCell
+  , class Movement
   , getPossibleMoves
-  , accessCell
   , protectedPieceMovementCells
+  , removeMovesWithConflict
   )
   where
 
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), (:), concat)
+import Data.List (List(..), (:), concat, filter)
 import Data.Array (index)
 import Data.Foldable (notElem)
 
@@ -115,6 +116,18 @@ getFreeCells board col row
     where 
       invalidCells = concat $ (protectedPieceMovementCells 0 0 board One) : (protectedPieceMovementCells 0 0 board Two) : Nil
 
+removeMovesWithConflict :: Int -> Int -> Board -> PlayerNum -> List Position -> List Position
+removeMovesWithConflict col row board player current_moves
+  | row >= rows = current_moves  -- Base case
+  | col >= columns = removeMovesWithConflict 0 (row+1) board player current_moves-- Once whole row searched, search next row
+  | otherwise = case accessCell col row board of
+    Nothing -> removeMovesWithConflict (col+1) row board player current_moves
+    Just current_piece -> if current_piece.player == player
+      then removeMovesWithConflict (col+1) row board player current_moves
+      else removeMovesWithConflict (col+1) row board player updated_moves
+        where
+          checker = (flip notElem) (getPossibleMoves current_piece.kind board current_piece.position current_piece.player current_piece.isProtected (current_piece.position.col == (-1) && current_piece.position.row == (-1)))
+          updated_moves = filter checker current_moves
 
 protectedPieceMovementCells :: Int -> Int -> Board -> PlayerNum -> List Position
 protectedPieceMovementCells c r board player
@@ -123,8 +136,10 @@ protectedPieceMovementCells c r board player
         | otherwise = case accessCell c r board of 
           Nothing -> protectedPieceMovementCells (c+1) r board player
           Just piece -> if piece.isProtected && piece.player == player
-            then concat $ getPossibleMoves piece.kind board piece.position piece.player piece.isProtected false 
+            then concat $ removeMovesWithConflict 0 0 board player base_moves 
                         : protectedPieceMovementCells (c+1) r board player 
                         : Nil
             else protectedPieceMovementCells (c+1) r board player
+              where
+                base_moves = getPossibleMoves piece.kind board piece.position piece.player piece.isProtected false 
 
