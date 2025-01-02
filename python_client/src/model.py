@@ -403,8 +403,7 @@ class GameModel:
         self._board = board
         self._active_player = player
         self._action_count = action_count
-        self._is_game_over = False
-        self._winner: PlayerNumber
+        self._game_status: GameStatus = GameStatus.ONGOING
     
     @property
     def state(self) -> GameState:
@@ -416,22 +415,24 @@ class GameModel:
             self._active_player = PlayerNumber.ONE if self._active_player == PlayerNumber.TWO else PlayerNumber.TWO
             self._action_count = 3
 
+
         self._state = GameState(
             player_number = PlayerNumber.ONE,
             active_player = self._active_player,
             captured_pieces= self._board.get_captured_pieces(),
             live_pieces=self._board.get_live_pieces(),
             action_count=self._action_count,
-            game_status=GameStatus.PLAYER_WIN if self._winner == PlayerNumber.ONE else GameStatus.PLAYER_LOSE
+            game_status=self._game_status
         )
 
 
     def _check_if_game_over(self) -> PlayerNumber | None:
         board = self._board
+        winner = None
         if board.is_checkmate(self._active_player):
-            self._winner = self._active_player
+           winner = self._active_player
 
-        self._is_game_over = True
+        self._game_status= GameStatus.PLAYER_WIN if winner == PlayerNumber.ONE else GameStatus.PLAYER_LOSE
 
     def make_action(self, action: PlayerAction):
         board = self._board
