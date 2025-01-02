@@ -17,7 +17,7 @@ import CS150241Project.Networking (Message)
 import Data.Int (toNumber, floor)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.List (List(..), index, null, concat, (:)) -- , (:), concat, length, snoc)
+import Data.List (List(..), index, null, concat, (:))
 import Data.Array (replicate, (!!))
 import Data.Foldable (elem)
 import Effect (Effect)
