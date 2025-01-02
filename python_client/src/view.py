@@ -107,6 +107,10 @@ class Tile:
     @property
     def occupier(self) -> LivePiece | None:
         return self._occupier
+    
+    @property
+    def is_targetable(self) -> bool:
+        return self._is_targetable
 
     def mark_occupied(self, piece: LivePiece):
         self._occupier = piece
@@ -203,6 +207,8 @@ class GameView:
         self._captures_p1 = Captures(PlayerNumber.ONE)
         self._captures_p2 = Captures(PlayerNumber.TWO)
 
+        self._current_hovered_piece: LivePiece | None = None
+
     def on_state_change(self, state: GameState):
         self._active_player = state.active_player
         self._captured_pieces = state.captured_pieces
@@ -250,12 +256,19 @@ class GameView:
 
             tile = self._renderable_board.get_tile(Location(_row,_col))
 
-            if tile.occupier is not None and tile.occupier.owner == self._active_player:
-                self._renderable_board.mark_nearby_targetable(Location(_row,_col))
-            
-            elif tile._is_targetable:
-                # self._move_piece_to_tile(Location(_row,_col))
-                ...
+            if tile.occupier is not None:
+                if tile.occupier.owner == self._active_player:
+                    self._current_hovered_location = Location(_row,_col)
+                    self._renderable_board.mark_nearby_targetable(Location(_row,_col))
+                
+                elif tile._is_targetable:
+                    self._make_turn(PlayerAction(
+                        ActionType.MOVE,
+                        self._active_player,
+                        self._current_hovered_location,
+                        Location(_row, _col),
+                        tile.occupier.kind
+                    ))
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
