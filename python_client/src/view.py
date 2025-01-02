@@ -156,6 +156,9 @@ class RenderableBoard:
     def mark_nearby_targetable(self, location: Location):
         ...
 
+    def click_tile(self, coords: tuple[int, int], player: PlayerNumber):
+        ...
+
     def render_to_screen(self, screen: pygame.Surface):
         pygame.Surface.fill(self._actual_board, 'black')
 
@@ -222,6 +225,10 @@ class GameView:
         for observer in self._new_game_observers:
             observer.on_new_game()
 
+    _cursor_is_inside_board = lambda self,rel_x,rel_y : (rel_x < BOARD_WIDTH and rel_y < BOARD_HEIGHT)
+
+    _cursor_is_inside_captures = lambda self,rel_x,rel_y : (rel_x < TILE_PIXELS*12 and rel_y < TILE_PIXELS)
+
     def _render_text_result(self, text: str):
         result_text = self._font.render(text, True, 'black')
         _blittable = result_text.get_rect(center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
@@ -232,22 +239,20 @@ class GameView:
         rel_x = abs_pos[0] + 129
         rel_y = abs_pos[1] + 105
 
-        curr_player = self._active_player
-
-        if self._game_status == GameStatus.ONGOING:
-            ...
+        if self._game_status == GameStatus.ONGOING and self._cursor_is_inside_board(rel_x, rel_y):
+            self._renderable_board.click_tile((rel_x, rel_y), self._active_player)
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         rel_x = abs_pos[0]
+        rel_y = abs_pos[1] if player == PlayerNumber.ONE else abs_pos[1] + 656
 
-        match player:
-            case PlayerNumber.ONE:
-                rel_y = abs_pos[1]
-            case PlayerNumber.TWO:
-                rel_y = abs_pos[1] + 656
-
-        if self._game_status == GameStatus.ONGOING:
-            ...
+        if self._game_status == GameStatus.ONGOING and self._cursor_is_inside_captures(rel_x, rel_y):
+            match player:
+                case PlayerNumber.ONE:
+                    ...
+                    
+                case PlayerNumber.TWO:
+                    ...
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
