@@ -228,14 +228,26 @@ class GameView:
 
         self._screen.blit(result_text, _blittable)
 
-    def _mouse_press_on_board(self, pos: tuple[int, int]):
+    def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
+        rel_x = abs_pos[0] + 129
+        rel_y = abs_pos[1] + 105
+
         curr_player = self._active_player
 
         if self._game_status == GameStatus.ONGOING:
             ...
 
-    def _mouse_press_on_captures(self, pos: tuple[int, int]):
-        ...
+    def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
+        rel_x = abs_pos[0]
+
+        match player:
+            case PlayerNumber.ONE:
+                rel_y = abs_pos[1]
+            case PlayerNumber.TWO:
+                rel_y = abs_pos[1] + 656
+
+        if self._game_status == GameStatus.ONGOING:
+            ...
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
@@ -252,10 +264,12 @@ class GameView:
                     _game_is_running = False
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    print("Pos:", event.pos)
+
                     if ...:
                         self._mouse_press_on_board(event.pos)
                     elif ...:
-                        self._mouse_press_on_captures(event.pos)
+                        self._mouse_press_on_captures(event.pos, self._active_player)
 
             self._screen.fill('black')
 
