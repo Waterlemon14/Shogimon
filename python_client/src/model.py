@@ -151,12 +151,12 @@ class Board:
         """
         return [
 
-                LivePiece(piece.kind, piece.id, piece.owner, self.get_piece_movable_locations(piece), Location(piece.row, piece.col)) 
+                LivePiece(piece.kind, piece.owner, self.get_piece_movable_locations(piece), Location(piece.row, piece.col)) 
                 for piece in (self._live_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.ONE])
 
             ] + [
 
-                LivePiece(piece.kind, piece.id, piece.owner, self.get_piece_movable_locations(piece), Location(piece.row, piece.col)) 
+                LivePiece(piece.kind, piece.owner, self.get_piece_movable_locations(piece), Location(piece.row, piece.col)) 
                 for piece in (self._live_pieces[PlayerNumber.TWO] + self._protected_pieces[PlayerNumber.TWO])
                 
             ]
@@ -167,38 +167,32 @@ class Board:
         """
         return [
             
-                LivePiece(piece.kind, piece.id, piece.owner, None, None) 
+                LivePiece(piece.kind, piece.owner, None, None) 
                 for piece in self._captured_pieces[PlayerNumber.ONE]
 
             ] + [
 
-                LivePiece(piece.kind, piece.id, piece.owner, None, None) 
+                LivePiece(piece.kind, piece.owner, None, None) 
                 for piece in self._captured_pieces[PlayerNumber.TWO]
                 
             ]
 
 
-    def get_live_piece(self, id: int, player: PlayerNumber) -> Piece | ProtectedPiece | None:
-        for piece in self._live_pieces[player] + self._protected_pieces[player]:
-            if piece.id == id:
-                return piece
+    def get_live_piece(self, location: Location) -> Piece | ProtectedPiece | None:
+        return self._grid[location.row][location.col]
             
-    def get_captured_piece(self, id: int, player: PlayerNumber) -> Piece | None:
+    def get_captured_piece(self, kind: PieceKind, player: PlayerNumber) -> Piece | None:
         for piece in self._captured_pieces[player]:
-            if piece.id == id:
+            if piece.kind == kind:
                 return piece
     
-    def _live_to_captured(self, id: int, captured_player: PlayerNumber, capturing_player: PlayerNumber):
-        for piece in self._live_pieces[captured_player]:
-            if piece.id == id and type(piece) == Piece:
-                self._live_pieces[captured_player].remove(piece)
-                self._captured_pieces[capturing_player].append(piece)
+    def _live_to_captured(self, piece: Piece, captured_player: PlayerNumber, capturing_player: PlayerNumber):
+        self._live_pieces[captured_player].remove(piece)
+        self._captured_pieces[capturing_player].append(piece)
 
-    def _captured_to_live(self, id: int, player: PlayerNumber):
-        for piece in self._captured_pieces[player]:
-            if piece.id == id:
-                self._captured_pieces[player].remove(piece)
-                self._live_pieces[player].append(piece)
+    def _captured_to_live(self, piece: Piece, player: PlayerNumber):
+        self._captured_pieces[player].remove(piece)
+        self._live_pieces[player].append(piece)
 
     def put(self, row: int, col: int, piece: Piece | ProtectedPiece, player: PlayerNumber):
         live_pieces = self._live_pieces[player]
@@ -209,33 +203,29 @@ class Board:
             protected_pieces.append(piece)
         self._grid[row][col] = piece
 
-    def take(self, row: int, col: int):
-        self._grid[row][col] = None
+    def take(self, location: Location):
+        self._grid[location.row][location.col] = None
         
-    def move(self, row: int, col: int, piece: Piece | ProtectedPiece):
-        piece.location = Location(row, col)
-        self._grid[row][col] = piece
-
+    def move(self, location: Location, piece: Piece | ProtectedPiece):
+        piece.location = Location(location.row, location.col)
+        self._grid[location.row][location.col] = piece
     
-    def capture(self, row: int, col: int, capturing_player: PlayerNumber, capturing_piece: Piece):
-        captured_player = PlayerNumber.TWO if capturing_player == PlayerNumber.ONE else PlayerNumber.ONE
+    def capture(self, target: Location, capturing_piece: Piece):
+        captured_player = PlayerNumber.TWO if capturing_piece.owner == PlayerNumber.ONE else PlayerNumber.ONE
 
-        captured_piece = self._grid[row][col]
-
-        capturing_piece.location = Location(row, col)
-        self._grid[row][col] = capturing_piece
+        captured_piece = self._grid[target.row][target.col]
+        self.move(target, capturing_piece)
 
         if captured_piece:
             captured_piece.switch_ownership()
-            self._live_to_captured(captured_piece.id, captured_player, capturing_player)
+            self._live_to_captured(captured_piece, captured_player, captured_piece.owner)
 
-    def drop(self, row: int, col: int, piece: Piece, player: PlayerNumber):
-        self._grid[row][col] = piece
-        piece.location = Location(row, col)
-        self._captured_to_live(piece.id, player)
+    def drop(self, target: Location, piece: Piece, player: PlayerNumber):
+        self.move(target, piece)
+        self._captured_to_live(piece, player)
 
-    def can_capture(self, row: int, col: int) -> bool:
-        piece = self._grid[row][col]
+    def can_capture(self, location: Location) -> bool:
+        piece = self._grid[location.row][location.col]
         if piece and type(piece) == Piece:
             return True
         
@@ -274,21 +264,21 @@ class Board:
 
         return [Location(row, int) for row, int in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner))]
     
-    def is_valid_location(self, row: int, col: int) -> bool:
-        loc = self._grid[row][col]
+    def is_valid_location(self, location: Location) -> bool:
+        loc = self._grid[location.row][location.col]
 
         for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
-            if (row, col) in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner)):
+            if (location.row, location.col) in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner)):
                 return False
             
         return not loc
 
-    def is_safe_location(self, row: int, col: int, curr_player: PlayerNumber) -> bool:
+    def is_safe_location(self, target: Location, curr_player: PlayerNumber) -> bool:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
 
-        unsafe_locations = [(loc.row, loc.col) for loc in self.get_all_movable_locations(opponent)]
+        unsafe_locations = self.get_all_movable_locations(opponent)
 
-        if (row, col) in unsafe_locations:
+        if target in unsafe_locations:
             return False
             
         return True
@@ -298,14 +288,14 @@ class Board:
         """
         Checks if Latias and Latios of each player can still move
         """
-        unsafe_locations = [(loc.row, loc.col) for loc in self.get_all_movable_locations(curr_player)]
+        unsafe_locations = self.get_all_movable_locations(curr_player)
 
         for protected in self._protected_pieces[opponent]:
             possible_moves = protected.get_movement_range(self.get_movable_locations_mapping(opponent))
             danger: list[bool] = []
 
             for r, c in possible_moves:
-                if (r, c) in unsafe_locations:
+                if Location(r, c) in unsafe_locations:
                     danger.append(True)
                 else:
                     danger.append(False)
@@ -453,51 +443,48 @@ class GameModel:
 
     def make_action(self, action: PlayerAction):
         board = self._board
-        target_row = action.target_location.row
-        target_col = action.target_location.col
-        player_number = action.player_number
-        id = action.piece_id
+        target = action.target_location
+        source = action.source_location
+        kind = action.kind
+        player = action.player
 
         match action.action_type:
 
             case ActionType.MOVE:
-                piece_to_move = board.get_live_piece(id, player_number)
+                piece_to_move = board.get_live_piece(source)
 
                 # Narrow type down
                 if piece_to_move:
                     
                     # If regular piece, capture or move
                     if type(piece_to_move) == Piece:
-                        board.take(piece_to_move.row, piece_to_move.col)
+                        board.take(source)
 
                         # Check if can capture
-                        if board.can_capture(target_row, target_col):
+                        if board.can_capture(target):
                             
-                            board.capture(target_row, target_col, player_number, piece_to_move)
+                            board.capture(target, piece_to_move)
 
                         # Move piece simply  
                         else:
-                            board.move(target_row, target_col, piece_to_move)
+                            board.move(target, piece_to_move)
 
                     # If protected piece, check if target location is valid
-                    elif type(piece_to_move) == ProtectedPiece and board.is_safe_location(target_row, target_col, player_number):
+                    elif type(piece_to_move) == ProtectedPiece and board.is_safe_location(target, piece_to_move.owner):
 
-                        board.take(piece_to_move.row, piece_to_move.col)
-                        board.move(target_row, target_col, piece_to_move)
+                        board.take(source)
+                        board.move(target, piece_to_move)
 
 
             case ActionType.DROP:
-                piece_to_drop = board.get_captured_piece(id, player_number)
+                piece_to_drop = board.get_captured_piece(kind, player)
 
-                if piece_to_drop and board.is_valid_location(target_row, target_col):
-                    board.drop(target_row, target_col, piece_to_drop, player_number)
+                if piece_to_drop and board.is_valid_location(target):
+                    board.drop(target, piece_to_drop, player)
 
         self._action_count -= 1
         self._check_if_game_over()
         self._update_state()
-
-    def mouse_click(self, id: int):
-        ...
         
     def new_game(self):
         ...
