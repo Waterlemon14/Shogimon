@@ -99,7 +99,7 @@ class Tile:
 
     @property
     def rect(self) -> pygame.Rect:
-        return self._actual_tile.get_rect(center=(TILE_PIXELS//2, TILE_PIXELS//2))
+        return self._actual_tile.get_rect(topleft=(self._x_coord, self._y_coord))
 
     @property
     def occupier(self) -> LivePiece | None:
@@ -128,7 +128,7 @@ class Tile:
         if self._is_targetable:
             pygame.draw.circle(self._actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
 
-        board.blit(self._actual_tile, (self._x_coord, self._y_coord))
+        board.blit(self._actual_tile, self.rect)
 
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
