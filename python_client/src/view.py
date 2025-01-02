@@ -58,6 +58,9 @@ class Captures:
     def click_pixels(self, coords: tuple[int, int]):
         ...
 
+    def place_piece_to_tile(self):
+        ...
+
     def render_to_screen(self, screen: pygame.Surface):
         actual_captures = self._render_row()
         screen.blit(actual_captures, self.rect)
@@ -150,10 +153,10 @@ class RenderableBoard:
             if piece.location:
                 self._location_to_tile[piece.location].mark_occupied(piece)
 
-    def mark_nearby_targetable(self, location: Location):
+    def click_pixels(self, coords: tuple[int, int], player: PlayerNumber):
         ...
 
-    def click_pixels(self, coords: tuple[int, int], player: PlayerNumber):
+    def mark_nearby_targetable(self, location: Location):
         ...
 
     def render_to_screen(self, screen: pygame.Surface):
