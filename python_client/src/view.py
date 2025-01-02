@@ -3,7 +3,7 @@ from collections import Counter
 
 from project_types import (
     TILE_PIXELS, BOARD_ROWS, BOARD_COLS, GameStatus,
-    LivePiece, Location, GameState, PieceKind, PlayerNumber,
+    LivePiece, Location, GameState, PieceKind, ActionType, PlayerAction, PlayerNumber,
     MakeTurnObserver, NewGameObserver,
     )
 from model import Board
@@ -35,6 +35,8 @@ class Captures:
         self._captures: list[LivePiece] = []
         self._owner = number
 
+        self._actual_row = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
+
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
 
@@ -45,6 +47,11 @@ class Captures:
     @property
     def owner(self) -> PlayerNumber:
         return self._owner
+    
+    @property
+    def rect(self) -> pygame.Rect:
+        '''UNTESTED'''
+        return self._actual_row.get_rect(center=(TILE_PIXELS*12//2, TILE_PIXELS//2))
     
     def render_to_screen(self, screen: pygame.Surface):
         actual_captures = self._render_row()
@@ -58,24 +65,24 @@ class Captures:
         screen.blit(actual_captures, _blittable)
 
     def _render_row(self) -> pygame.Surface:
-        returnable = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
+        pygame.Surface.fill(self._actual_row, 'white')
         _counted_list = Counter(self._captures)
 
         order_in_screen = 0
 
         for piece in _counted_list:
             _blittable = get_blittable(piece)
-            returnable.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
+            self._actual_row.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
 
             _count = self._font.render(
                 "x" + str(_counted_list[piece]),
                 True, "white"
             )
-            returnable.blit(_count, (TILE_PIXELS*order_in_screen, TILE_PIXELS))
+            self._actual_row.blit(_count, (TILE_PIXELS*order_in_screen, TILE_PIXELS))
 
             order_in_screen += 1
 
-        return returnable
+        return self._actual_row
 
 class Tile:
     """Renderable class for each tile inside board"""
@@ -86,6 +93,13 @@ class Tile:
         self._y_coord = location.pixels[1]
         self._occupier: LivePiece | None = None
         self._is_targetable = False
+
+        self._actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
+
+    @property
+    def rect(self) -> pygame.Rect:
+        '''UNTESTED'''
+        return self._actual_tile.get_rect(center=(TILE_PIXELS//2, TILE_PIXELS//2))
 
     @property
     def occupier(self) -> LivePiece | None:
@@ -104,18 +118,17 @@ class Tile:
         self._is_targetable = False
 
     def render_to_board(self, board: pygame.Surface):
-        actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
-        pygame.Surface.fill(actual_tile, 'white')
-        pygame.draw.rect(actual_tile, "black", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
+        pygame.Surface.fill(self._actual_tile, 'white')
+        pygame.draw.rect(self._actual_tile, "black", pygame.Rect(0, 0, TILE_PIXELS, TILE_PIXELS), width=1)
         
         if self._occupier is not None:
             _blittable = get_blittable(self._occupier)
-            actual_tile.blit(_blittable, (0,0))
+            self._actual_tile.blit(_blittable, (0,0))
 
         if self._is_targetable:
-            pygame.draw.circle(actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
+            pygame.draw.circle(self._actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
 
-        board.blit(actual_tile, (self._x_coord, self._y_coord))
+        board.blit(self._actual_tile, (self._x_coord, self._y_coord))
 
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
@@ -126,7 +139,14 @@ class RenderableBoard:
             for j in range(BOARD_COLS)
         }
 
+        self._actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
+
         self.set_board_state(live_pieces)
+
+    @property
+    def rect(self) -> pygame.Rect:
+        '''UNTESTED'''
+        return self._actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
 
     def set_board_state(self, live_pieces: list[LivePiece]):
         """Set board according to current live pieces (preferably take from game state instance)"""
@@ -138,14 +158,13 @@ class RenderableBoard:
         ...
 
     def render_to_screen(self, screen: pygame.Surface):
-        actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
-        pygame.Surface.fill(actual_board, 'black')
+        pygame.Surface.fill(self._actual_board, 'black')
 
         for k in self._location_to_tile:
-            self._location_to_tile[k].render_to_board(actual_board)
+            self._location_to_tile[k].render_to_board(self._actual_board)
         
-        _blittable = actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
-        screen.blit(actual_board, _blittable)
+        _blittable = self._actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+        screen.blit(self._actual_board, _blittable)
 
 class GameView:
     """Actual MVC view class"""
@@ -196,9 +215,9 @@ class GameView:
         elif self._game_status == GameStatus.GAME_DRAW:
             self._render_text_result("GAME RESULTED IN STALEMATE")
 
-    def _make_turn(self):
+    def _make_turn(self, action: PlayerAction):
         for observer in self._make_turn_observers:
-            observer.on_make_turn()
+            observer.on_make_turn(action)
 
     def _new_game(self):
         for observer in self._new_game_observers:
@@ -210,13 +229,13 @@ class GameView:
 
         self._screen.blit(result_text, _blittable)
 
-    def _mouse_press_on_board(self, event: pygame.Event):
+    def _mouse_press_on_board(self, pos: tuple[int, int]):
         curr_player = self._active_player
 
         if self._game_status == GameStatus.ONGOING:
             ...
 
-    def _mouse_press_on_captures(self, event: pygame.Event):
+    def _mouse_press_on_captures(self, pos: tuple[int, int]):
         ...
 
     def run(self):
@@ -235,9 +254,9 @@ class GameView:
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if ...:
-                        self._mouse_press_on_board(event)
+                        self._mouse_press_on_board(event.pos)
                     elif ...:
-                        self._mouse_press_on_captures(event)
+                        self._mouse_press_on_captures(event.pos)
 
             self._screen.fill('black')
 
