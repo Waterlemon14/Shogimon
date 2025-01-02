@@ -258,20 +258,32 @@ class GameView:
             _col = (abs_pos[0] - 129) // TILE_PIXELS
 
             tile = self._renderable_board.get_tile(Location(_row,_col))
-
+            print(self._current_hovered_piece)
             if tile.occupier is not None:
                 if tile.occupier.owner == self._active_player:
                     self._current_hovered_location = Location(_row,_col)
                     self._renderable_board.mark_nearby_targetable(Location(_row,_col))
-                
+                    self._current_hovered_piece = self._renderable_board._location_to_tile[Location(_row, _col)].occupier
+
                 elif tile._is_targetable:
                     self._make_turn(PlayerAction(
                         ActionType.MOVE,
                         self._active_player,
                         self._current_hovered_location,
                         Location(_row, _col),
-                        tile.occupier.kind
+                        self._current_hovered_piece.kind
                     ))
+                    self._init_view_state()
+                
+            elif tile._is_targetable:
+                self._make_turn(PlayerAction(
+                    ActionType.MOVE,
+                    self._active_player,
+                    self._current_hovered_location,
+                    Location(_row, _col),
+                    self._current_hovered_piece.kind
+                ))
+                self._init_view_state()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
