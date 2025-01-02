@@ -90,16 +90,19 @@ class Tile:
     def __init__(self, location: Location):
         """Infer implicit info from occupier: type LivePiece => occupied, type None => unoccupied"""
         self._location = location
-        self._x_coord = location.pixels[0]
-        self._y_coord = location.pixels[1]
+        self._topleft = location.pixels
         self._occupier: LivePiece | None = None
         self._is_targetable = False
 
         self._actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
 
     @property
+    def topleft(self):
+        return self._topleft
+
+    @property
     def rect(self) -> pygame.Rect:
-        return self._actual_tile.get_rect(topleft=(self._x_coord, self._y_coord))
+        return self._actual_tile.get_rect(topleft=self._topleft)
 
     @property
     def occupier(self) -> LivePiece | None:
