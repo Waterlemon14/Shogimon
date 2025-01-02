@@ -64,7 +64,7 @@ class Captures:
         screen.blit(actual_captures, _blittable)
 
     def _render_row(self) -> pygame.Surface:
-        pygame.Surface.fill(self._actual_row, 'white')
+        pygame.Surface.fill(self._actual_row, 'black')
         _counted_list = Counter(self._captures)
 
         order_in_screen = 0
@@ -77,7 +77,7 @@ class Captures:
                 "x" + str(_counted_list[piece]),
                 True, "white"
             )
-            self._actual_row.blit(_count, (TILE_PIXELS*order_in_screen, TILE_PIXELS))
+            self._actual_row.blit(_count, (TILE_PIXELS*order_in_screen, 0))
 
             order_in_screen += 1
 
@@ -156,7 +156,7 @@ class RenderableBoard:
     def mark_nearby_targetable(self, location: Location):
         ...
 
-    def click_tile(self, coords: tuple[int, int], player: PlayerNumber):
+    def click_pixels(self, coords: tuple[int, int], player: PlayerNumber):
         ...
 
     def render_to_screen(self, screen: pygame.Surface):
@@ -233,16 +233,16 @@ class GameView:
 
     def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
         """When mouse is clicked inside rect Board"""
-        rel_x = abs_pos[0] + 129
-        rel_y = abs_pos[1] + 105
+        rel_x = abs_pos[0] - 129
+        rel_y = abs_pos[1] - 105
 
         if self._game_status == GameStatus.ONGOING:
-            self._renderable_board.click_tile((rel_x, rel_y), self._active_player)
+            self._renderable_board.click_pixels((rel_x, rel_y), self._active_player)
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside rect Captures"""
         rel_x = abs_pos[0]
-        rel_y = abs_pos[1] if player == PlayerNumber.ONE else abs_pos[1] + 656
+        rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
 
         if self._game_status == GameStatus.ONGOING:
             '''TO DO: add something missing inside class Captures'''
@@ -273,6 +273,7 @@ class GameView:
                     
                     elif (self._active_player == PlayerNumber.ONE and self._captures_p1.rect.collidepoint(event.pos)) \
                     or (self._active_player == PlayerNumber.TWO and self._captures_p2.rect.collidepoint(event.pos)):
+                        print(self._active_player)
                         self._mouse_press_on_captures(event.pos, self._active_player)
 
             self._screen.fill('black')
