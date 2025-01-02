@@ -37,6 +37,12 @@ class Location:
     row: int
     col: int
 
+    def __eq__(self, other: object):
+        if isinstance(other, Location):
+            return (self.row, self.col) == (other.row, other.col)
+        
+        return False
+
     @property
     def pixels(self) -> tuple[int, int]:
         return (self.col * TILE_PIXELS, self.row * TILE_PIXELS)
@@ -56,8 +62,9 @@ class LivePiece:
 class PlayerAction:
     action_type: ActionType
     player: PlayerNumber
-    source_locaiton: Location
+    source_location: Location
     target_location: Location
+    kind: PieceKind
 
 @dataclass(frozen=True)
 class GameState:
