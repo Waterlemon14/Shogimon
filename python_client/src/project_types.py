@@ -60,9 +60,12 @@ class LivePiece:
 
 @dataclass(frozen=True)
 class PlayerAction:
+    """
+    source_location is None if action_type == DROP
+    """
     action_type: ActionType
     player: PlayerNumber
-    source_location: Location
+    source_location: Location | None
     target_location: Location
     kind: PieceKind
 
@@ -84,7 +87,7 @@ class MovePossibilities(Enum):
 
 
 class Movement(Protocol):    
-    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
         ...
 
 class PiecePositions(Protocol):

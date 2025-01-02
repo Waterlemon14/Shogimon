@@ -3,26 +3,26 @@ from typing import Self
 from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, GameStatus
 
 class EeveeMovement:
-    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
         
         return [
-            (row + dr, col + dc)
+            Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.FORWARD.value
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
         ]
 
 class EeveeShinyMovement:
-    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
         
         return [
-            (row + dr, col + dc)
+            Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.FORWARD_OPPOSITE.value
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
         ]
 
 class PikachuMovement:
-    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
-        diagonals: list[tuple[int, int]] = []
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
+        diagonals: list[Location] = []
         
         for dr, dc in MovePossibilities.DIAGONALS.value:
 
@@ -31,15 +31,15 @@ class PikachuMovement:
                 temp_row += dr
                 temp_col += dc
                 if not valid_locations[(temp_row,temp_col)]: # if encounters a location with opponent piece (False), block the range
-                    diagonals.append((temp_row, temp_col))
+                    diagonals.append(Location(temp_row, temp_col))
                     break
-                diagonals.append((temp_row, temp_col))
+                diagonals.append(Location(temp_row, temp_col))
         
         return diagonals
 
 class TurtwigMovement:
-    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
-        orthogonals: list[tuple[int, int]] = []
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
+        orthogonals: list[Location] = []
         
         for dr, dc in MovePossibilities.ORTHOGONALS.value:
 
@@ -48,24 +48,24 @@ class TurtwigMovement:
                 temp_row += dr
                 temp_col += dc
                 if not valid_locations[(temp_row,temp_col)]: # if encounters a location with opponent piece (False), block the range
-                    orthogonals.append((temp_row, temp_col))
+                    orthogonals.append(Location(temp_row, temp_col))
                     break
-                orthogonals.append((temp_row, temp_col))
+                orthogonals.append(Location(temp_row, temp_col))
         
         return orthogonals
 
 class LatiosMovement:
-    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
         return [
-            (row + dr, col + dc)
+            Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.ORTHOGONALS.value
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)] # Latios cannot capture hence only locations with True values are considered
         ]
     
 class LatiasMovement:
-    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
+    def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
          return [
-            (row + dr, col + dc)
+            Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.DIAGONALS.value
             if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)]
             # Latias cannot capture hence only locations with True values are considered
@@ -86,17 +86,12 @@ class Opponent:
     ...
 
 class Piece:
-    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
-        self._id = id
+    def __init__(self, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
         self._kind = kind
         self.location = location
         self._is_captured = False
         self._movement = movement
         self._owner = owner
-
-    @property
-    def id(self) -> int:
-        return self._id
 
     @property
     def kind(self) -> PieceKind:
@@ -118,11 +113,11 @@ class Piece:
     def is_captured(self) -> bool:
         return self._is_captured
 
-    def can_move(self, row: int, col: int, grid: dict[tuple[int, int], bool]) -> bool:
+    def can_move(self, location: Location, grid: dict[tuple[int, int], bool]) -> bool:
         
-        return (row, col) in self._movement.get_movement_range(self.row, self.col, grid)
+        return location in self._movement.get_movement_range(self.row, self.col, grid)
     
-    def get_movement_range(self, grid: dict[tuple[int, int], bool]) -> list[tuple[int, int]]:
+    def get_movement_range(self, grid: dict[tuple[int, int], bool]) -> list[Location]:
         return self._movement.get_movement_range(self.row, self.col, grid)
     
     def switch_ownership(self):
@@ -130,8 +125,8 @@ class Piece:
   
 
 class ProtectedPiece(Piece):
-    def __init__(self, id: int, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
-        super().__init__(id, kind, location, movement, owner)
+    def __init__(self, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
+        super().__init__(kind, location, movement, owner)
         self.is_immobile = False
     
 
@@ -256,19 +251,19 @@ class Board:
 
         for piece in self._live_pieces[player] + self._protected_pieces[player]:
             
-            locations.extend([Location(row, int) for row, int in piece.get_movement_range(self.get_movable_locations_mapping(player))])
+            locations.extend(piece.get_movement_range(self.get_movable_locations_mapping(player)))
 
         return locations
     
     def get_piece_movable_locations(self, piece: Piece | ProtectedPiece) -> list[Location]:
 
-        return [Location(row, int) for row, int in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner))]
+        return piece.get_movement_range(self.get_movable_locations_mapping(piece.owner))
     
     def is_valid_location(self, location: Location) -> bool:
         loc = self._grid[location.row][location.col]
 
         for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
-            if (location.row, location.col) in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner)):
+            if location in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner)):
                 return False
             
         return not loc
@@ -294,8 +289,8 @@ class Board:
             possible_moves = protected.get_movement_range(self.get_movable_locations_mapping(opponent))
             danger: list[bool] = []
 
-            for r, c in possible_moves:
-                if Location(r, c) in unsafe_locations:
+            for loc in possible_moves:
+                if loc in unsafe_locations:
                     danger.append(True)
                 else:
                     danger.append(False)
@@ -305,38 +300,35 @@ class Board:
         return all([piece.is_immobile for piece in self._protected_pieces[opponent]])
     
 class PieceFactory:
-    _piece_count = 0
 
     @classmethod
     def make(cls, piece_kind: PieceKind,
              location: Location, owner: PlayerNumber) -> Piece | ProtectedPiece:
-        piece_id = cls._piece_count
-        cls._piece_count += 1
 
         match piece_kind:
             case PieceKind.EEVEE:
                 movement = EeveeMovement()
-                return Piece(piece_id, piece_kind, location, movement, owner)
+                return Piece(piece_kind, location, movement, owner)
 
             case PieceKind.EEVEE_SHINY:
                 movement = EeveeShinyMovement()
-                return Piece(piece_id, piece_kind, location, movement, owner)
+                return Piece(piece_kind, location, movement, owner)
 
             case PieceKind.PIKACHU:
                 movement = PikachuMovement()
-                return Piece(piece_id, piece_kind, location, movement, owner)
+                return Piece(piece_kind, location, movement, owner)
  
             case PieceKind.TURTWIG:
                 movement = TurtwigMovement()
-                return Piece(piece_id, piece_kind, location, movement, owner)
+                return Piece(piece_kind, location, movement, owner)
  
             case PieceKind.LATIOS:
                 movement = LatiosMovement()
-                return ProtectedPiece(piece_id, piece_kind, location, movement, owner)
+                return ProtectedPiece(piece_kind, location, movement, owner)
  
             case PieceKind.LATIAS:
                 movement = LatiasMovement()
-                return ProtectedPiece(piece_id, piece_kind, location, movement, owner)
+                return ProtectedPiece(piece_kind, location, movement, owner)
 
 class DefaultPositions:
     def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
@@ -451,29 +443,30 @@ class GameModel:
         match action.action_type:
 
             case ActionType.MOVE:
-                piece_to_move = board.get_live_piece(source)
+                if source:
+                    piece_to_move = board.get_live_piece(source)
 
-                # Narrow type down
-                if piece_to_move:
-                    
-                    # If regular piece, capture or move
-                    if type(piece_to_move) == Piece:
-                        board.take(source)
+                    # Narrow type down
+                    if piece_to_move:
+                        
+                        # If regular piece, capture or move
+                        if type(piece_to_move) == Piece:
+                            board.take(source)
 
-                        # Check if can capture
-                        if board.can_capture(target):
-                            
-                            board.capture(target, piece_to_move)
+                            # Check if can capture
+                            if board.can_capture(target):
+                                
+                                board.capture(target, piece_to_move)
 
-                        # Move piece simply  
-                        else:
+                            # Move piece simply  
+                            else:
+                                board.move(target, piece_to_move)
+
+                        # If protected piece, check if target location is valid
+                        elif type(piece_to_move) == ProtectedPiece and board.is_safe_location(target, piece_to_move.owner):
+
+                            board.take(source)
                             board.move(target, piece_to_move)
-
-                    # If protected piece, check if target location is valid
-                    elif type(piece_to_move) == ProtectedPiece and board.is_safe_location(target, piece_to_move.owner):
-
-                        board.take(source)
-                        board.move(target, piece_to_move)
 
 
             case ActionType.DROP:
