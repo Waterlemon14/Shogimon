@@ -50,18 +50,15 @@ class Captures:
     @property
     def rect(self) -> pygame.Rect:
         '''UNTESTED'''
-        return self._actual_row.get_rect(center=(TILE_PIXELS*12//2, TILE_PIXELS//2))
+        match self._owner:
+            case PlayerNumber.ONE:
+                return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, bottom=SCREEN_HEIGHT)
+            case PlayerNumber.TWO:
+                return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, top=0)
     
     def render_to_screen(self, screen: pygame.Surface):
         actual_captures = self._render_row()
-
-        match self._owner:
-            case PlayerNumber.ONE:
-                _blittable = actual_captures.get_rect(midbottom=(SCREEN_WIDTH//2, SCREEN_HEIGHT))
-            case PlayerNumber.TWO:
-                _blittable = actual_captures.get_rect(midtop=(SCREEN_WIDTH//2, 0))
-
-        screen.blit(actual_captures, _blittable)
+        screen.blit(actual_captures, self.rect)
 
     def _render_row(self) -> pygame.Surface:
         pygame.Surface.fill(self._actual_row, 'black')
@@ -165,8 +162,7 @@ class RenderableBoard:
         for k in self._location_to_tile:
             self._location_to_tile[k].render_to_board(self._actual_board)
         
-        _blittable = self._actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
-        screen.blit(self._actual_board, _blittable)
+        screen.blit(self._actual_board, self.rect)
 
 class GameView:
     """Actual MVC view class"""
