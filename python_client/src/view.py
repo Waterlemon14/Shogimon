@@ -57,9 +57,9 @@ class Captures:
 
         match self._owner:
             case PlayerNumber.ONE:
-                _blittable = actual_captures.get_rect(midbottom=(SCREEN_WIDTH//2, SCREEN_HEIGHT))
-            case PlayerNumber.TWO:
                 _blittable = actual_captures.get_rect(midtop=(SCREEN_WIDTH//2, 0))
+            case PlayerNumber.TWO:
+                _blittable = actual_captures.get_rect(midbottom=(SCREEN_WIDTH//2, SCREEN_HEIGHT))
 
         screen.blit(actual_captures, _blittable)
 
