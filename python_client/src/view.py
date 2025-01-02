@@ -243,7 +243,7 @@ class GameView:
         self._screen.blit(result_text, _blittable)
 
     def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
-        """When mouse is clicked inside rect Board"""
+        """When mouse is clicked inside RenderableBoard rect"""
         if self._game_status == GameStatus.ONGOING:
             _row = (abs_pos[1] - 105) // TILE_PIXELS
             _col = (abs_pos[0] - 129) // TILE_PIXELS
@@ -258,7 +258,7 @@ class GameView:
                 ...
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
-        """When mouse is clicked inside rect Captures"""
+        """When mouse is clicked inside Captures rect"""
         rel_x = abs_pos[0]
         rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
 
