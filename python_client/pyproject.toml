@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 cs150241project-networking = {git = "https://github.com/UPD-CS150-241/cs150241project_networking"}
+pygame-ce = "^2.5.2"
 
 
 [build-system]
