@@ -46,7 +46,6 @@ class LivePiece:
     """Infer implicit type from location and moves: type Location => piece is on board, type None => piece is captured 
     """
     kind: PieceKind
-    id: int
     owner: PlayerNumber
     moves: list[Location] | None
     location: Location | None
@@ -56,8 +55,8 @@ class LivePiece:
 @dataclass(frozen=True)
 class PlayerAction:
     action_type: ActionType
-    player_number: PlayerNumber
-    piece_id: int
+    player: PlayerNumber
+    source_locaiton: Location
     target_location: Location
 
 @dataclass(frozen=True)
@@ -98,9 +97,4 @@ class NewGameObserver(Protocol):
 class GameStateChangeObserver(Protocol):
     """For controller; Communicator of change in game state (ongoing, player 1 win, player 1 lose)"""
     def on_state_change(self, state: GameState):
-        ...
-
-class MouseClickObserver(Protocol):
-    """For view; Communicator betweem mouse clicks and piece movements"""
-    def on_mouse_click(self, id: int, ): # id = piece.id
         ...
