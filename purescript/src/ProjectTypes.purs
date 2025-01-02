@@ -1,12 +1,15 @@
 module ProjectTypes
-  ( Kind(..)
-  , Position
-  , Board
-  , PlayerNum(..)
-  , Piece
+  ( Board
   , Captured
   , GameState
+  , Kind(..)
+  , Piece
+  , PlayerNum(..)
+  , Position
   , Winner(..)
+  , class Images
+  , getCurrentPlayerImage
+  , getIdlePlayerImage
   )
   where
 
@@ -36,6 +39,22 @@ instance Show Kind where
 
 derive instance Eq Kind
 
+class Images a where
+  getCurrentPlayerImage :: a -> String
+  getIdlePlayerImage :: a -> String
+
+instance Images Kind where
+  getCurrentPlayerImage Pawn = "../../img/eevee.png"
+  getCurrentPlayerImage Bishop = "../../img/pikachu.png"
+  getCurrentPlayerImage Rook = "../../img/turtwig.png"
+  getCurrentPlayerImage Prince = "../../img/latios.png"
+  getCurrentPlayerImage Princess = "../../img/latias.png"
+  
+  getIdlePlayerImage Pawn    = "../../img/eevee-shiny.png"
+  getIdlePlayerImage Bishop    = "../../img/pikachu-shiny.png"
+  getIdlePlayerImage Rook    = "../../img/turtwig-shiny.png"
+  getIdlePlayerImage Prince    = "../../img/latios-shiny.png"
+  getIdlePlayerImage Princess    = "../../img/latias-shiny.png"
 
 -- Used to represent the position of a piece on the board
 type Position =
@@ -63,7 +82,6 @@ derive instance Eq PlayerNum
 type Piece =
   { kind :: Kind            -- Kind of the piece
   , position :: Position    -- Current position of the piece
-  , image :: String         -- Filename of the image used to draw the piece
   , player :: PlayerNum     -- Which player the piece belongs to
   , isProtected :: Boolean    -- If the piece is to be protected
   }
@@ -74,7 +92,6 @@ type Piece =
 type Captured =
   { kind :: Kind      -- Kind of the piece
   , count :: Int      -- How many of that kind of piece is captured
-  , image :: String   -- Filename of the image used to draw the piece
   }
 
 

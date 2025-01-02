@@ -40,6 +40,8 @@ import ProjectTypes
   , Captured
   , GameState
   , Winner(..)
+  , getCurrentPlayerImage
+  , getIdlePlayerImage
   )
 
 import Config
@@ -59,24 +61,24 @@ import Config
 
 
 createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
-createBishop col row One    = Just {kind: Bishop,   position: {col:col,row:row},  image: "../../img/pikachu.png", player: One, isProtected: false}
-createBishop col row Two    = Just {kind: Bishop,   position: {col:col,row:row},  image: "../../img/pikachu-shiny.png", player: Two, isProtected: false}
+createBishop col row One    = Just {kind: Bishop,   position: {col:col,row:row},  player: One, isProtected: false}
+createBishop col row Two    = Just {kind: Bishop,   position: {col:col,row:row},  player: Two, isProtected: false}
 
 createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row One      = Just {kind: Pawn,     position: {col:col,row:row},  image: "../../img/eevee.png", player: One, isProtected: false}
-createPawn col row Two      = Just {kind: Pawn,     position: {col:col,row:row},  image: "../../img/eevee-shiny.png", player: Two, isProtected: false}
+createPawn col row One      = Just {kind: Pawn,     position: {col:col,row:row},  player: One, isProtected: false}
+createPawn col row Two      = Just {kind: Pawn,     position: {col:col,row:row},  player: Two, isProtected: false}
 
 createRook :: Int -> Int -> PlayerNum -> Maybe Piece
-createRook col row One      = Just {kind: Rook,     position: {col:col,row:row},  image: "../../img/turtwig.png", player: One, isProtected: false}
-createRook col row Two      = Just {kind: Rook,     position: {col:col,row:row},  image: "../../img/turtwig-shiny.png", player: Two, isProtected: false}
+createRook col row One      = Just {kind: Rook,     position: {col:col,row:row},  player: One, isProtected: false}
+createRook col row Two      = Just {kind: Rook,     position: {col:col,row:row},  player: Two, isProtected: false}
 
 createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrince col row One    = Just {kind: Prince,   position: {col:col,row:row},  image: "../../img/latios.png", player: One, isProtected: true}
-createPrince col row Two    = Just {kind: Prince,   position: {col:col,row:row},  image: "../../img/latios-shiny.png", player: Two, isProtected: true}
+createPrince col row One    = Just {kind: Prince,   position: {col:col,row:row},  player: One, isProtected: true}
+createPrince col row Two    = Just {kind: Prince,   position: {col:col,row:row},  player: Two, isProtected: true}
 
 createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  image: "../../img/latias.png", player: One, isProtected: true}
-createPrincess col row Two  = Just {kind: Princess, position: {col:col,row:row},  image: "../../img/latias-shiny.png", player: Two, isProtected: true}
+createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  player: One, isProtected: true}
+createPrincess col row Two  = Just {kind: Princess, position: {col:col,row:row},  player: Two, isProtected: true}
 
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
@@ -218,7 +220,7 @@ onTick send gameState = do
 
         
         addCaptured :: List Captured -> Piece -> List Captured
-        addCaptured Nil piece = Cons { kind: piece.kind, count: 1, image: piece.image } Nil
+        addCaptured Nil piece = Cons { kind: piece.kind, count: 1 } Nil
         addCaptured (Cons h t) piece | h.kind == piece.kind = Cons (h {count = h.count + 1}) t
         addCaptured (Cons h t) piece | otherwise = Cons h (addCaptured t piece)
 
@@ -321,15 +323,15 @@ onTick send gameState = do
         getCapturedMessage state.playerTwoCaptures <> " " <> (trim $ getBoardMessage 0 0 state.board)
       pure state
     
-    readCapturedMessage :: String -> PlayerNum -> List Captured
-    readCapturedMessage captured_string player_num = if captured_string == "None"
+    readCapturedMessage :: String -> List Captured
+    readCapturedMessage captured_string = if captured_string == "None"
       then Nil
       else helper captured_string
         where
           helper :: String -> List Captured
           helper remaining_captured = if count == 0
             then Nil
-            else Cons { kind: kind, count: count, image: image } (helper (drop 2 remaining_captured))
+            else Cons { kind: kind, count: count } (helper (drop 2 remaining_captured))
               where
                 kind = case take 1 remaining_captured of
                   "p" -> Pawn
@@ -341,13 +343,6 @@ onTick send gameState = do
                 count = case fromString (take 1 (drop 1 remaining_captured)) of
                   Just num -> num
                   Nothing -> 0
-                image = case take 1 remaining_captured of
-                  "p" -> "../../img/eevee.png"
-                  "b" -> "../../img/pikachu.png"
-                  "r" -> "../../img/turtwig.png"
-                  "k" -> "../../img/latios.png"
-                  "q" -> "../../img/latias.png"
-                  _   -> "" -- should never reach this case
     
     readStateMessage :: GameState -> GameState
     readStateMessage state = do
@@ -374,13 +369,13 @@ onTick send gameState = do
         player_one_captures = if is_command == true
           then state.playerOneCaptures
           else case payload_arr Array.!! 1 of
-            Just captured_message -> readCapturedMessage captured_message One
+            Just captured_message -> readCapturedMessage captured_message
             Nothing -> state.playerOneCaptures
         
         player_two_captures = if is_command == true
           then state.playerTwoCaptures
           else case payload_arr Array.!! 2 of
-          Just captured_message -> readCapturedMessage captured_message Two
+          Just captured_message -> readCapturedMessage captured_message
           Nothing -> state.playerTwoCaptures
       
       state
@@ -567,11 +562,17 @@ onRender images ctx gameState = do
           -- Print the piece to the board if present, else go to next cell
           case accessCell col row gameState.board of
             Nothing -> drawBoard (col+1) row
-            Just piece -> case Map.lookup piece.image images of
-              Nothing -> drawBoard (col+1) row
-              Just img -> do
-                drawImageScaled ctx img { x: temp_x, y: temp_y, width: cell_width, height: cell_height }
-                drawBoard (col+1) row
+            Just piece -> do
+              let
+                image = if gameState.currentPlayer == piece.player
+                  then getCurrentPlayerImage piece.kind
+                  else getIdlePlayerImage piece.kind
+              
+              case Map.lookup image images of
+                Nothing -> drawBoard (col+1) row
+                Just img -> do
+                  drawImageScaled ctx img { x: temp_x, y: temp_y, width: cell_width, height: cell_height }
+                  drawBoard (col+1) row
 
     -- Draws the indicators for the possible moves on the board
     drawMoves :: List(Position) -> Effect Unit
@@ -587,24 +588,34 @@ onRender images ctx gameState = do
     drawCaptured playerOneCaptures playerTwoCaptures = do
       let
         player_one_y_offset = (cell_height+1.0) * (1.0 + toNumber rows)
+        is_playerone_current = if gameState.currentPlayer == One
+          then true
+          else false
+        is_playertwo_current = if gameState.currentPlayer == Two
+          then true
+          else false
 
         -- Takes a list of captured pieces and draw them on the board
         -- with their respective counts using the given y offset
         -- that depends on the current player's captures being drawn
-        drawKinds :: List Captured -> Number -> Number -> Effect Unit
-        drawKinds Nil _ _ = pure unit
-        drawKinds (Cons captured tail) y_offset count = do
+        drawKinds :: List Captured -> Number -> Number -> Boolean -> Effect Unit
+        drawKinds Nil _ _ _ = pure unit
+        drawKinds (Cons captured tail) y_offset count is_current = do
           -- Values for the counter can still be updated to fit better
           -- Should be updated if height, width, rows, or columns is changed
-          case Map.lookup captured.image images of
+          let
+            image = if is_current == true
+              then getCurrentPlayerImage captured.kind
+              else getIdlePlayerImage captured.kind
+          case Map.lookup image images of
             Nothing -> pure unit
             Just img -> drawImageScaled ctx img { x: (cell_width+1.0) * count, y: y_offset, width: cell_width, height: cell_height }
           drawRect ctx { x: (cell_width+1.0) * count + cell_width/2.0 - cell_width/8.0, y: y_offset + cell_height/1.25, color: "white", width: cell_width/4.0, height: cell_height/4.0}
           drawText ctx { x: (cell_width+1.0) * count + cell_width/2.0, y: y_offset + cell_height/1.25 + 15.0, color, font, size, text: show captured.count }
-          drawKinds tail y_offset (count+1.0)
+          drawKinds tail y_offset (count+1.0) is_current
       
-      drawKinds playerOneCaptures player_one_y_offset 0.0
-      drawKinds playerTwoCaptures 0.0 0.0
+      drawKinds playerOneCaptures player_one_y_offset 0.0 is_playerone_current
+      drawKinds playerTwoCaptures 0.0 0.0 is_playertwo_current
       pure unit
 
 
