@@ -119,14 +119,14 @@ class Tile:
 
 class RenderableBoard:
     """Renderable class for board; contains all tiles"""
-    def __init__(self, board: Board):
+    def __init__(self, live_pieces: list[LivePiece]):
         self._location_to_tile: dict[Location, Tile] = {
             Location(i, j) : Tile(Location(i, j))
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
         }
 
-        self.set_board_state(board)
+        self.set_board_state(live_pieces)
 
     def set_board_state(self, live_pieces: list[LivePiece]):
         """Set board according to current live pieces (preferably take from game state instance)"""
@@ -218,13 +218,13 @@ class GameView:
 
         self._screen.blit(result_text, _blittable)
 
-    def _mouse_press_on_board(self, event: pygame.event):
+    def _mouse_press_on_board(self, event: pygame.Event):
         curr_player = self._active_player
 
         if self._game_status == GameStatus.ONGOING:
             ...
 
-    def _mouse_press_on_captures(self, event: pygame.event):
+    def _mouse_press_on_captures(self, event: pygame.Event):
         ...
 
     def run(self):
