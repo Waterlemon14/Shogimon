@@ -53,7 +53,7 @@ class LivePiece:
     """
     kind: PieceKind
     owner: PlayerNumber
-    moves: list[Location] | None
+    moves: list[Location]
     location: Location | None
     
 
