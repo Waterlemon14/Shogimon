@@ -121,7 +121,7 @@ class Piece:
         return self._movement.get_movement_range(self.row, self.col, grid)
     
     def switch_ownership(self):
-        self._owner = PlayerNumber.ONE if self._owner == PlayerNumber.TWO else PlayerNumber.ONE
+        self._owner = PlayerNumber.ONE if self._owner == PlayerNumber.TWO else PlayerNumber.TWO
   
 
 class ProtectedPiece(Piece):
@@ -214,6 +214,7 @@ class Board:
         if captured_piece:
             captured_piece.switch_ownership()
             self._live_to_captured(captured_piece, captured_player, captured_piece.owner)
+            
 
     def drop(self, target: Location, piece: Piece, player: PlayerNumber):
         self.move(target, piece)
