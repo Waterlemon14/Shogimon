@@ -500,4 +500,19 @@ class GameModel:
         self._update_state()
         
     def new_game(self):
-        ...
+        self._board = Board(BOARD_ROWS, BOARD_COLS)
+        setter = BoardSetter(DefaultPositions())
+        setter.set_board(self._board)
+
+        self._state = GameState(
+            player_number = PlayerNumber.ONE,
+            active_player = PlayerNumber.ONE,
+            captured_pieces= self._board.get_captured_pieces(),
+            live_pieces=self._board.get_live_pieces(),
+            action_count=3,
+            game_status=GameStatus.ONGOING
+        )
+
+        self._active_player = PlayerNumber.ONE
+        self._action_count = 3
+        self._game_status: GameStatus = GameStatus.ONGOING
