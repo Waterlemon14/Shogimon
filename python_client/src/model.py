@@ -363,7 +363,7 @@ class DefaultPositions:
         ]
 
         positions += [
-            (PlayerNumber.TWO, PieceKind.EEVEE_SHINY, Location(1, n)) for n in range(8)
+            (PlayerNumber.TWO, PieceKind.EEVEE_SHINY, Location(1, n)) for n in range(BOARD_COLS)
         ]
 
         # Player One
@@ -377,7 +377,7 @@ class DefaultPositions:
         ]
 
         positions += [
-            (PlayerNumber.ONE, PieceKind.EEVEE, Location(6, n)) for n in range(8)
+            (PlayerNumber.ONE, PieceKind.EEVEE, Location(6, n)) for n in range(BOARD_COLS)
         ]
 
         return positions
@@ -445,13 +445,13 @@ class GameModel:
         )
 
 
+
     def _check_if_game_over(self) -> PlayerNumber | None:
         board = self._board
         winner = None
         if board.is_checkmate(self._active_player):
            winner = self._active_player
-
-        self._game_status= GameStatus.PLAYER_WIN if winner == PlayerNumber.ONE else GameStatus.PLAYER_LOSE
+           self._game_status= GameStatus.PLAYER_WIN if winner == PlayerNumber.ONE else GameStatus.PLAYER_LOSE
 
     def make_action(self, action: PlayerAction):
         board = self._board
@@ -460,10 +460,12 @@ class GameModel:
         kind = action.kind
         player = action.player
 
+        print(target, source, kind, player)
         match action.action_type:
 
             case ActionType.MOVE:
                 if source:
+                    print("I am moving!")
                     piece_to_move = board.get_live_piece(source)
 
                     # Narrow type down
