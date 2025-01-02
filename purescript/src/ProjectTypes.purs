@@ -104,4 +104,7 @@ type GameState =
   , moveCount :: Int
   , columns :: Int
   , rows :: Int
+  , gameStart :: Boolean              -- Used to check if both players have connected
+  , initialized :: Boolean            -- Used to check if board has been initialized based on player 1
+  , myPlayerNum :: PlayerNum          -- Represents your player number
   }
