@@ -54,8 +54,11 @@ class Captures:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, bottom=SCREEN_HEIGHT)
             case PlayerNumber.TWO:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, top=0)
+            
+    def set_captures(self, captures: list[LivePiece]):
+        self._captures = captures
     
-    def click_capture_row(self, x_coord: int, y_coord: int):
+    def click_capture_row(self, col: int):
         ...
 
     def place_piece_to_tile(self):
@@ -133,7 +136,7 @@ class Tile:
             self._actual_tile.blit(_blittable, (0,0))
 
         if self._is_targetable:
-            pygame.draw.circle(self._actual_tile, 'red', (TILE_PIXELS//2, TILE_PIXELS//2), 4.0)
+            pygame.draw.circle(self._actual_tile, 'blue', (TILE_PIXELS//2, TILE_PIXELS//2), 16.0)
 
         board.blit(self._actual_tile, self.rect)
 
@@ -276,12 +279,14 @@ class GameView:
         rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
 
         if self._game_status == GameStatus.ONGOING:
+            _col = rel_y // TILE_PIXELS
+
             match player:
                 case PlayerNumber.ONE:
-                    self._captures_p1.click_capture_row(rel_x, rel_y)
+                    self._captures_p1.click_capture_row(_col)
                     
                 case PlayerNumber.TWO:
-                    self._captures_p2.click_capture_row(rel_x, rel_y)
+                    self._captures_p2.click_capture_row(_col)
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
