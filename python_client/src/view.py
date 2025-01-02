@@ -55,7 +55,7 @@ class Captures:
             case PlayerNumber.TWO:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, top=0)
     
-    def click_pixels(self, x_coord: int, y_coord: int):
+    def click_capture_row(self, x_coord: int, y_coord: int):
         ...
 
     def place_piece_to_tile(self):
@@ -149,6 +149,9 @@ class RenderableBoard:
     @property
     def rect(self) -> pygame.Rect:
         return self._actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+    
+    def get_tile(self, location: Location) -> Tile:
+        return self._location_to_tile[location]
 
     def set_board_state(self, live_pieces: list[LivePiece]):
         """Set board according to current live pieces (preferably take from game state instance)"""
@@ -156,19 +159,7 @@ class RenderableBoard:
             if piece.location:
                 self._location_to_tile[piece.location].mark_occupied(piece)
 
-    def click_pixels(self, x_coord: int, y_coord: int, player: PlayerNumber):
-        _row = y_coord // TILE_PIXELS
-        _col = x_coord // TILE_PIXELS
-
-        tile = self._location_to_tile[Location(_row,_col)]
-
-        if tile.occupier is not None and tile.occupier.owner == player:
-            self._mark_nearby_targetable(Location(_row,_col))
-        
-        elif tile._is_targetable:
-            self._move_piece_to_tile(Location(_row,_col))
-
-    def _mark_nearby_targetable(self, location: Location):
+    def mark_nearby_targetable(self, location: Location):
         selected_piece = self._location_to_tile[location].occupier
 
         if selected_piece is not None:
@@ -179,9 +170,6 @@ class RenderableBoard:
     def _unmark_all(self):
         for loc in self._location_to_tile:
             self._location_to_tile[loc].unmark_targetable()
-
-    def _move_piece_to_tile(self, location: Location):
-        ...
 
     def render_to_screen(self, screen: pygame.Surface):
         pygame.Surface.fill(self._actual_board, 'black')
@@ -256,11 +244,18 @@ class GameView:
 
     def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
         """When mouse is clicked inside rect Board"""
-        rel_x = abs_pos[0] - 129
-        rel_y = abs_pos[1] - 105
-
         if self._game_status == GameStatus.ONGOING:
-            self._renderable_board.click_pixels(rel_x, rel_y, self._active_player)
+            _row = (abs_pos[1] - 105) // TILE_PIXELS
+            _col = (abs_pos[0] - 129) // TILE_PIXELS
+
+            tile = self._renderable_board.get_tile(Location(_row,_col))
+
+            if tile.occupier is not None and tile.occupier.owner == self._active_player:
+                self._renderable_board.mark_nearby_targetable(Location(_row,_col))
+            
+            elif tile._is_targetable:
+                # self._move_piece_to_tile(Location(_row,_col))
+                ...
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside rect Captures"""
@@ -270,10 +265,10 @@ class GameView:
         if self._game_status == GameStatus.ONGOING:
             match player:
                 case PlayerNumber.ONE:
-                    self._captures_p1.click_pixels(rel_x, rel_y)
+                    self._captures_p1.click_capture_row(rel_x, rel_y)
                     
                 case PlayerNumber.TWO:
-                    self._captures_p2.click_pixels(rel_x, rel_y)
+                    self._captures_p2.click_capture_row(rel_x, rel_y)
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
