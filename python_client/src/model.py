@@ -1,6 +1,6 @@
 from typing import Self
 
-from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, GameStatus
+from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, GameStatus, BOARD_ROWS, BOARD_COLS
 
 class EeveeMovement:
     def get_movement_range(self, row: int, col: int, valid_locations: dict[tuple[int, int], bool]) -> list[Location]:
@@ -8,7 +8,7 @@ class EeveeMovement:
         return [
             Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.FORWARD.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
+            if 0 <= row + dr < BOARD_ROWS and 0 <= col + dc < BOARD_COLS and (row + dr, col + dc) in valid_locations
         ]
 
 class EeveeShinyMovement:
@@ -17,7 +17,7 @@ class EeveeShinyMovement:
         return [
             Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.FORWARD_OPPOSITE.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations
+            if 0 <= row + dr < BOARD_ROWS and 0 <= col + dc < BOARD_COLS and (row + dr, col + dc) in valid_locations
         ]
 
 class PikachuMovement:
@@ -27,7 +27,7 @@ class PikachuMovement:
         for dr, dc in MovePossibilities.DIAGONALS.value:
 
             temp_row, temp_col = row, col
-            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8 and (temp_row + dr, temp_col + dc) in valid_locations:
+            while 0 <= temp_row + dr < BOARD_ROWS and 0 <= temp_col + dc < BOARD_COLS and (temp_row + dr, temp_col + dc) in valid_locations:
                 temp_row += dr
                 temp_col += dc
                 if not valid_locations[(temp_row,temp_col)]: # if encounters a location with opponent piece (False), block the range
@@ -44,7 +44,7 @@ class TurtwigMovement:
         for dr, dc in MovePossibilities.ORTHOGONALS.value:
 
             temp_row, temp_col = row, col
-            while 0 <= temp_row + dr < 8 and 0 <= temp_col + dc < 8 and (temp_row + dr, temp_col + dc) in valid_locations:
+            while 0 <= temp_row + dr < BOARD_ROWS and 0 <= temp_col + dc < BOARD_COLS and (temp_row + dr, temp_col + dc) in valid_locations:
                 temp_row += dr
                 temp_col += dc
                 if not valid_locations[(temp_row,temp_col)]: # if encounters a location with opponent piece (False), block the range
@@ -59,7 +59,7 @@ class LatiosMovement:
         return [
             Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.ORTHOGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)] # Latios cannot capture hence only locations with True values are considered
+            if 0 <= row + dr < BOARD_ROWS and 0 <= col + dc < BOARD_COLS and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)] # Latios cannot capture hence only locations with True values are considered
         ]
     
 class LatiasMovement:
@@ -67,7 +67,7 @@ class LatiasMovement:
          return [
             Location(row + dr, col + dc)
             for dr, dc in MovePossibilities.DIAGONALS.value
-            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)]
+            if 0 <= row + dr < BOARD_ROWS and 0 <= col + dc < BOARD_COLS and (row + dr, col + dc) in valid_locations and valid_locations[(row + dr, col + dc)]
             # Latias cannot capture hence only locations with True values are considered
         ]
 
@@ -162,12 +162,12 @@ class Board:
         """
         return [
             
-                LivePiece(piece.kind, piece.owner, None, None) 
+                LivePiece(piece.kind, piece.owner, self.get_piece_droppable_locations(piece), None) 
                 for piece in self._captured_pieces[PlayerNumber.ONE]
 
             ] + [
 
-                LivePiece(piece.kind, piece.owner, None, None) 
+                LivePiece(piece.kind, piece.owner, self.get_piece_droppable_locations(piece), None) 
                 for piece in self._captured_pieces[PlayerNumber.TWO]
                 
             ]
@@ -258,13 +258,31 @@ class Board:
     
     def get_piece_movable_locations(self, piece: Piece | ProtectedPiece) -> list[Location]:
 
-        return piece.get_movement_range(self.get_movable_locations_mapping(piece.owner))
-    
-    def is_valid_location(self, location: Location) -> bool:
-        loc = self._grid[location.row][location.col]
+        locations: list[Location] = piece.get_movement_range(self.get_movable_locations_mapping(piece.owner))
 
-        for piece in self._protected_pieces[PlayerNumber.ONE] + self._protected_pieces[PlayerNumber.TWO]:
-            if location in piece.get_movement_range(self.get_movable_locations_mapping(piece.owner)):
+        if type(piece) == Piece:
+            return locations
+        else:
+            return [ location for location in locations if self.is_safe_location(location, piece.owner)]
+    
+    def get_piece_droppable_locations(self, piece: Piece) -> list[Location]:
+
+        locations: list[Location] = []
+
+        for row in range(self._height):
+            for col in range(self._width):
+                loc = Location(row, col)
+                if self.is_valid_location(loc, piece.owner):
+                    locations.append(loc)
+        
+        return locations
+    
+    def is_valid_location(self, location: Location, owner: PlayerNumber) -> bool:
+        loc = self._grid[location.row][location.col]
+        opponent: PlayerNumber = PlayerNumber.ONE if owner == PlayerNumber.TWO else PlayerNumber.TWO
+
+        for piece in self._protected_pieces[opponent]:
+            if location in piece.get_movement_range(self.get_movable_locations_mapping(opponent)):
                 return False
             
         return not loc
@@ -381,7 +399,7 @@ class GameModel:
     @classmethod
     def default(cls) -> Self:
 
-        board = Board(8, 8)
+        board = Board(BOARD_ROWS, BOARD_COLS)
 
         setter = BoardSetter(DefaultPositions())
         setter.set_board(board)
@@ -474,7 +492,7 @@ class GameModel:
             case ActionType.DROP:
                 piece_to_drop = board.get_captured_piece(kind, player)
 
-                if piece_to_drop and board.is_valid_location(target):
+                if piece_to_drop and board.is_valid_location(target, player):
                     board.drop(target, piece_to_drop, player)
 
         self._action_count -= 1
