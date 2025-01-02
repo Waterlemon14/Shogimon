@@ -3,7 +3,7 @@ from collections import Counter
 
 from project_types import (
     TILE_PIXELS, BOARD_ROWS, BOARD_COLS, GameStatus,
-    LivePiece, Location, GameState, PieceKind, PlayerNumber,
+    LivePiece, Location, GameState, PieceKind, ActionType, PlayerAction, PlayerNumber,
     MakeTurnObserver, NewGameObserver,
     )
 from model import Board
@@ -196,9 +196,9 @@ class GameView:
         elif self._game_status == GameStatus.GAME_DRAW:
             self._render_text_result("GAME RESULTED IN STALEMATE")
 
-    def _make_turn(self):
+    def _make_turn(self, action: PlayerAction):
         for observer in self._make_turn_observers:
-            observer.on_make_turn()
+            observer.on_make_turn(action)
 
     def _new_game(self):
         for observer in self._new_game_observers:
