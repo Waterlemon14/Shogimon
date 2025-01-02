@@ -17,11 +17,11 @@ BOARD_HEIGHT = TILE_PIXELS*BOARD_COLS
 def get_blittable(piece: LivePiece) -> pygame.Surface:
     """Return surface from piece, for use with blit"""
     if piece.kind == PieceKind.EEVEE_SHINY:
-        _path = "../img/eevee-shiny.png"
+        _path = "./../../img/eevee-shiny.png"
     elif piece.owner == PlayerNumber.TWO:
-        _path = "../img/" + piece.kind.value + "-shiny.png"
+        _path = "./../../img/" + piece.kind.value + "-shiny.png"
     else:
-        _path = "../img/" + piece.kind.value + ".png"
+        _path = "./../../img/" + piece.kind.value + ".png"
 
     _transformable = pygame.image.load(_path).convert_alpha()
     returnable = pygame.transform.scale(_transformable, (64, 64))
