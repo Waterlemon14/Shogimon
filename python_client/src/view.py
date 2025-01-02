@@ -49,13 +49,15 @@ class Captures:
     
     @property
     def rect(self) -> pygame.Rect:
-        '''UNTESTED'''
         match self._owner:
             case PlayerNumber.ONE:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, bottom=SCREEN_HEIGHT)
             case PlayerNumber.TWO:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, top=0)
     
+    def click_pixels(self, coords: tuple[int, int]):
+        ...
+
     def render_to_screen(self, screen: pygame.Surface):
         actual_captures = self._render_row()
         screen.blit(actual_captures, self.rect)
@@ -94,7 +96,6 @@ class Tile:
 
     @property
     def rect(self) -> pygame.Rect:
-        '''UNTESTED'''
         return self._actual_tile.get_rect(center=(TILE_PIXELS//2, TILE_PIXELS//2))
 
     @property
@@ -141,7 +142,6 @@ class RenderableBoard:
 
     @property
     def rect(self) -> pygame.Rect:
-        '''UNTESTED'''
         return self._actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
 
     def set_board_state(self, live_pieces: list[LivePiece]):
@@ -229,25 +229,22 @@ class GameView:
 
     def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
         """When mouse is clicked inside rect Board"""
-        rel_x = abs_pos[0] - 129
-        rel_y = abs_pos[1] - 105
+        rel_pos = (abs_pos[0] - 129, abs_pos[1] - 105)
 
         if self._game_status == GameStatus.ONGOING:
-            self._renderable_board.click_pixels((rel_x, rel_y), self._active_player)
+            self._renderable_board.click_pixels(rel_pos, self._active_player)
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside rect Captures"""
-        rel_x = abs_pos[0]
-        rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
+        rel_pos = (abs_pos[0], abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1])
 
         if self._game_status == GameStatus.ONGOING:
-            '''TO DO: add something missing inside class Captures'''
             match player:
                 case PlayerNumber.ONE:
-                    ...
+                    self._captures_p1.click_pixels(rel_pos)
                     
                 case PlayerNumber.TWO:
-                    ...
+                    self._captures_p2.click_pixels(rel_pos)
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
@@ -269,7 +266,6 @@ class GameView:
                     
                     elif (self._active_player == PlayerNumber.ONE and self._captures_p1.rect.collidepoint(event.pos)) \
                     or (self._active_player == PlayerNumber.TWO and self._captures_p2.rect.collidepoint(event.pos)):
-                        print(self._active_player)
                         self._mouse_press_on_captures(event.pos, self._active_player)
 
             self._screen.fill('black')
