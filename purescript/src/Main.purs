@@ -449,7 +449,10 @@ onTick send gameState = do
   case gameState.gameStart of
     false -> initializeGame gameState  
     true -> if gameState.myPlayerNum /= gameState.currentPlayer
-      then pure $ readStateMessage gameState
+      then pure $ gameState
+        # readStateMessage
+        # updateTickCount
+        # updateGameOver
       else case gameState.winner of 
         Nothing -> if valid_move == true
           then gameState

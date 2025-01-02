@@ -3859,7 +3859,7 @@
               };
             }
             ;
-            throw new Error("Failed pattern match at Main (line 578, column 5 - line 578, column 47): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 581, column 5 - line 581, column 47): " + [v.constructor.name]);
           };
           var drawBoard = function(col) {
             return function(row) {
@@ -3911,14 +3911,14 @@
                       return drawBoard(col + 1 | 0)(row)();
                     }
                     ;
-                    throw new Error("Failed pattern match at Main (line 571, column 15 - line 575, column 40): " + [v1.constructor.name]);
+                    throw new Error("Failed pattern match at Main (line 574, column 15 - line 578, column 40): " + [v1.constructor.name]);
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 563, column 11 - line 575, column 40): " + [v.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 566, column 11 - line 578, column 40): " + [v.constructor.name]);
                 };
               }
               ;
-              throw new Error("Failed pattern match at Main (line 551, column 5 - line 551, column 43): " + [col.constructor.name, row.constructor.name]);
+              throw new Error("Failed pattern match at Main (line 554, column 5 - line 554, column 43): " + [col.constructor.name, row.constructor.name]);
             };
           };
           var drawCaptured = function(playerOneCaptures) {
@@ -3973,7 +3973,7 @@
                               })();
                             }
                             ;
-                            throw new Error("Failed pattern match at Main (line 610, column 11 - line 612, column 133): " + [v4.constructor.name]);
+                            throw new Error("Failed pattern match at Main (line 613, column 11 - line 615, column 133): " + [v4.constructor.name]);
                           })();
                           drawRect(ctx)({
                             x: (cell_width + 1) * v2 + cell_width / 2 - cell_width / 8,
@@ -3994,7 +3994,7 @@
                         };
                       }
                       ;
-                      throw new Error("Failed pattern match at Main (line 601, column 9 - line 601, column 81): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name]);
+                      throw new Error("Failed pattern match at Main (line 604, column 9 - line 604, column 81): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name]);
                     };
                   };
                 };
@@ -4024,7 +4024,7 @@
             })();
           }
           ;
-          throw new Error("Failed pattern match at Main (line 626, column 3 - line 628, column 138): " + [gameState.winner.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 629, column 3 - line 631, column 138): " + [gameState.winner.constructor.name]);
         };
       };
     };
@@ -4078,10 +4078,10 @@
                     return v3.value0;
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 515, column 27 - line 517, column 32): " + [v3.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 518, column 27 - line 520, column 32): " + [v3.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 513, column 24 - line 517, column 32): " + [v2.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 516, column 24 - line 520, column 32): " + [v2.constructor.name]);
               }();
               var cell_col = function() {
                 var v2 = index(command)(1);
@@ -4099,10 +4099,10 @@
                     return v3.value0;
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 510, column 27 - line 512, column 32): " + [v3.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 513, column 27 - line 515, column 32): " + [v3.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 508, column 24 - line 512, column 32): " + [v2.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 511, column 24 - line 515, column 32): " + [v2.constructor.name]);
               }();
               return {
                 col: cell_col,
@@ -4116,7 +4116,7 @@
             };
           }
           ;
-          throw new Error("Failed pattern match at Main (line 503, column 20 - line 519, column 34): " + [v1.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 506, column 20 - line 522, column 34): " + [v1.constructor.name]);
         }();
         return function __do() {
           log2("Received Message: " + show22(message2))();
@@ -4211,7 +4211,7 @@
             };
           }
           ;
-          throw new Error("Failed pattern match at Main (line 523, column 3 - line 533, column 64): " + [gameState.gameStart.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 526, column 3 - line 536, column 64): " + [gameState.gameStart.constructor.name]);
         };
       };
     };
@@ -5487,7 +5487,7 @@
       if (gameState.gameStart) {
         var $339 = notEq1(gameState.myPlayerNum)(gameState.currentPlayer);
         if ($339) {
-          return pure4(readStateMessage(gameState));
+          return pure4(updateGameOver(updateTickCount(readStateMessage(gameState))));
         }
         ;
         if (gameState.winner instanceof Nothing) {
@@ -5503,10 +5503,10 @@
           return pure4(gameState);
         }
         ;
-        throw new Error("Failed pattern match at Main (line 453, column 12 - line 469, column 27): " + [gameState.winner.constructor.name]);
+        throw new Error("Failed pattern match at Main (line 456, column 12 - line 472, column 27): " + [gameState.winner.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Main (line 449, column 3 - line 469, column 27): " + [gameState.gameStart.constructor.name]);
+      throw new Error("Failed pattern match at Main (line 449, column 3 - line 472, column 27): " + [gameState.gameStart.constructor.name]);
     };
   };
   var main = /* @__PURE__ */ startNetworkGame({
