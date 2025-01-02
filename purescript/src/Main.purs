@@ -136,9 +136,6 @@ getBoardRow row board = case board Array.!! row of
 onTick :: (String -> Effect Unit) -> GameState -> Effect GameState
 onTick send gameState = do
   let
-    clicked_col = gameState.clickedCell.col
-    clicked_row = gameState.clickedCell.row
-
     pieceConstructor :: Captured -> Maybe Piece
     pieceConstructor cp 
       | cp.kind == Bishop = createBishop  (-1) (-1) gameState.currentPlayer 
@@ -343,7 +340,7 @@ onTick send gameState = do
                   _   -> Pawn -- should never reach this case
                 count = case fromString (take 1 (drop 1 remaining_captured)) of
                   Just num -> num
-                  Nothing -> 0 -- should never reach this case
+                  Nothing -> 0
                 image = case take 1 remaining_captured of
                   "p" -> "../../img/eevee.png"
                   "b" -> "../../img/pikachu.png"
@@ -368,16 +365,22 @@ onTick send gameState = do
         then constructBoard 0 board
         else state.board
 
-        player_one_captures = case payload_arr Array.!! 1 of
-          Just captured_message -> if readCapturedMessage captured_message One == Nil
-            then state.playerOneCaptures
-            else readCapturedMessage captured_message One
-          Nothing -> state.playerOneCaptures
+        is_command = case payload_arr Array.!! 0 of
+          Nothing -> false
+          Just first_message -> if first_message == "click"
+            then true
+            else false
+
+        player_one_captures = if is_command == true
+          then state.playerOneCaptures
+          else case payload_arr Array.!! 1 of
+            Just captured_message -> readCapturedMessage captured_message One
+            Nothing -> state.playerOneCaptures
         
-        player_two_captures = case payload_arr Array.!! 2 of
-          Just captured_message -> if readCapturedMessage captured_message Two == Nil
-            then state.playerTwoCaptures
-            else readCapturedMessage captured_message Two
+        player_two_captures = if is_command == true
+          then state.playerTwoCaptures
+          else case payload_arr Array.!! 2 of
+          Just captured_message -> readCapturedMessage captured_message Two
           Nothing -> state.playerTwoCaptures
       
       state
