@@ -55,8 +55,9 @@ class Captures:
     def set_captures(self, captures: list[LivePiece]):
         self._captures = captures
     
-    def click_capture_row(self, col: int) -> LivePiece:
-        ...
+    def get_chosen_capture(self, col: int) -> LivePiece:
+        """Get clicked capture"""
+        return self._captures[col]
 
     def place_piece_to_tile(self):
         ...
@@ -181,6 +182,10 @@ class RenderableBoard:
             for loc in selected_piece.moves:
                 self._location_to_tile[loc].mark_targetable()
 
+    def mark_droppable(self, list_loc: list[Location]):
+        for loc in list_loc:
+            self._location_to_tile[loc].mark_targetable()
+
     def unmark_all(self):
         for loc in self._location_to_tile:
             self._location_to_tile[loc].unmark_targetable()
@@ -227,6 +232,7 @@ class GameView:
         self._game_status = state.game_status
 
     def _rerender_after_turn(self):
+        self._renderable_board.unmark_all()
         self._renderable_board.set_board_state(self._live_pieces)
 
         _all_captures = {
@@ -300,12 +306,18 @@ class GameView:
                         Location(_row, _col),
                         self._current_hovered_piece.kind
                         ))
-                    self._renderable_board.unmark_all()
                     self._rerender_after_turn()
 
                 else:
                     "Finish drop turn"
-                    ...
+                    self._make_turn(PlayerAction(
+                        ActionType.DROP,
+                        self._active_player,
+                        None,
+                        Location(_row, _col),
+                        self._current_hovered_piece.kind
+                        ))
+                    self._rerender_after_turn()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
@@ -317,10 +329,11 @@ class GameView:
 
             match player:
                 case PlayerNumber.ONE:
-                    self._current_hovered_piece = self._captures_p1.click_capture_row(_col)
-                    
+                    self._current_hovered_piece = self._captures_p1.get_chosen_capture(_col)
                 case PlayerNumber.TWO:
-                    self._current_hovered_piece = self._captures_p2.click_capture_row(_col)
+                    self._current_hovered_piece = self._captures_p2.get_chosen_capture(_col)
+
+            self._renderable_board.mark_droppable(self._current_hovered_piece.moves)
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
