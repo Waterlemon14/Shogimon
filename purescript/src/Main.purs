@@ -304,14 +304,14 @@ onTick send gameState = do
 
     -- Constructs the board into the Board representation given 
     -- an array of strings derived from getBoardMessage
-    constructBoard :: Int -> Array String -> Board
-    constructBoard row board = case board Array.!! row of
+    constructBoard :: Int -> Int -> Array String -> Board
+    constructBoard row state_col board = case board Array.!! row of
       Nothing -> []
-      Just current_row -> [constructRow 0 current_row] <> constructBoard (row+1) board
+      Just current_row -> [constructRow 0 current_row] <> constructBoard (row+1) state_col board
         where
           constructRow :: Int -> String -> Array (Maybe Piece)
           constructRow col row_string
-            | col >= gameState.columns || row_string == "" = []
+            | col >= state_col || row_string == "" = []
             | otherwise = [new_piece] <> constructRow (col + 1) (drop 2 row_string)
               where
                 piece = take 1 row_string
@@ -372,7 +372,7 @@ onTick send gameState = do
         board = Array.drop 3 $ payload_arr
                       
         new_board = if Array.length board == state.rows
-        then constructBoard 0 board
+        then constructBoard 0 state.columns board
         else state.board
 
         is_command = case payload_arr Array.!! 0 of
@@ -444,13 +444,13 @@ onTick send gameState = do
               Nothing -> 0
               Just rows_string -> case fromString rows_string of
                 Nothing -> 0
-                Just rows -> rows
+                Just rws -> rws
             board_array = case Array.dropEnd 1 (Array.drop 2 message) of
               [] -> []
               arr -> arr
 
             new_board = if Array.length board_array == new_rows
-              then constructBoard 0 board_array
+              then constructBoard 0 new_columns board_array
               else []
           pure state { columns = new_columns, rows = new_rows, board = new_board, initialized = true, myPlayerNum = my_player_num }
 

@@ -5187,62 +5187,64 @@
         throw new Error("Failed pattern match at Main (line 464, column 21 - line 472, column 24): " + [state3.lastReceivedMessage.constructor.name]);
       };
       var constructBoard = function(row) {
-        return function(board) {
-          var v = index(board)(row);
-          if (v instanceof Nothing) {
-            return [];
-          }
-          ;
-          if (v instanceof Just) {
-            var constructRow = function(col) {
-              return function(row_string) {
-                if (col >= gameState.columns || row_string === "") {
-                  return [];
-                }
-                ;
-                if (otherwise) {
-                  var player_num = function() {
-                    var v1 = take5(1)(drop4(1)(row_string));
-                    if (v1 === "1") {
-                      return One.value;
-                    }
-                    ;
-                    return Two.value;
-                  }();
-                  var piece = take5(1)(row_string);
-                  var new_piece = function() {
-                    if (piece === "p") {
-                      return createPawn(col)(row)(player_num);
-                    }
-                    ;
-                    if (piece === "b") {
-                      return createBishop(col)(row)(player_num);
-                    }
-                    ;
-                    if (piece === "r") {
-                      return createRook(col)(row)(player_num);
-                    }
-                    ;
-                    if (piece === "k") {
-                      return createPrince(col)(row)(player_num);
-                    }
-                    ;
-                    if (piece === "q") {
-                      return createPrincess(col)(row)(player_num);
-                    }
-                    ;
-                    return Nothing.value;
-                  }();
-                  return append13([new_piece])(constructRow(col + 1 | 0)(drop4(2)(row_string)));
-                }
-                ;
-                throw new Error("Failed pattern match at Main (line 312, column 11 - line 312, column 63): " + [col.constructor.name, row_string.constructor.name]);
+        return function(state_col) {
+          return function(board) {
+            var v = index(board)(row);
+            if (v instanceof Nothing) {
+              return [];
+            }
+            ;
+            if (v instanceof Just) {
+              var constructRow = function(col) {
+                return function(row_string) {
+                  if (col >= state_col || row_string === "") {
+                    return [];
+                  }
+                  ;
+                  if (otherwise) {
+                    var player_num = function() {
+                      var v1 = take5(1)(drop4(1)(row_string));
+                      if (v1 === "1") {
+                        return One.value;
+                      }
+                      ;
+                      return Two.value;
+                    }();
+                    var piece = take5(1)(row_string);
+                    var new_piece = function() {
+                      if (piece === "p") {
+                        return createPawn(col)(row)(player_num);
+                      }
+                      ;
+                      if (piece === "b") {
+                        return createBishop(col)(row)(player_num);
+                      }
+                      ;
+                      if (piece === "r") {
+                        return createRook(col)(row)(player_num);
+                      }
+                      ;
+                      if (piece === "k") {
+                        return createPrince(col)(row)(player_num);
+                      }
+                      ;
+                      if (piece === "q") {
+                        return createPrincess(col)(row)(player_num);
+                      }
+                      ;
+                      return Nothing.value;
+                    }();
+                    return append13([new_piece])(constructRow(col + 1 | 0)(drop4(2)(row_string)));
+                  }
+                  ;
+                  throw new Error("Failed pattern match at Main (line 312, column 11 - line 312, column 63): " + [col.constructor.name, row_string.constructor.name]);
+                };
               };
-            };
-            return append13([constructRow(0)(v.value0)])(constructBoard(row + 1 | 0)(board));
-          }
-          ;
-          throw new Error("Failed pattern match at Main (line 308, column 32 - line 328, column 33): " + [v.constructor.name]);
+              return append13([constructRow(0)(v.value0)])(constructBoard(row + 1 | 0)(state_col)(board));
+            }
+            ;
+            throw new Error("Failed pattern match at Main (line 308, column 42 - line 328, column 33): " + [v.constructor.name]);
+          };
         };
       };
       var initializeGame = function(state3) {
@@ -5333,10 +5335,10 @@
                     return v1.value0;
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 445, column 35 - line 447, column 34): " + [v1.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 445, column 35 - line 447, column 32): " + [v1.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 443, column 24 - line 447, column 34): " + [v.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 443, column 24 - line 447, column 32): " + [v.constructor.name]);
               }();
               var new_columns = function() {
                 var v = index(message2)(0);
@@ -5370,7 +5372,7 @@
               var new_board = function() {
                 var $324 = length(board_array) === new_rows;
                 if ($324) {
-                  return constructBoard(0)(board_array);
+                  return constructBoard(0)(new_columns)(board_array);
                 }
                 ;
                 return [];
@@ -5501,7 +5503,7 @@
         var new_board = function() {
           var $339 = length(board) === state3.rows;
           if ($339) {
-            return constructBoard(0)(board);
+            return constructBoard(0)(state3.columns)(board);
           }
           ;
           return state3.board;
