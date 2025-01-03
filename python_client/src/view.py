@@ -336,7 +336,7 @@ class GameView:
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
         rel_x = abs_pos[0]
-        rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
+        # rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
 
         if self._game_status == GameStatus.ONGOING:
             _col = rel_x // TILE_PIXELS
@@ -368,6 +368,11 @@ class GameView:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     _game_is_running = False
+
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    print("R IS CLICKED")
+                    self._new_game()
+                    self._init_view_state()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self._renderable_board.rect.collidepoint(event.pos):
