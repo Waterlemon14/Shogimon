@@ -54,6 +54,7 @@ class Captures:
         match self._owner:
             case PlayerNumber.ONE:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, bottom=SCREEN_HEIGHT)
+
             case PlayerNumber.TWO:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, top=0)
             
@@ -78,13 +79,6 @@ class Captures:
             _blittable = get_blittable(piece)
             self._actual_row.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
         
-            # _count = self._font.render(
-            #     "x" + str(_counted_list[piece]),
-            #     True, "white"
-            # )
-            #
-            # self._actual_row.blit(_count, (TILE_PIXELS*order_in_screen, 0))
-
             order_in_screen += 1
 
         return self._actual_row
@@ -227,8 +221,6 @@ class GameView:
 
         self._current_hovered_location: Location | None = None
         self._current_hovered_piece: LivePiece | None = None
-        
-        # Might need to add viewing player?
 
     def on_state_change(self, state: GameState):
         """Update view state based on passed GameState"""
@@ -273,8 +265,6 @@ class GameView:
             
         elif self._game_status == GameStatus.GAME_DRAW:
             self._render_text_result("GAME RESULTED IN STALEMATE")
-        
-        # Might need viewing player?
 
     def _make_turn(self, action: PlayerAction):
         "For interaction with controller"
@@ -336,7 +326,6 @@ class GameView:
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
         rel_x = abs_pos[0]
-        # rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
 
         if self._game_status == GameStatus.ONGOING:
             _col = rel_x // TILE_PIXELS
