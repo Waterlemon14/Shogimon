@@ -31,7 +31,7 @@ def get_blittable(piece: LivePiece) -> pygame.Surface:
 class Captures:
     """Renderable class for player captures (top and bottom of game screen)"""
     def __init__(self, number: PlayerNumber):
-        self._captures: dict[LivePiece, int] = {}
+        self._captures: list[LivePiece] = []
         self._owner = number
 
         self._actual_row = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
@@ -51,19 +51,8 @@ class Captures:
             case PlayerNumber.TWO:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, top=0)
             
-    def set_captures(self, list_caps: list[LivePiece]):
-        self._captures = {}
-
-        for capture in list_caps:
-            print(capture, self._captures)
-            
-            if capture not in self._captures:
-                self._captures[capture] = 1
-            else:
-                self._captures[capture] += 1
-
-    def pop_piece(self, poppable: LivePiece) -> LivePiece:
-        ...
+    def set_captures(self, captures: list[LivePiece]):
+        self._captures = captures
     
     def click_capture_row(self, col: int):
         ...
@@ -84,8 +73,12 @@ class Captures:
             _blittable = get_blittable(piece)
             self._actual_row.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
         
-            _counter = self._font.render(str(self._captures[piece]), True, 'white')
-            self._actual_row.blit(_counter, (TILE_PIXELS*order_in_screen, 0))
+            # _count = self._font.render(
+            #     "x" + str(_counted_list[piece]),
+            #     True, "white"
+            # )
+            #
+            # self._actual_row.blit(_count, (TILE_PIXELS*order_in_screen, 0))
 
             order_in_screen += 1
 
