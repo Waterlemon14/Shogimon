@@ -178,11 +178,11 @@ class RenderableBoard:
         selected_piece = self._location_to_tile[location].occupier
 
         if selected_piece is not None:
-            self._unmark_all()
+            self.unmark_all()
             for loc in selected_piece.moves:
                 self._location_to_tile[loc].mark_targetable()
 
-    def _unmark_all(self):
+    def unmark_all(self):
         for loc in self._location_to_tile:
             self._location_to_tile[loc].unmark_targetable()
 
@@ -283,13 +283,15 @@ class GameView:
 
             tile = self._renderable_board.get_tile(Location(_row,_col))
             print(self._current_hovered_piece)
+
             if tile.occupier is not None and tile.occupier.owner == self._active_player:
+                """Hover piece (to see possible moves)"""
                 self._current_hovered_location = Location(_row,_col)
                 self._current_hovered_piece = self._renderable_board.get_tile(Location(_row, _col)).occupier
-                
                 self._renderable_board.mark_nearby_targetable(Location(_row,_col))
 
             elif tile._is_targetable and self._current_hovered_piece is not None:
+                """Finish move"""
                 self._make_turn(PlayerAction(
                     ActionType.MOVE,
                     self._active_player,
@@ -297,7 +299,7 @@ class GameView:
                     Location(_row, _col),
                     self._current_hovered_piece.kind
                 ))
-
+                self._renderable_board.unmark_all()
                 self._rerender_after_turn()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
