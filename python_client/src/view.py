@@ -45,6 +45,7 @@ class Captures:
     
     @property
     def rect(self) -> pygame.Rect:
+        """Return surface rect with appropriate location; For calculating mouse collision"""
         match self._owner:
             case PlayerNumber.ONE:
                 return self._actual_row.get_rect(centerx=SCREEN_WIDTH//2, bottom=SCREEN_HEIGHT)
@@ -65,6 +66,7 @@ class Captures:
         screen.blit(actual_captures, self.rect)
 
     def _render_row(self) -> pygame.Surface:
+        """Render captured pieces in respective row"""
         pygame.Surface.fill(self._actual_row, 'black')
         
         order_in_screen = 0
@@ -97,10 +99,12 @@ class Tile:
 
     @property
     def topleft(self):
+        """Return surface top left (main coordinate for rendering)"""
         return self._topleft
 
     @property
     def rect(self) -> pygame.Rect:
+        """Return surface rect with appropriate location; For calculating mouse collision"""
         return self._actual_tile.get_rect(topleft=self._topleft)
 
     @property
@@ -144,15 +148,14 @@ class RenderableBoard:
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
         }
-
         self._all_locations = [Location(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLS)]
-
         self._actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
 
         self.set_board_state(live_pieces)
 
     @property
     def rect(self) -> pygame.Rect:
+        """Return surface rect with appropriate location; For calculating mouse collision"""
         return self._actual_board.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
     
     def get_tile(self, location: Location) -> Tile:
@@ -210,7 +213,6 @@ class GameView:
         --- Might need to add viewing player?
         """
         self._renderable_board = RenderableBoard(self._live_pieces)
-
         self._captures_p1 = Captures(PlayerNumber.ONE)
         self._captures_p2 = Captures(PlayerNumber.TWO)
 
