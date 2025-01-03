@@ -16,8 +16,10 @@ def get_blittable(piece: LivePiece) -> pygame.Surface:
     """Return surface from piece, for use with blit"""
     if piece.kind == PieceKind.EEVEE_SHINY:
         _path = "./../img/eevee-shiny.png"
+
     elif piece.owner == PlayerNumber.TWO:
         _path = "./../img/" + piece.kind.value + "-shiny.png"
+
     else:
         _path = "./../img/" + piece.kind.value + ".png"
 
@@ -61,9 +63,6 @@ class Captures:
     def get_chosen_capture(self, col: int) -> LivePiece:
         """Get clicked capture"""
         return self._captures[col]
-
-    def place_piece_to_tile(self):
-        ...
 
     def render_to_screen(self, screen: pygame.Surface):
         actual_captures = self._render_row()
@@ -152,6 +151,7 @@ class RenderableBoard:
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
         }
+
         self._all_locations = [Location(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLS)]
         self._actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
 
@@ -182,6 +182,7 @@ class RenderableBoard:
 
         if selected_piece is not None:
             self.unmark_all()
+
             for loc in selected_piece.moves:
                 self._location_to_tile[loc].mark_targetable()
 
@@ -240,6 +241,7 @@ class GameView:
     def _rerender_after_turn(self):
         """For showing state of board every after turn; works with properties established by on_state_change"""
         self._renderable_board.unmark_all()
+        
         self._renderable_board.set_board_state(self._live_pieces)
 
         _all_captures = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
@@ -265,8 +267,10 @@ class GameView:
         """Evaluate game-end on-screen render"""
         if self._game_status == GameStatus.PLAYER_WIN:
             self._render_text_result("YOU WIN")
+
         elif self._game_status == GameStatus.PLAYER_LOSE:
             self._render_text_result("YOU LOSE")
+            
         elif self._game_status == GameStatus.GAME_DRAW:
             self._render_text_result("GAME RESULTED IN STALEMATE")
         
@@ -301,6 +305,7 @@ class GameView:
                 """Hover piece (to see possible moves)"""
                 self._current_hovered_location = Location(_row,_col)
                 self._current_hovered_piece = self._renderable_board.get_tile(Location(_row, _col)).occupier
+
                 self._renderable_board.mark_nearby_targetable(Location(_row,_col))
 
             elif tile._is_targetable and self._current_hovered_piece is not None:
@@ -313,6 +318,7 @@ class GameView:
                         Location(_row, _col),
                         self._current_hovered_piece.kind
                         ))
+                    
                     self._rerender_after_turn()
 
                 else:
@@ -324,6 +330,7 @@ class GameView:
                         Location(_row, _col),
                         self._current_hovered_piece.kind
                         ))
+                    
                     self._rerender_after_turn()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
@@ -339,13 +346,12 @@ class GameView:
                 case PlayerNumber.ONE:
                     if _col <= self._captures_p1.len:
                         self._current_hovered_piece = self._captures_p1.get_chosen_capture(_col)
-                    else:
-                        return
+                    else: return
+                    
                 case PlayerNumber.TWO:
                     if _col <= self._captures_p2.len:
                         self._current_hovered_piece = self._captures_p2.get_chosen_capture(_col)
-                    else:
-                        return
+                    else: return
 
             self._renderable_board.mark_droppable(self._current_hovered_piece.moves)
 
@@ -374,6 +380,7 @@ class GameView:
             self._screen.fill('black')
 
             self._renderable_board.render_to_screen(self._screen)
+
             self._captures_p1.render_to_screen(self._screen)
             self._captures_p2.render_to_screen(self._screen)
 
@@ -381,6 +388,7 @@ class GameView:
                 self._evaluate_winner()
 
             pygame.display.flip()
+
             self._clock.tick(60)
 
         pygame.quit()
