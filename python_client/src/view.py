@@ -149,6 +149,8 @@ class RenderableBoard:
             for j in range(BOARD_COLS)
         }
 
+        self._all_locations = [Location(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLS)]
+
         self._actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
 
         self.set_board_state(live_pieces)
@@ -162,9 +164,15 @@ class RenderableBoard:
 
     def set_board_state(self, live_pieces: list[LivePiece]):
         """Set board according to current live pieces (preferably take from game state instance)"""
+        spaces = self._all_locations + []
+
         for piece in live_pieces:
-            if piece.location:
+            if piece.location is not None:
+                spaces.remove(piece.location)
                 self._location_to_tile[piece.location].mark_occupied(piece)
+
+        for space in spaces:
+            self._location_to_tile[space].mark_empty()
 
     def mark_nearby_targetable(self, location: Location):
         selected_piece = self._location_to_tile[location].occupier
@@ -218,6 +226,22 @@ class GameView:
         self._live_pieces = state.live_pieces
         self._action_count = state.action_count
         self._game_status = state.game_status
+
+    def _rerender_after_turn(self):
+        self._renderable_board.set_board_state(self._live_pieces)
+
+        _all_captures = {
+            PlayerNumber.ONE: [],
+            PlayerNumber.TWO: []
+            }
+
+        for piece in self._captured_pieces:
+            _all_captures[piece.owner].append(piece)
+
+        self._captures_p1.set_captures(_all_captures[PlayerNumber.ONE])
+        self._captures_p2.set_captures(_all_captures[PlayerNumber.TWO])
+
+        self._current_hovered_piece = None
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
@@ -273,7 +297,8 @@ class GameView:
                     Location(_row, _col),
                     self._current_hovered_piece.kind
                 ))
-                self._init_view_state()
+
+                self._rerender_after_turn()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
