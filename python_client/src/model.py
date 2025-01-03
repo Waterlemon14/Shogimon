@@ -84,12 +84,10 @@ class Opponent:
     Get interactions from server (saka na natin problemahin)
     """
     ...
-
-class Piece:
+class BasePiece:
     def __init__(self, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
         self._kind = kind
         self.location = location
-        self._is_captured = False
         self._movement = movement
         self._owner = owner
 
@@ -108,18 +106,14 @@ class Piece:
     @property
     def owner(self) -> PlayerNumber:
         return self._owner
-
-    @property
-    def is_captured(self) -> bool:
-        return self._is_captured
-
-    def can_move(self, location: Location, grid: dict[tuple[int, int], bool]) -> bool:
-        
-        return location in self._movement.get_movement_range(self.row, self.col, grid)
     
     def get_movement_range(self, grid: dict[tuple[int, int], bool]) -> list[Location]:
         return self._movement.get_movement_range(self.row, self.col, grid)
     
+class Piece(BasePiece):
+    def __init__(self, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
+        super().__init__(kind, location, movement, owner)
+
     def switch_ownership(self):
         self._owner = PlayerNumber.ONE if self._owner == PlayerNumber.TWO else PlayerNumber.TWO
 
@@ -131,7 +125,7 @@ class Piece:
             self._kind = PieceKind.EEVEE
             self._movement = EeveeMovement()
 
-class ProtectedPiece(Piece):
+class ProtectedPiece(BasePiece):
     def __init__(self, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
         super().__init__(kind, location, movement, owner)
         self.is_immobile = False
@@ -218,7 +212,7 @@ class Board:
         captured_piece = self._grid[target.row][target.col]
         self.move(target, capturing_piece)
 
-        if captured_piece:
+        if captured_piece and type(captured_piece) == Piece:
             captured_piece.switch_ownership()
             self._live_to_captured(captured_piece, captured_player, captured_piece.owner)
             
