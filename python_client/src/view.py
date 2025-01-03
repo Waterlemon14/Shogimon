@@ -201,7 +201,6 @@ class RenderableBoard:
 class GameView:
     """Actual MVC view class"""
     def __init__(self, state: GameState):
-        """Initialize observers, Pygame font"""
         self.on_state_change(state)
 
         self._make_turn_observers: list[MakeTurnObserver] = []
@@ -214,8 +213,9 @@ class GameView:
 
     def _init_view_state(self):
         """
-        Initialize view-specific properties
-        --- Might need to add viewing player?
+        Infer implicit player move status (if current_hovered_piece is not None):
+        If current_hovered_location == None, then a capture is currently selected.
+        Else, piece on board is selected.
         """
         self._renderable_board = RenderableBoard(self._live_pieces)
         self._captures_p1 = Captures(PlayerNumber.ONE)
@@ -223,8 +223,11 @@ class GameView:
 
         self._current_hovered_location: Location | None = None
         self._current_hovered_piece: LivePiece | None = None
+        
+        # Might need to add viewing player?
 
     def on_state_change(self, state: GameState):
+        """Update view state based on passed GameState"""
         self._active_player = state.active_player
         self._captured_pieces = state.captured_pieces
         self._live_pieces = state.live_pieces
@@ -232,13 +235,11 @@ class GameView:
         self._game_status = state.game_status
 
     def _rerender_after_turn(self):
+        """For showing state of board every after turn; works with properties established by on_state_change"""
         self._renderable_board.unmark_all()
         self._renderable_board.set_board_state(self._live_pieces)
 
-        _all_captures = {
-            PlayerNumber.ONE: [],
-            PlayerNumber.TWO: []
-            }
+        _all_captures = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
 
         for piece in self._captured_pieces:
             _all_captures[piece.owner].append(piece)
@@ -250,28 +251,31 @@ class GameView:
         self._current_hovered_piece = None
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
+        "For registering controller as observer"
         self._make_turn_observers.append(observer)
 
     def register_new_game_observer(self, observer: NewGameObserver):
+        "For registering controller as observer"
         self._new_game_observers.append(observer)
 
     def _evaluate_winner(self):
-        """
-        Evaluate game-end on-screen printout
-        --- Might need viewing player?
-        """
+        """Evaluate game-end on-screen render"""
         if self._game_status == GameStatus.PLAYER_WIN:
             self._render_text_result("YOU WIN")
         elif self._game_status == GameStatus.PLAYER_LOSE:
             self._render_text_result("YOU LOSE")
         elif self._game_status == GameStatus.GAME_DRAW:
             self._render_text_result("GAME RESULTED IN STALEMATE")
+        
+        # Might need viewing player?
 
     def _make_turn(self, action: PlayerAction):
+        "For interaction with controller"
         for observer in self._make_turn_observers:
             observer.on_make_turn(action)
 
     def _new_game(self):
+        "For interaction with controller"
         for observer in self._new_game_observers:
             observer.on_new_game()
 
