@@ -1,3 +1,7 @@
+"""
+IF YOU SEE THIS, BRANCH SUCCESSFUL
+REMOVE NA LANG WHEN DONE
+"""
 from typing import Self
 
 from project_types import GameState, Movement, PieceKind, Location, PlayerNumber, MovePossibilities, PiecePositions, LivePiece, PlayerAction, ActionType, GameStatus, BOARD_ROWS, BOARD_COLS
