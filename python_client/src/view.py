@@ -216,6 +216,7 @@ class GameView:
         self._captures_p1 = Captures(PlayerNumber.ONE)
         self._captures_p2 = Captures(PlayerNumber.TWO)
 
+        self._current_hovered_location: Location | None = None
         self._current_hovered_piece: LivePiece | None = None
 
     def on_state_change(self, state: GameState):
@@ -239,6 +240,7 @@ class GameView:
         self._captures_p1.set_captures(_all_captures[PlayerNumber.ONE])
         self._captures_p2.set_captures(_all_captures[PlayerNumber.TWO])
 
+        self._current_hovered_location = None
         self._current_hovered_piece = None
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
