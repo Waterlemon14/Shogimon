@@ -40,10 +40,6 @@ class Captures:
         self._font = pygame.font.SysFont('Arial', 25)
 
     @property
-    def captures(self) -> list[LivePiece]:
-        return self._captures
-    
-    @property
     def owner(self) -> PlayerNumber:
         return self._owner
     
@@ -70,19 +66,19 @@ class Captures:
 
     def _render_row(self) -> pygame.Surface:
         pygame.Surface.fill(self._actual_row, 'black')
-        _counted_list = Counter(self._captures)
-
+        
         order_in_screen = 0
-
-        for piece in _counted_list:
+        
+        for piece in self._captures:
             _blittable = get_blittable(piece)
             self._actual_row.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
-
-            _count = self._font.render(
-                "x" + str(_counted_list[piece]),
-                True, "white"
-            )
-            self._actual_row.blit(_count, (TILE_PIXELS*order_in_screen, 0))
+        
+            # _count = self._font.render(
+            #     "x" + str(_counted_list[piece]),
+            #     True, "white"
+            # )
+            #
+            # self._actual_row.blit(_count, (TILE_PIXELS*order_in_screen, 0))
 
             order_in_screen += 1
 
