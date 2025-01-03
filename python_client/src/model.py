@@ -122,7 +122,14 @@ class Piece:
     
     def switch_ownership(self):
         self._owner = PlayerNumber.ONE if self._owner == PlayerNumber.TWO else PlayerNumber.TWO
-  
+
+        if self._kind == PieceKind.EEVEE:
+            self._kind = PieceKind.EEVEE_SHINY
+            self._movement = EeveeShinyMovement()
+
+        elif self._kind == PieceKind.EEVEE_SHINY:
+            self._kind = PieceKind.EEVEE
+            self._movement = EeveeMovement()
 
 class ProtectedPiece(Piece):
     def __init__(self, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
@@ -457,7 +464,6 @@ class GameModel:
         if board.opponent_immobile(self._active_player):
            winner = self._active_player
            self._game_status= GameStatus.PLAYER_WIN if winner == PlayerNumber.ONE else GameStatus.PLAYER_LOSE
-           print('hello')
 
     def make_action(self, action: PlayerAction):
         board = self._board
