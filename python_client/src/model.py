@@ -262,8 +262,8 @@ class Board:
 
         if type(piece) == Piece:
             return [ location for location in locations if not type(self._grid[location.row][location.col]) == ProtectedPiece]
-        else:
-            return [ location for location in locations if self.is_safe_location(location, piece.owner)]
+        
+        return locations
     
     def get_piece_droppable_locations(self, piece: Piece) -> list[Location]:
 
@@ -491,8 +491,7 @@ class GameModel:
                                 board.move(target, piece_to_move)
 
                         # If protected piece, check if target location is valid
-                        elif type(piece_to_move) == ProtectedPiece and board.is_safe_location(target, piece_to_move.owner):
-
+                        elif type(piece_to_move) == ProtectedPiece:
                             board.take(source)
                             board.move(target, piece_to_move)
 
