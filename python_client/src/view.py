@@ -201,7 +201,6 @@ class RenderableBoard:
 class GameView:
     """Actual MVC view class"""
     def __init__(self, state: GameState):
-        """Initialize observers, Pygame font"""
         self.on_state_change(state)
 
         self._make_turn_observers: list[MakeTurnObserver] = []
@@ -214,10 +213,9 @@ class GameView:
 
     def _init_view_state(self):
         """
-        Infer implicit player move status;
-        If current_hovered_piece is not None:
-            If current_hovered_location == None, then a capture is currently selected.
-            Else, piece on board is selected.
+        Infer implicit player move status (if current_hovered_piece is not None):
+        If current_hovered_location == None, then a capture is currently selected.
+        Else, piece on board is selected.
         """
         self._renderable_board = RenderableBoard(self._live_pieces)
         self._captures_p1 = Captures(PlayerNumber.ONE)
@@ -229,6 +227,7 @@ class GameView:
         # Might need to add viewing player?
 
     def on_state_change(self, state: GameState):
+        """Update view state based on passed GameState"""
         self._active_player = state.active_player
         self._captured_pieces = state.captured_pieces
         self._live_pieces = state.live_pieces
@@ -236,6 +235,7 @@ class GameView:
         self._game_status = state.game_status
 
     def _rerender_after_turn(self):
+        """For showing state of board every after turn; works with properties established by on_state_change"""
         self._renderable_board.unmark_all()
         self._renderable_board.set_board_state(self._live_pieces)
 
@@ -251,9 +251,11 @@ class GameView:
         self._current_hovered_piece = None
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
+        "For registering controller as observer"
         self._make_turn_observers.append(observer)
 
     def register_new_game_observer(self, observer: NewGameObserver):
+        "For registering controller as observer"
         self._new_game_observers.append(observer)
 
     def _evaluate_winner(self):
