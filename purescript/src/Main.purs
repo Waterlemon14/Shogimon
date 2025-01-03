@@ -59,7 +59,8 @@ import Config
   , images
   )
 
-
+-- Piece constructors used to create new pieces for the
+-- initial state and when moving pieces.
 createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
 createBishop col row One    = Just {kind: Bishop,   position: {col:col,row:row},  player: One, isProtected: false}
 createBishop col row Two    = Just {kind: Bishop,   position: {col:col,row:row},  player: Two, isProtected: false}
@@ -155,6 +156,8 @@ onTick send gameState = do
                                           then Just piece
                                           else Nothing
 
+    -- Variable that stores if the current clickedCell leads to a valid move
+    -- Can be placed outside the functions since clickedCell is updated outside of onTick
     valid_move = elem gameState.clickedCell gameState.possibleMoves
 
     -- Assigns state active piece to clicked piece
@@ -183,22 +186,27 @@ onTick send gameState = do
           then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = capturedPieces state.playerOneCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
           else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = capturedPieces state.playerTwoCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
           where 
+            -- gets whose turn it is after a move is made
             next_player = if state.moveCount == 1 
               then if state.currentPlayer == One then Two else One
               else state.currentPlayer
 
+            -- gets the next moveCount after a move is made
             checker = if state.moveCount == 1 
               then 3
               else state.moveCount - 1
 
       else state
       where
+        -- If a move is to be made, creates a new piece to be placed
+        -- in the clicked cell.
         new_piece = if valid_move == true 
           then case state.activePiece of
             Nothing -> Nothing
             Just piece -> Just (piece { position = state.clickedCell })
           else state.activePiece
 
+        -- Gets the new list of captured pieces
         capturedPieces :: List Captured -> Piece -> List Captured
         capturedPieces captured activePiece 
           -- remove the placed piece from the list
@@ -208,13 +216,14 @@ onTick send gameState = do
             Nothing -> captured
             Just piece -> addCaptured captured piece
 
+        -- Decrements the captured piece kind if one is placed on the board
         decrCount :: List Captured -> Piece -> List Captured
         decrCount Nil _ = Nil
         decrCount (Cons h t) p 
           | h.kind == p.kind = if h.count == 1 then t else (Cons (h { count = h.count - 1 }) t)
           | otherwise = Cons h (decrCount t p)
 
-        
+        -- Adds to the captured piece kind if one is captured
         addCaptured :: List Captured -> Piece -> List Captured
         addCaptured Nil piece = Cons { kind: piece.kind, count: 1 } Nil
         addCaptured (Cons h t) piece | h.kind == piece.kind = Cons (h {count = h.count + 1}) t
@@ -233,7 +242,7 @@ onTick send gameState = do
           where
             helper :: Int -> Array (Maybe Piece)
             helper current_col
-              | current_col == columns = []
+              | current_col == state.columns = []
               | current_col == col_num = [new_piece] <> helper (current_col + 1)
               | otherwise = case row Array.!! current_col of
                 Nothing -> [Nothing] <> helper (current_col + 1)
@@ -246,14 +255,14 @@ onTick send gameState = do
           where
             helper :: Int -> Board
             helper current_row
-              | current_row == rows = []
+              | current_row == state.rows = []
               | current_row == target_position.row && current_row == piece_position.row 
                 = [removePiece (addPiece (getBoardRow current_row board) target_position.col) ] <> helper (current_row + 1)
               | current_row == target_position.row = [addPiece (getBoardRow current_row board) target_position.col ] <> helper (current_row + 1)
               | current_row == piece_position.row = [removePiece (getBoardRow current_row board) ] <> helper (current_row + 1)
               | otherwise = [getBoardRow current_row board] <> helper (current_row + 1)
 
-
+    -- Checker for if the game is finished or not
     updateGameOver :: GameState -> GameState
     updateGameOver state = if null (protectedPieceMovementCells 0 0 state.board One) 
       then if null (protectedPieceMovementCells 0 0 state.board Two)
@@ -263,10 +272,12 @@ onTick send gameState = do
         then state { winner = Just Player1 } 
         else state
     
+    -- Transforms the given board into a string that represents
+    -- the board, to be used when sending messages
     getBoardMessage :: Int -> Int -> Board -> String
     getBoardMessage col row board
-      | col >= columns = " " <> getBoardMessage 0 (row+1) board
-      | row >= rows    = ""
+      | col >= gameState.columns = " " <> getBoardMessage 0 (row+1) board
+      | row >= gameState.rows    = ""
       | otherwise = case accessCell col row board of
         Nothing -> "xx" <> getBoardMessage (col+1) row board
         Just piece -> case piece.kind of
@@ -276,6 +287,8 @@ onTick send gameState = do
           Prince   -> "k" <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
           Princess -> "q" <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
     
+    -- Transforms the list of captured pieces into  a string that
+    -- represents the list, to be used when sending messages
     getCapturedMessage :: List Captured -> String
     getCapturedMessage Nil = "None"
     getCapturedMessage captured_pieces = foldl helper "" captured_pieces
@@ -289,6 +302,8 @@ onTick send gameState = do
           | captured_piece.kind == Princess = acc <> "q" <> show captured_piece.count
           | otherwise                       = acc <> "xx" -- should never reach this branch
 
+    -- Constructs the board into the Board representation given 
+    -- an array of strings derived from getBoardMessage
     constructBoard :: Int -> Array String -> Board
     constructBoard row board = case board Array.!! row of
       Nothing -> []
@@ -296,7 +311,7 @@ onTick send gameState = do
         where
           constructRow :: Int -> String -> Array (Maybe Piece)
           constructRow col row_string
-            | col >= columns || row_string == "" = []
+            | col >= gameState.columns || row_string == "" = []
             | otherwise = [new_piece] <> constructRow (col + 1) (drop 2 row_string)
               where
                 piece = take 1 row_string
@@ -319,6 +334,8 @@ onTick send gameState = do
         getCapturedMessage state.playerTwoCaptures <> " " <> (trim $ getBoardMessage 0 0 state.board)
       pure state
     
+    -- Constructs the list of captured pieces given the string
+    -- from getCapturedMessage
     readCapturedMessage :: String -> List Captured
     readCapturedMessage captured_string = if captured_string == "None"
       then Nil
@@ -340,6 +357,8 @@ onTick send gameState = do
                   Just num -> num
                   Nothing -> 0
     
+    -- Updates the current game state given the string from 
+    -- getStateMessage
     readStateMessage :: GameState -> GameState
     readStateMessage state = do
       let
@@ -381,21 +400,28 @@ onTick send gameState = do
         , playerTwoCaptures = player_two_captures
         }
     
+    -- Used to get the board settings from player 1 when starting a game
+    -- Also used to broadcast its own settings
     initializeGame :: GameState -> Effect GameState
     initializeGame state = do
+      -- Assumed that player 1 always connects first and player 2
+      -- only begins to receive messages once player 1 is initialized
       if state.initialized == false
       then send $ "init1 " <> show state.columns <> " " <> show state.rows <> " " <> getBoardMessage 0 0 state.board
       else send $ "init2 " <> show state.columns <> " " <> show state.rows <> " " <> getBoardMessage 0 0 state.board
 
       let
+        -- Get the player num of the sender of the last received message
         player = case state.lastReceivedMessage of
           Nothing -> ""
           Just msg -> if show msg.playerId == "Player1" then "One" else if show msg.playerId == "Player2" then "Two" else ""
+        -- If a message is received, split the message into its components
         message = case state.lastReceivedMessage of
           Nothing -> []
           Just msg -> if take 4 msg.payload == "init"
             then split (Pattern " ") $ drop 6 msg.payload
             else []
+        -- Given a valid message, get the player num to be assigned to the player
         my_player_num = case state.lastReceivedMessage of
           Nothing -> state.currentPlayer
           Just msg -> if take 1 (drop 4 msg.payload) == "1"
@@ -408,6 +434,7 @@ onTick send gameState = do
       then if player == "One" && state.initialized == false
         then do
           let
+            -- Extract and construct the information from the message here
             new_columns = case message Array.!! 0 of
               Nothing -> 0
               Just cols_string -> case fromString cols_string of
@@ -428,10 +455,11 @@ onTick send gameState = do
           pure state { columns = new_columns, rows = new_rows, board = new_board, initialized = true, myPlayerNum = my_player_num }
 
         else if player == "Two"
-        then pure state { gameStart = true }
+        then pure state { gameStart = true } -- start the game once player 2 has connected
         else pure state
       else pure state
     
+    -- Used when the game has finished, game is reset through this
     endGame :: GameState -> Effect GameState
     endGame state = case state.lastReceivedMessage of
       Nothing -> pure state
@@ -481,7 +509,7 @@ onTick send gameState = do
         Just _ ->
           endGame gameState
       
-
+-- Sends the coordinates of the clicked cell
 onMouseDown :: (String -> Effect Unit) -> { x :: Int, y :: Int } -> GameState -> Effect GameState
 onMouseDown send { x, y } gameState = do
   let
@@ -497,8 +525,7 @@ onMouseDown send { x, y } gameState = do
     pure gameState
   else pure gameState
 
--- Not sure if we will be using this? Didn't remove it first
--- since I just buit on the demo
+-- Used to send the reset message used during game over
 onKeyDown :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
 onKeyDown send key gameState = do
   if key == "KeyR"
@@ -506,11 +533,12 @@ onKeyDown send key gameState = do
   else pure unit
   pure gameState
 
--- Unused function
+-- Unused
 onKeyUp :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
 onKeyUp _ _ gameState = pure gameState
 
--- Used to update clicks depending on received messages
+-- Manages received messages, used to updated clickedCell
+-- and lastReceivedMessage
 onMessage :: (String -> Effect Unit) -> Message -> GameState -> Effect GameState
 onMessage _ message gameState = do
   let
@@ -565,8 +593,8 @@ onRender images ctx gameState = do
     -- Takes in 0-indexed input
     drawBoard :: Int -> Int -> Effect Unit
     drawBoard col row 
-      | row >= rows = pure unit  -- Base case, return pure unit once everything is printed
-      | col >= columns = drawBoard 0 (row+1) -- Once whole row is printed, print next row
+      | row >= gameState.rows = pure unit  -- Base case, return pure unit once everything is printed
+      | col >= gameState.columns = drawBoard 0 (row+1) -- Once whole row is printed, print next row
       | otherwise = do 
           let
             temp_x = (cell_width+1.0) * (toNumber (col+1))  -- cell_width + 1.0 for cell border, col+1 to account for board border
@@ -602,7 +630,7 @@ onRender images ctx gameState = do
     drawCaptured :: List Captured -> List Captured -> Effect Unit
     drawCaptured playerOneCaptures playerTwoCaptures = do
       let
-        player_one_y_offset = (cell_height+1.0) * (1.0 + toNumber rows)
+        player_one_y_offset = (cell_height+1.0) * (1.0 + toNumber gameState.rows)
         is_playerone_current = if gameState.currentPlayer == One
           then true
           else false
@@ -638,10 +666,12 @@ onRender images ctx gameState = do
   drawMoves gameState.possibleMoves
   drawCaptured gameState.playerOneCaptures gameState.playerTwoCaptures
 
+  -- If game has not yet started, draw a text to show waiting status
   case gameState.gameStart of
     true -> pure unit
     false -> drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Waiting for Player 2 to connect ..." }
 
+  -- Draw game end text
   case gameState.winner of 
     Nothing -> pure unit
     Just winner -> do

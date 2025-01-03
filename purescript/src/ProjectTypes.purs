@@ -39,10 +39,18 @@ instance Show Kind where
 
 derive instance Eq Kind
 
+-- Type class to get the image paths of a piece kind
+-- Whenever adding a piece kind, add to the instantiation below
 class Images a where
+  -- getCurrentPlayerImage gets the image to be used when drawing
+  -- the pieces of the player whose turn it currently is
+  
+  -- getIdlePlayerImage gets the image to be used when drawing
+  -- the pieces of the player who is waiting for their turn
   getCurrentPlayerImage :: a -> String
   getIdlePlayerImage :: a -> String
 
+-- Define getCurrentPlayerImage and getIdlePlayerImage of the new kind added here
 instance Images Kind where
   getCurrentPlayerImage Pawn = "../../img/eevee.png"
   getCurrentPlayerImage Bishop = "../../img/pikachu.png"
@@ -81,7 +89,7 @@ derive instance Eq PlayerNum
 -- Used to represent a piece and store relevant information to the piece
 type Piece =
   { kind :: Kind            -- Kind of the piece
-  , position :: Position    -- Current position of the piece
+  , position :: Position    -- Current position of the piece, {-1,-1} refers to a captured piece
   , player :: PlayerNum     -- Which player the piece belongs to
   , isProtected :: Boolean    -- If the piece is to be protected
   }
@@ -110,18 +118,18 @@ derive instance Eq Winner
 type GameState =
   { tickCount :: Int
   , lastReceivedMessage :: Maybe Message
-  , board :: Board
-  , currentPlayer :: PlayerNum        -- Represents whose turn it is
-  , clickedCell :: Position           -- Position of the last clicked cell
-  , possibleMoves :: List Position    -- List of possible moves (position) that the active piece can take
-  , activePiece :: Maybe Piece        -- Currently clicked piece to be moved
+  , board :: Board                       -- Represents the current board
+  , currentPlayer :: PlayerNum           -- Represents whose turn it is
+  , clickedCell :: Position              -- Position of the last clicked cell
+  , possibleMoves :: List Position       -- List of possible moves (position) that the active piece can take
+  , activePiece :: Maybe Piece           -- Currently clicked piece to be moved
   , playerOneCaptures :: List Captured   -- List of pieces captured by player one
   , playerTwoCaptures :: List Captured   -- List of pieces captured by player two
-  , winner :: Maybe Winner
-  , moveCount :: Int
-  , columns :: Int
-  , rows :: Int
-  , gameStart :: Boolean              -- Used to check if both players have connected
-  , initialized :: Boolean            -- Used to check if board has been initialized based on player 1
-  , myPlayerNum :: PlayerNum          -- Represents your player number
+  , winner :: Maybe Winner               -- Stores the winner of the current game
+  , moveCount :: Int                     -- Available number of moves remaining in the turn
+  , columns :: Int                       -- Number of columns of the board
+  , rows :: Int                          -- Number of rows of the board
+  , gameStart :: Boolean                 -- Used to check if both players have connected
+  , initialized :: Boolean               -- Used to check if board has been initialized based on player 1
+  , myPlayerNum :: PlayerNum             -- Represents your player number
   }

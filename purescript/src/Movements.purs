@@ -102,6 +102,8 @@ moveSearcher {col, row} board player colMove rowMove limit isProtected =
         true -> if piece.isProtected then Nil else {col, row} : Nil     -- meaning piece in cell cannot be eaten
         false -> Nil
 
+-- Used to get the possible cells where a
+-- captured piece can be placed
 getFreeCells :: Board -> Int -> Int -> List Position
 getFreeCells board col row 
   | row >= rows = Nil  -- Base case
@@ -115,7 +117,8 @@ getFreeCells board col row
     where 
       invalidCells = concat $ (protectedPieceMovementCells 0 0 board One) : (protectedPieceMovementCells 0 0 board Two) : Nil
 
--- Revert change
+-- Revert change, was previously used to remove moves of
+-- captured pieces that are in the possible moves of enemy pieces
 -- removeMovesWithConflict :: Int -> Int -> Board -> PlayerNum -> List Position -> List Position
 -- removeMovesWithConflict col row board player current_moves
 --   | row >= rows = current_moves  -- Base case
@@ -129,6 +132,13 @@ getFreeCells board col row
 --           checker = (flip notElem) (getPossibleMoves current_piece.kind board current_piece.position current_piece.player current_piece.isProtected (current_piece.position.col == (-1) && current_piece.position.row == (-1)))
 --           updated_moves = filter checker current_moves
 
+-- Used to get the possible moves of protected pieces of
+-- the given player.
+-- Used in getFreeCells since you are not allowed to place
+-- captured pieces on the possible movements of the enemy's
+-- protected pieces.
+-- Also used in updateGameOver to check if the protected
+-- pieces of a player still has possible moves.
 protectedPieceMovementCells :: Int -> Int -> Board -> PlayerNum -> List Position
 protectedPieceMovementCells c r board player
         | r >= rows = Nil                                                 -- Base case
