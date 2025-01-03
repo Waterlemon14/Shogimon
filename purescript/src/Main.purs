@@ -431,6 +431,17 @@ onTick send gameState = do
         then pure state { gameStart = true }
         else pure state
       else pure state
+    
+    endGame :: GameState -> Effect GameState
+    endGame state = case state.lastReceivedMessage of
+      Nothing -> pure state
+      Just message -> if message.payload == "reset"
+        then if gameState.myPlayerNum == One
+          then initialState
+          else pure state
+        else if take 5 message.payload == "init2"
+        then initialState
+        else pure state
 
     -- mapper :: List Position -> String
     -- mapper Nil str = str
@@ -445,10 +456,13 @@ onTick send gameState = do
   case gameState.gameStart of
     false -> initializeGame gameState  
     true -> if gameState.myPlayerNum /= gameState.currentPlayer
-      then pure $ gameState
-        # readStateMessage
-        # updateTickCount
-        # updateGameOver
+      then case gameState.winner of
+        Nothing -> pure $ gameState
+          # readStateMessage
+          # updateTickCount
+          # updateGameOver
+        Just _ ->
+          endGame gameState
       else case gameState.winner of 
         Nothing -> if valid_move == true
           then gameState
@@ -465,7 +479,7 @@ onTick send gameState = do
             # updateTickCount
             # updateGameOver
         Just _ ->
-          pure $ gameState
+          endGame gameState
       
 
 onMouseDown :: (String -> Effect Unit) -> { x :: Int, y :: Int } -> GameState -> Effect GameState
@@ -486,8 +500,10 @@ onMouseDown send { x, y } gameState = do
 -- Not sure if we will be using this? Didn't remove it first
 -- since I just buit on the demo
 onKeyDown :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
-onKeyDown _ _ gameState = do
-  -- send $ "I pressed " <> key
+onKeyDown send key gameState = do
+  if key == "KeyR"
+  then send $ "reset"
+  else pure unit
   pure gameState
 
 -- Unused function
@@ -622,9 +638,15 @@ onRender images ctx gameState = do
   drawMoves gameState.possibleMoves
   drawCaptured gameState.playerOneCaptures gameState.playerTwoCaptures
 
+  case gameState.gameStart of
+    true -> pure unit
+    false -> drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Waiting for Player 2 to connect ..." }
+
   case gameState.winner of 
     Nothing -> pure unit
-    Just winner -> drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Game Verdict: " <> show winner }
+    Just winner -> do
+      drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Game Verdict: " <> show winner }
+      drawText ctx { x: messageX, y: messageY + (toNumber size), color: color, font: font, size: size, text: "Press R to restart the game" }
 
   -- This can be used to check messages received or to print something
   -- on the screen for debugging purposes
