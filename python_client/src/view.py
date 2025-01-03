@@ -329,12 +329,13 @@ class GameView:
 
         if self._game_status == GameStatus.ONGOING:
             _col = rel_x // TILE_PIXELS
-            print(_col)
 
             match player:
                 case PlayerNumber.ONE:
+                    self._current_hovered_location = None
                     self._current_hovered_piece = self._captures_p1.get_chosen_capture(_col)
                 case PlayerNumber.TWO:
+                    self._current_hovered_location = None
                     self._current_hovered_piece = self._captures_p2.get_chosen_capture(_col)
 
             self._renderable_board.mark_droppable(self._current_hovered_piece.moves)
