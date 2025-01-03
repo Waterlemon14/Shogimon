@@ -261,7 +261,7 @@ class Board:
         locations: list[Location] = piece.get_movement_range(self.get_movable_locations_mapping(piece.owner))
 
         if type(piece) == Piece:
-            return locations
+            return [ location for location in locations if not type(self._grid[location.row][location.col]) == ProtectedPiece]
         else:
             return [ location for location in locations if self.is_safe_location(location, piece.owner)]
     
