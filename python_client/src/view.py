@@ -214,22 +214,14 @@ class GameView:
 
     def on_state_change(self, state: GameState):
         self._active_player = state.active_player
+
+        self._all_captured_pieces = {PlayerNumber.ONE : [], PlayerNumber.TWO : []}
+        for piece in state.captured_pieces:
+            self._all_captured_pieces[piece.owner].append(piece)
+
         self._live_pieces = state.live_pieces
         self._action_count = state.action_count
         self._game_status = state.game_status
-        
-        _captures_p1 = []
-        _captures_p2 = []
-
-        for piece in state.captured_pieces:
-            match piece.owner:
-                case PlayerNumber.ONE:
-                    _captures_p1.append(piece)
-                case PlayerNumber.TWO:
-                    _captures_p2.append(piece)
-
-        self._captures_p1.set_captures(_captures_p1)
-        self._captures_p2.set_captures(_captures_p2)
 
     def register_make_turn_observer(self, observer: MakeTurnObserver):
         self._make_turn_observers.append(observer)
