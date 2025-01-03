@@ -1,5 +1,4 @@
 import pygame
-from collections import Counter
 
 from project_types import (
     TILE_PIXELS, BOARD_ROWS, BOARD_COLS, GameStatus,
@@ -329,7 +328,8 @@ class GameView:
         rel_y = abs_pos[1] - 656 if player == PlayerNumber.ONE else abs_pos[1]
 
         if self._game_status == GameStatus.ONGOING:
-            _col = rel_y // TILE_PIXELS
+            _col = rel_x // TILE_PIXELS
+            print(_col)
 
             match player:
                 case PlayerNumber.ONE:
