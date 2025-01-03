@@ -55,7 +55,7 @@ class Captures:
     def set_captures(self, captures: list[LivePiece]):
         self._captures = captures
     
-    def click_capture_row(self, col: int):
+    def click_capture_row(self, col: int) -> LivePiece:
         ...
 
     def place_piece_to_tile(self):
@@ -291,16 +291,21 @@ class GameView:
                 self._renderable_board.mark_nearby_targetable(Location(_row,_col))
 
             elif tile._is_targetable and self._current_hovered_piece is not None:
-                """Finish move"""
-                self._make_turn(PlayerAction(
-                    ActionType.MOVE,
-                    self._active_player,
-                    self._current_hovered_location,
-                    Location(_row, _col),
-                    self._current_hovered_piece.kind
-                ))
-                self._renderable_board.unmark_all()
-                self._rerender_after_turn()
+                if self._current_hovered_location is not None:
+                    """Finish move turn"""
+                    self._make_turn(PlayerAction(
+                        ActionType.MOVE,
+                        self._active_player,
+                        self._current_hovered_location,
+                        Location(_row, _col),
+                        self._current_hovered_piece.kind
+                        ))
+                    self._renderable_board.unmark_all()
+                    self._rerender_after_turn()
+
+                else:
+                    "Finish drop turn"
+                    ...
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
@@ -312,10 +317,10 @@ class GameView:
 
             match player:
                 case PlayerNumber.ONE:
-                    self._captures_p1.click_capture_row(_col)
+                    self._current_hovered_piece = self._captures_p1.click_capture_row(_col)
                     
                 case PlayerNumber.TWO:
-                    self._captures_p2.click_capture_row(_col)
+                    self._current_hovered_piece = self._captures_p2.click_capture_row(_col)
 
     def run(self):
         """Main game running logic; Equivalent to main()"""
