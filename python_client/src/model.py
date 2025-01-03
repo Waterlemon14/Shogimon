@@ -297,24 +297,29 @@ class Board:
             
         return True
 
-    def is_checkmate(self, curr_player: PlayerNumber) -> bool:
+    def opponent_immobile(self, curr_player: PlayerNumber) -> bool:
         opponent = PlayerNumber.TWO if curr_player == PlayerNumber.ONE else PlayerNumber.ONE
         """
         Checks if Latias and Latios of each player can still move
         """
-        unsafe_locations = self.get_all_movable_locations(curr_player)
+        # unsafe_locations = self.get_all_movable_locations(curr_player) # wrong implementation
 
         for protected in self._protected_pieces[opponent]:
             possible_moves = protected.get_movement_range(self.get_movable_locations_mapping(opponent))
-            danger: list[bool] = []
+            blocked: list[bool] = []
 
+            # for loc in possible_moves:  wrong implementation
+            #     if loc in unsafe_locations:
+            #         danger.append(True)
+            #     else:
+            #         danger.append(False)
             for loc in possible_moves:
-                if loc in unsafe_locations:
-                    danger.append(True)
+                if self._grid[loc.row][loc.col]:
+                    blocked.append(True)
                 else:
-                    danger.append(False)
+                    blocked.append(False)
 
-            protected.is_immobile = True  if all(danger) else False
+            protected.is_immobile = True  if all(blocked) else False
             
         return all([piece.is_immobile for piece in self._protected_pieces[opponent]])
     
@@ -449,9 +454,10 @@ class GameModel:
     def _check_if_game_over(self) -> PlayerNumber | None:
         board = self._board
         winner = None
-        if board.is_checkmate(self._active_player):
+        if board.opponent_immobile(self._active_player):
            winner = self._active_player
            self._game_status= GameStatus.PLAYER_WIN if winner == PlayerNumber.ONE else GameStatus.PLAYER_LOSE
+           print('hello')
 
     def make_action(self, action: PlayerAction):
         board = self._board
