@@ -30,8 +30,8 @@ def get_blittable(piece: LivePiece) -> pygame.Surface:
 
 class Captures:
     """Renderable class for player captures (top and bottom of game screen)"""
-    def __init__(self, number: PlayerNumber):
-        self._captures: list[LivePiece] = []
+    def __init__(self, number: PlayerNumber, list_caps: list[LivePiece]):
+        self._captures = list_caps
         self._owner = number
 
         self._actual_row = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
@@ -207,8 +207,8 @@ class GameView:
         """
         self._renderable_board = RenderableBoard(self._live_pieces)
 
-        self._captures_p1 = Captures(PlayerNumber.ONE)
-        self._captures_p2 = Captures(PlayerNumber.TWO)
+        self._captures_p1 = Captures(PlayerNumber.ONE, self._all_captured_pieces[PlayerNumber.ONE])
+        self._captures_p2 = Captures(PlayerNumber.TWO, self._all_captured_pieces[PlayerNumber.TWO])
 
         self._current_hovered_piece: LivePiece | None = None
 
@@ -263,12 +263,23 @@ class GameView:
 
             tile = self._renderable_board.get_tile(Location(_row,_col))
             
-            if tile.occupier is not None and tile.occupier.owner == self._active_player:
+            if tile.occupier is not None:
+                if tile.occupier.owner == self._active_player:
                     self._current_hovered_location = Location(_row,_col)
                     self._renderable_board.mark_nearby_targetable(Location(_row,_col))
                     self._current_hovered_piece = self._renderable_board._location_to_tile[Location(_row, _col)].occupier
 
-            elif tile._is_targetable and self._current_hovered_piece is not None:
+                elif tile._is_targetable:
+                    self._make_turn(PlayerAction(
+                        ActionType.MOVE,
+                        self._active_player,
+                        self._current_hovered_location,
+                        Location(_row, _col),
+                        self._current_hovered_piece.kind
+                    ))
+                    self._init_view_state()
+
+            elif tile._is_targetable:
                 self._make_turn(PlayerAction(
                     ActionType.MOVE,
                     self._active_player,
