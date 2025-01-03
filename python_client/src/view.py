@@ -43,6 +43,10 @@ class Captures:
         return self._owner
     
     @property
+    def len(self) -> int:
+        return len(self._captures)
+    
+    @property
     def rect(self) -> pygame.Rect:
         """Return surface rect with appropriate location; For calculating mouse collision"""
         match self._owner:
@@ -329,14 +333,19 @@ class GameView:
 
         if self._game_status == GameStatus.ONGOING:
             _col = rel_x // TILE_PIXELS
+            self._current_hovered_location = None
 
             match player:
                 case PlayerNumber.ONE:
-                    self._current_hovered_location = None
-                    self._current_hovered_piece = self._captures_p1.get_chosen_capture(_col)
+                    if _col <= self._captures_p1.len:
+                        self._current_hovered_piece = self._captures_p1.get_chosen_capture(_col)
+                    else:
+                        return
                 case PlayerNumber.TWO:
-                    self._current_hovered_location = None
-                    self._current_hovered_piece = self._captures_p2.get_chosen_capture(_col)
+                    if _col <= self._captures_p2.len:
+                        self._current_hovered_piece = self._captures_p2.get_chosen_capture(_col)
+                    else:
+                        return
 
             self._renderable_board.mark_droppable(self._current_hovered_piece.moves)
 
