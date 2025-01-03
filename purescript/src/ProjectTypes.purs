@@ -7,9 +7,6 @@ module ProjectTypes
   , PlayerNum(..)
   , Position
   , Winner(..)
-  , class Images
-  , getCurrentPlayerImage
-  , getIdlePlayerImage
   )
   where
 
@@ -38,31 +35,6 @@ instance Show Kind where
   show Princess = "Princess"  -- q
 
 derive instance Eq Kind
-
--- Type class to get the image paths of a piece kind
--- Whenever adding a piece kind, add to the instantiation below
-class Images a where
-  -- getCurrentPlayerImage gets the image to be used when drawing
-  -- the pieces of the player whose turn it currently is
-  
-  -- getIdlePlayerImage gets the image to be used when drawing
-  -- the pieces of the player who is waiting for their turn
-  getCurrentPlayerImage :: a -> String
-  getIdlePlayerImage :: a -> String
-
--- Define getCurrentPlayerImage and getIdlePlayerImage of the new kind added here
-instance Images Kind where
-  getCurrentPlayerImage Pawn = "../../img/eevee.png"
-  getCurrentPlayerImage Bishop = "../../img/pikachu.png"
-  getCurrentPlayerImage Rook = "../../img/turtwig.png"
-  getCurrentPlayerImage Prince = "../../img/latios.png"
-  getCurrentPlayerImage Princess = "../../img/latias.png"
-  
-  getIdlePlayerImage Pawn    = "../../img/eevee-shiny.png"
-  getIdlePlayerImage Bishop    = "../../img/pikachu-shiny.png"
-  getIdlePlayerImage Rook    = "../../img/turtwig-shiny.png"
-  getIdlePlayerImage Prince    = "../../img/latios-shiny.png"
-  getIdlePlayerImage Princess    = "../../img/latias-shiny.png"
 
 -- Used to represent the position of a piece on the board
 type Position =

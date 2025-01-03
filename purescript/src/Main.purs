@@ -25,8 +25,11 @@ import Effect (Effect)
 import Effect.Console (log)
 import Graphics.Canvas as Canvas
 
-import Movements
-  ( getPossibleMoves
+import PieceFunctions
+  ( getCurrentPlayerImage
+  , getIdlePlayerImage
+  , createPiece
+  , getPossibleMoves
   , accessCell
   , protectedPieceMovementCells
   )
@@ -40,8 +43,6 @@ import ProjectTypes
   , Captured
   , GameState
   , Winner(..)
-  , getCurrentPlayerImage
-  , getIdlePlayerImage
   )
 
 import Config
@@ -59,28 +60,6 @@ import Config
   , images
   )
 
--- Piece constructors used to create new pieces for the
--- initial state and when moving pieces.
-createBishop :: Int -> Int -> PlayerNum -> Maybe Piece
-createBishop col row One    = Just {kind: Bishop,   position: {col:col,row:row},  player: One, isProtected: false}
-createBishop col row Two    = Just {kind: Bishop,   position: {col:col,row:row},  player: Two, isProtected: false}
-
-createPawn :: Int -> Int -> PlayerNum -> Maybe Piece
-createPawn col row One      = Just {kind: Pawn,     position: {col:col,row:row},  player: One, isProtected: false}
-createPawn col row Two      = Just {kind: Pawn,     position: {col:col,row:row},  player: Two, isProtected: false}
-
-createRook :: Int -> Int -> PlayerNum -> Maybe Piece
-createRook col row One      = Just {kind: Rook,     position: {col:col,row:row},  player: One, isProtected: false}
-createRook col row Two      = Just {kind: Rook,     position: {col:col,row:row},  player: Two, isProtected: false}
-
-createPrince :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrince col row One    = Just {kind: Prince,   position: {col:col,row:row},  player: One, isProtected: true}
-createPrince col row Two    = Just {kind: Prince,   position: {col:col,row:row},  player: Two, isProtected: true}
-
-createPrincess :: Int -> Int -> PlayerNum -> Maybe Piece
-createPrincess col row One  = Just {kind: Princess, position: {col:col,row:row},  player: One, isProtected: true}
-createPrincess col row Two  = Just {kind: Princess, position: {col:col,row:row},  player: Two, isProtected: true}
-
 -- Returns a GameState representinng the initial state of the game.
 -- The initial board is constructed here, as well as the initial
 -- values of the other properties.
@@ -92,19 +71,19 @@ initialState = do
     init_board = [getBackRow 0 Two] <> [getPawnRow 1 Two 0] <> Array.replicate (rows-4) nothing_row <> [getPawnRow (rows-2) One 0] <> [getBackRow (rows-1) One]
     
     getBackRow :: Int -> PlayerNum -> Array (Maybe Piece)
-    getBackRow row player_num = [ createRook 0 row player_num, 
-                                  createBishop 1 row player_num, 
+    getBackRow row player_num = [ createPiece Rook 0 row player_num, 
+                                  createPiece Bishop 1 row player_num, 
                                   Nothing,
-                                  createPrince 3 row player_num,
-                                  createPrincess 4 row player_num,
+                                  createPiece Prince 3 row player_num,
+                                  createPiece Princess 4 row player_num,
                                   Nothing,
-                                  createBishop 6 row player_num, 
-                                  createRook 7 row player_num
+                                  createPiece Bishop 6 row player_num, 
+                                  createPiece Rook 7 row player_num
                                 ]
 
     getPawnRow :: Int -> PlayerNum -> Int -> Array (Maybe Piece)
     getPawnRow row player_num col | col == columns = []
-                                  | otherwise = [createPawn col row player_num] <> getPawnRow row player_num (col+1)
+                                  | otherwise = [createPiece Pawn col row player_num] <> getPawnRow row player_num (col+1)
 
   pure { tickCount: 0
   , lastReceivedMessage: Nothing
@@ -141,9 +120,9 @@ onTick send gameState = do
   let
     pieceConstructor :: Captured -> Maybe Piece
     pieceConstructor cp 
-      | cp.kind == Bishop = createBishop  (-1) (-1) gameState.currentPlayer 
-      | cp.kind == Pawn   = createPawn    (-1) (-1) gameState.currentPlayer 
-      | otherwise         = createRook    (-1) (-1) gameState.currentPlayer 
+      | cp.kind == Bishop = createPiece Bishop  (-1) (-1) gameState.currentPlayer 
+      | cp.kind == Pawn   = createPiece Pawn    (-1) (-1) gameState.currentPlayer 
+      | otherwise         = createPiece Rook    (-1) (-1) gameState.currentPlayer 
 
     -- Finds currently clicked piece
     pieceFinder :: Int -> Int -> PlayerNum -> Maybe Piece
@@ -320,11 +299,11 @@ onTick send gameState = do
                   _ -> Two    -- Assume valid piece always, check later if invalid
 
                 new_piece = case piece of
-                  "p" -> createPawn     col row player_num
-                  "b" -> createBishop   col row player_num
-                  "r" -> createRook     col row player_num
-                  "k" -> createPrince   col row player_num
-                  "q" -> createPrincess col row player_num
+                  "p" -> createPiece Pawn     col row player_num
+                  "b" -> createPiece Bishop   col row player_num
+                  "r" -> createPiece Rook     col row player_num
+                  "k" -> createPiece Prince   col row player_num
+                  "q" -> createPiece Princess col row player_num
                   _   -> Nothing
 
     -- Used to send the current state of the game
