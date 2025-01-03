@@ -214,8 +214,10 @@ class GameView:
 
     def _init_view_state(self):
         """
-        Initialize view-specific properties
-        --- Might need to add viewing player?
+        Infer implicit player move status;
+        If current_hovered_piece is not None:
+            If current_hovered_location == None, then a capture is currently selected.
+            Else, piece on board is selected.
         """
         self._renderable_board = RenderableBoard(self._live_pieces)
         self._captures_p1 = Captures(PlayerNumber.ONE)
@@ -223,6 +225,8 @@ class GameView:
 
         self._current_hovered_location: Location | None = None
         self._current_hovered_piece: LivePiece | None = None
+        
+        # Might need to add viewing player?
 
     def on_state_change(self, state: GameState):
         self._active_player = state.active_player
@@ -235,10 +239,7 @@ class GameView:
         self._renderable_board.unmark_all()
         self._renderable_board.set_board_state(self._live_pieces)
 
-        _all_captures = {
-            PlayerNumber.ONE: [],
-            PlayerNumber.TWO: []
-            }
+        _all_captures = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
 
         for piece in self._captured_pieces:
             _all_captures[piece.owner].append(piece)
@@ -256,22 +257,23 @@ class GameView:
         self._new_game_observers.append(observer)
 
     def _evaluate_winner(self):
-        """
-        Evaluate game-end on-screen printout
-        --- Might need viewing player?
-        """
+        """Evaluate game-end on-screen render"""
         if self._game_status == GameStatus.PLAYER_WIN:
             self._render_text_result("YOU WIN")
         elif self._game_status == GameStatus.PLAYER_LOSE:
             self._render_text_result("YOU LOSE")
         elif self._game_status == GameStatus.GAME_DRAW:
             self._render_text_result("GAME RESULTED IN STALEMATE")
+        
+        # Might need viewing player?
 
     def _make_turn(self, action: PlayerAction):
+        "For interaction with controller"
         for observer in self._make_turn_observers:
             observer.on_make_turn(action)
 
     def _new_game(self):
+        "For interaction with controller"
         for observer in self._new_game_observers:
             observer.on_new_game()
 
