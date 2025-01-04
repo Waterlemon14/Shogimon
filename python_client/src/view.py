@@ -283,7 +283,6 @@ class GameView:
             _col = (abs_pos[0] - 129) // TILE_PIXELS
 
             tile = self._renderable_board.get_tile(Location(_row,_col))
-            print(self._current_hovered_piece)
 
             if tile.occupier is not None and tile.occupier.owner == self._active_player:
                 """Hover piece (to see possible moves)"""
@@ -349,7 +348,6 @@ class GameView:
                     _game_is_running = False
 
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                    print("R IS CLICKED")
                     self._new_game()
                     self._init_view_state()
 
