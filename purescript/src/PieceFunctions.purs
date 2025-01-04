@@ -62,16 +62,11 @@ instance PieceFunctions Kind where
 
   -----------------------------------------------------------
 
-  createPiece Pawn col row One     = Just {kind: Pawn,   position: {col:col,row:row},  player: One, isProtected: false}
-  createPiece Pawn col row Two     = Just {kind: Pawn,   position: {col:col,row:row},  player: Two, isProtected: false}
-  createPiece Bishop col row Two   = Just {kind: Bishop,   position: {col:col,row:row},  player: Two, isProtected: false}
-  createPiece Bishop col row One   = Just {kind: Bishop,   position: {col:col,row:row},  player: One, isProtected: false}
-  createPiece Rook col row One     = Just {kind: Rook,   position: {col:col,row:row},  player: One, isProtected: false}
-  createPiece Rook col row Two     = Just {kind: Rook,   position: {col:col,row:row},  player: Two, isProtected: false}
-  createPiece Prince col row One   = Just {kind: Prince,   position: {col:col,row:row},  player: One, isProtected: true}
-  createPiece Prince col row Two   = Just {kind: Prince,   position: {col:col,row:row},  player: Two, isProtected: true}
-  createPiece Princess col row One = Just {kind: Princess,   position: {col:col,row:row},  player: One, isProtected: true}
-  createPiece Princess col row Two = Just {kind: Princess,   position: {col:col,row:row},  player: Two, isProtected: true}
+  createPiece Pawn col row pnum     = Just {kind: Pawn,     position: {col:col,row:row},  player: pnum, isProtected: false}
+  createPiece Bishop col row pnum   = Just {kind: Bishop,   position: {col:col,row:row},  player: pnum, isProtected: false}
+  createPiece Rook col row pnum     = Just {kind: Rook,     position: {col:col,row:row},  player: pnum, isProtected: false}
+  createPiece Prince col row pnum   = Just {kind: Prince,   position: {col:col,row:row},  player: pnum, isProtected: true}
+  createPiece Princess col row pnum = Just {kind: Princess, position: {col:col,row:row},  player: pnum, isProtected: true}
 
   -----------------------------------------------------------
 

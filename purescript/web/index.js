@@ -3490,7 +3490,7 @@
       return length(v.value0);
     }
     ;
-    throw new Error("Failed pattern match at PieceFunctions (line 201, column 17 - line 203, column 25): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at PieceFunctions (line 196, column 17 - line 198, column 25): " + [v.constructor.name]);
   };
   var createPiece = function(dict) {
     return dict.createPiece;
@@ -3507,7 +3507,7 @@
           return cell.value0;
         }
         ;
-        throw new Error("Failed pattern match at PieceFunctions (line 118, column 28 - line 120, column 36): " + [cell.constructor.name]);
+        throw new Error("Failed pattern match at PieceFunctions (line 113, column 28 - line 115, column 36): " + [cell.constructor.name]);
       };
     };
   };
@@ -3555,13 +3555,13 @@
                       return Nil.value;
                     }
                     ;
-                    throw new Error("Failed pattern match at PieceFunctions (line 143, column 16 - line 146, column 21): " + [v8.constructor.name]);
+                    throw new Error("Failed pattern match at PieceFunctions (line 138, column 16 - line 141, column 21): " + [v8.constructor.name]);
                   }
                   ;
-                  throw new Error("Failed pattern match at PieceFunctions (line 140, column 19 - line 146, column 21): " + [v6.constructor.name]);
+                  throw new Error("Failed pattern match at PieceFunctions (line 135, column 19 - line 141, column 21): " + [v6.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at PieceFunctions (line 137, column 3 - line 146, column 21): " + [v7.constructor.name]);
+                throw new Error("Failed pattern match at PieceFunctions (line 132, column 3 - line 141, column 21): " + [v7.constructor.name]);
               };
             };
           };
@@ -3596,10 +3596,10 @@
               return protectedPieceMovementCells(c + 1 | 0)(r)(board)(player);
             }
             ;
-            throw new Error("Failed pattern match at PieceFunctions (line 189, column 23 - line 195, column 66): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at PieceFunctions (line 184, column 23 - line 190, column 66): " + [v.constructor.name]);
           }
           ;
-          throw new Error("Failed pattern match at PieceFunctions (line 185, column 1 - line 185, column 81): " + [c.constructor.name, r.constructor.name, board.constructor.name, player.constructor.name]);
+          throw new Error("Failed pattern match at PieceFunctions (line 180, column 1 - line 180, column 81): " + [c.constructor.name, r.constructor.name, board.constructor.name, player.constructor.name]);
         };
       };
     };
@@ -3626,7 +3626,7 @@
         return "../../img/latias.png";
       }
       ;
-      throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 110, column 18): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 105, column 18): " + [v.constructor.name]);
     },
     getIdlePlayerImage: function(v) {
       if (v instanceof Pawn) {
@@ -3649,133 +3649,73 @@
         return "../../img/latias-shiny.png";
       }
       ;
-      throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 110, column 18): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 105, column 18): " + [v.constructor.name]);
     },
     createPiece: function(v) {
       return function(v1) {
         return function(v2) {
           return function(v3) {
-            if (v instanceof Pawn && v3 instanceof One) {
+            if (v instanceof Pawn) {
               return new Just({
                 kind: Pawn.value,
                 position: {
                   col: v1,
                   row: v2
                 },
-                player: One.value,
+                player: v3,
                 isProtected: false
               });
             }
             ;
-            if (v instanceof Pawn && v3 instanceof Two) {
-              return new Just({
-                kind: Pawn.value,
-                position: {
-                  col: v1,
-                  row: v2
-                },
-                player: Two.value,
-                isProtected: false
-              });
-            }
-            ;
-            if (v instanceof Bishop && v3 instanceof Two) {
+            if (v instanceof Bishop) {
               return new Just({
                 kind: Bishop.value,
                 position: {
                   col: v1,
                   row: v2
                 },
-                player: Two.value,
+                player: v3,
                 isProtected: false
               });
             }
             ;
-            if (v instanceof Bishop && v3 instanceof One) {
-              return new Just({
-                kind: Bishop.value,
-                position: {
-                  col: v1,
-                  row: v2
-                },
-                player: One.value,
-                isProtected: false
-              });
-            }
-            ;
-            if (v instanceof Rook && v3 instanceof One) {
+            if (v instanceof Rook) {
               return new Just({
                 kind: Rook.value,
                 position: {
                   col: v1,
                   row: v2
                 },
-                player: One.value,
+                player: v3,
                 isProtected: false
               });
             }
             ;
-            if (v instanceof Rook && v3 instanceof Two) {
-              return new Just({
-                kind: Rook.value,
-                position: {
-                  col: v1,
-                  row: v2
-                },
-                player: Two.value,
-                isProtected: false
-              });
-            }
-            ;
-            if (v instanceof Prince && v3 instanceof One) {
+            if (v instanceof Prince) {
               return new Just({
                 kind: Prince.value,
                 position: {
                   col: v1,
                   row: v2
                 },
-                player: One.value,
+                player: v3,
                 isProtected: true
               });
             }
             ;
-            if (v instanceof Prince && v3 instanceof Two) {
-              return new Just({
-                kind: Prince.value,
-                position: {
-                  col: v1,
-                  row: v2
-                },
-                player: Two.value,
-                isProtected: true
-              });
-            }
-            ;
-            if (v instanceof Princess && v3 instanceof One) {
+            if (v instanceof Princess) {
               return new Just({
                 kind: Princess.value,
                 position: {
                   col: v1,
                   row: v2
                 },
-                player: One.value,
+                player: v3,
                 isProtected: true
               });
             }
             ;
-            if (v instanceof Princess && v3 instanceof Two) {
-              return new Just({
-                kind: Princess.value,
-                position: {
-                  col: v1,
-                  row: v2
-                },
-                player: Two.value,
-                isProtected: true
-              });
-            }
-            ;
-            throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 110, column 18): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name]);
+            throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 105, column 18): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name]);
           };
         };
       };
@@ -3871,7 +3811,7 @@
                   })(v1)(v3)(1)(1)(1)(v4), Nil.value)))));
                 }
                 ;
-                throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 110, column 18): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name, v4.constructor.name, v5.constructor.name]);
+                throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 105, column 18): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name, v4.constructor.name, v5.constructor.name]);
               };
             };
           };
@@ -3912,10 +3852,10 @@
             return getFreeCells(board)(col + 1 | 0)(row);
           }
           ;
-          throw new Error("Failed pattern match at PieceFunctions (line 154, column 17 - line 158, column 46): " + [v.constructor.name]);
+          throw new Error("Failed pattern match at PieceFunctions (line 149, column 17 - line 153, column 46): " + [v.constructor.name]);
         }
         ;
-        throw new Error("Failed pattern match at PieceFunctions (line 150, column 1 - line 150, column 53): " + [board.constructor.name, col.constructor.name, row.constructor.name]);
+        throw new Error("Failed pattern match at PieceFunctions (line 145, column 1 - line 145, column 53): " + [board.constructor.name, col.constructor.name, row.constructor.name]);
       };
     };
   };
@@ -3952,10 +3892,9 @@
     }
   })(eqInt));
   var elem2 = /* @__PURE__ */ elem(foldableList)(eqRec1);
-  var eq42 = /* @__PURE__ */ eq(eqKind);
   var bind5 = /* @__PURE__ */ bind(bindMaybe);
   var getPossibleMoves2 = /* @__PURE__ */ getPossibleMoves(pieceFunctionsKind);
-  var eq5 = /* @__PURE__ */ eq(/* @__PURE__ */ eqMaybe(/* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2({
+  var eq42 = /* @__PURE__ */ eq(/* @__PURE__ */ eqMaybe(/* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2({
     reflectSymbol: function() {
       return "position";
     }
@@ -3973,6 +3912,7 @@
     }
   })(eqBoolean))));
   var map6 = /* @__PURE__ */ map(functorArray);
+  var eq5 = /* @__PURE__ */ eq(eqKind);
   var foldl3 = /* @__PURE__ */ foldl(foldableList);
   var show42 = /* @__PURE__ */ show(showPlayerNum);
   var notEq1 = /* @__PURE__ */ notEq(/* @__PURE__ */ eqArray(eqString));
@@ -4005,7 +3945,7 @@
               };
             }
             ;
-            throw new Error("Failed pattern match at Main (line 600, column 5 - line 600, column 47): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 587, column 5 - line 587, column 47): " + [v.constructor.name]);
           };
           var drawBoard = function(col) {
             return function(row) {
@@ -4057,14 +3997,14 @@
                       return drawBoard(col + 1 | 0)(row)();
                     }
                     ;
-                    throw new Error("Failed pattern match at Main (line 593, column 15 - line 597, column 40): " + [v1.constructor.name]);
+                    throw new Error("Failed pattern match at Main (line 580, column 15 - line 584, column 40): " + [v1.constructor.name]);
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 585, column 11 - line 597, column 40): " + [v.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 572, column 11 - line 584, column 40): " + [v.constructor.name]);
                 };
               }
               ;
-              throw new Error("Failed pattern match at Main (line 573, column 5 - line 573, column 43): " + [col.constructor.name, row.constructor.name]);
+              throw new Error("Failed pattern match at Main (line 560, column 5 - line 560, column 43): " + [col.constructor.name, row.constructor.name]);
             };
           };
           var drawCaptured = function(playerOneCaptures) {
@@ -4119,7 +4059,7 @@
                               })();
                             }
                             ;
-                            throw new Error("Failed pattern match at Main (line 632, column 11 - line 634, column 133): " + [v4.constructor.name]);
+                            throw new Error("Failed pattern match at Main (line 619, column 11 - line 621, column 133): " + [v4.constructor.name]);
                           })();
                           drawRect(ctx)({
                             x: (cell_width + 1) * v2 + cell_width / 2 - cell_width / 8,
@@ -4140,7 +4080,7 @@
                         };
                       }
                       ;
-                      throw new Error("Failed pattern match at Main (line 623, column 9 - line 623, column 81): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name]);
+                      throw new Error("Failed pattern match at Main (line 610, column 9 - line 610, column 81): " + [v.constructor.name, v1.constructor.name, v2.constructor.name, v3.constructor.name]);
                     };
                   };
                 };
@@ -4171,7 +4111,7 @@
               })();
             }
             ;
-            throw new Error("Failed pattern match at Main (line 649, column 3 - line 651, column 138): " + [gameState.gameStart.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 636, column 3 - line 638, column 138): " + [gameState.gameStart.constructor.name]);
           })();
           if (gameState.winner instanceof Nothing) {
             return unit;
@@ -4196,7 +4136,7 @@
             })();
           }
           ;
-          throw new Error("Failed pattern match at Main (line 654, column 3 - line 658, column 141): " + [gameState.winner.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 641, column 3 - line 645, column 141): " + [gameState.winner.constructor.name]);
         };
       };
     };
@@ -4250,10 +4190,10 @@
                     return v3.value0;
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 537, column 27 - line 539, column 32): " + [v3.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 524, column 27 - line 526, column 32): " + [v3.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 535, column 24 - line 539, column 32): " + [v2.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 522, column 24 - line 526, column 32): " + [v2.constructor.name]);
               }();
               var cell_col = function() {
                 var v2 = index(command)(1);
@@ -4271,10 +4211,10 @@
                     return v3.value0;
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 532, column 27 - line 534, column 32): " + [v3.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 519, column 27 - line 521, column 32): " + [v3.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 530, column 24 - line 534, column 32): " + [v2.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 517, column 24 - line 521, column 32): " + [v2.constructor.name]);
               }();
               return {
                 col: cell_col,
@@ -4288,7 +4228,7 @@
             };
           }
           ;
-          throw new Error("Failed pattern match at Main (line 525, column 20 - line 541, column 34): " + [v1.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 512, column 20 - line 528, column 34): " + [v1.constructor.name]);
         }();
         return function __do() {
           log2("Received Message: " + show22(message2))();
@@ -4383,7 +4323,7 @@
             };
           }
           ;
-          throw new Error("Failed pattern match at Main (line 545, column 3 - line 555, column 64): " + [gameState.gameStart.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 532, column 3 - line 542, column 64): " + [gameState.gameStart.constructor.name]);
         };
       };
     };
@@ -4425,7 +4365,7 @@
             return append13([createPiece2(Pawn.value)(col)(row)(player_num)])(getPawnRow(row)(player_num)(col + 1 | 0));
           }
           ;
-          throw new Error("Failed pattern match at Main (line 84, column 5 - line 84, column 65): " + [row.constructor.name, player_num.constructor.name, col.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 86, column 5 - line 86, column 65): " + [row.constructor.name, player_num.constructor.name, col.constructor.name]);
         };
       };
     };
@@ -4468,7 +4408,7 @@
         return v.value0;
       }
       ;
-      throw new Error("Failed pattern match at Main (line 112, column 25 - line 114, column 34): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Main (line 114, column 25 - line 116, column 34): " + [v.constructor.name]);
     };
   };
   var onTick = function(send) {
@@ -4599,7 +4539,7 @@
               return 0;
             }
             ;
-            throw new Error("Failed pattern match at Main (line 335, column 25 - line 337, column 31): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 332, column 25 - line 334, column 31): " + [v.constructor.name]);
           }();
           var $203 = count === 0;
           if ($203) {
@@ -4619,19 +4559,7 @@
         return helper(captured_string);
       };
       var pieceConstructor = function(cp) {
-        if (eq42(cp.kind)(Bishop.value)) {
-          return createPiece2(Bishop.value)(-1 | 0)(-1 | 0)(gameState.currentPlayer);
-        }
-        ;
-        if (eq42(cp.kind)(Pawn.value)) {
-          return createPiece2(Pawn.value)(-1 | 0)(-1 | 0)(gameState.currentPlayer);
-        }
-        ;
-        if (otherwise) {
-          return createPiece2(Rook.value)(-1 | 0)(-1 | 0)(gameState.currentPlayer);
-        }
-        ;
-        throw new Error("Failed pattern match at Main (line 121, column 5 - line 121, column 48): " + [cp.constructor.name]);
+        return createPiece2(cp.kind)(-1 | 0)(-1 | 0)(gameState.currentPlayer);
       };
       var pieceFinder = function(col) {
         return function(row) {
@@ -4651,18 +4579,18 @@
               }
               ;
               if (v instanceof Just) {
-                var $210 = eq4(v.value0.player)(player);
-                if ($210) {
+                var $209 = eq4(v.value0.player)(player);
+                if ($209) {
                   return new Just(v.value0);
                 }
                 ;
                 return Nothing.value;
               }
               ;
-              throw new Error("Failed pattern match at Main (line 132, column 40 - line 136, column 55): " + [v.constructor.name]);
+              throw new Error("Failed pattern match at Main (line 131, column 40 - line 135, column 55): " + [v.constructor.name]);
             }
             ;
-            throw new Error("Failed pattern match at Main (line 128, column 5 - line 128, column 58): " + [col.constructor.name, row.constructor.name, player.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 127, column 5 - line 127, column 58): " + [col.constructor.name, row.constructor.name, player.constructor.name]);
           };
         };
       };
@@ -4690,8 +4618,8 @@
         }
         ;
         if (v instanceof Just) {
-          var $213 = eq4(v.value0.player)(state3.currentPlayer);
-          if ($213) {
+          var $212 = eq4(v.value0.player)(state3.currentPlayer);
+          if ($212) {
             return {
               tickCount: state3.tickCount,
               lastReceivedMessage: state3.lastReceivedMessage,
@@ -4732,7 +4660,7 @@
           };
         }
         ;
-        throw new Error("Failed pattern match at Main (line 144, column 31 - line 147, column 83): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Main (line 143, column 31 - line 146, column 83): " + [v.constructor.name]);
       };
       var updatePossibleMoves = function(state3) {
         var v = pieceFinder(state3.clickedCell.col)(state3.clickedCell.row)(state3.currentPlayer);
@@ -4778,13 +4706,13 @@
           };
         }
         ;
-        throw new Error("Failed pattern match at Main (line 154, column 33 - line 156, column 191): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Main (line 153, column 33 - line 155, column 191): " + [v.constructor.name]);
       };
       var makeMove = function(state3) {
         var removePiece = function(row) {
           var checker2 = function(to_compare) {
-            var $217 = eq5(state3.activePiece)(to_compare);
-            if ($217) {
+            var $216 = eq42(state3.activePiece)(to_compare);
+            if ($216) {
               return Nothing.value;
             }
             ;
@@ -4793,8 +4721,8 @@
           return map6(checker2)(row);
         };
         var new_piece = function() {
-          var $218 = valid_move === true;
-          if ($218) {
+          var $217 = valid_move === true;
+          if ($217) {
             if (state3.activePiece instanceof Nothing) {
               return Nothing.value;
             }
@@ -4808,7 +4736,7 @@
               });
             }
             ;
-            throw new Error("Failed pattern match at Main (line 183, column 16 - line 185, column 72): " + [state3.activePiece.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 182, column 16 - line 184, column 72): " + [state3.activePiece.constructor.name]);
           }
           ;
           return state3.activePiece;
@@ -4820,9 +4748,9 @@
             }
             ;
             if (v instanceof Cons) {
-              if (eq42(v.value0.kind)(v1.kind)) {
-                var $223 = v.value0.count === 1;
-                if ($223) {
+              if (eq5(v.value0.kind)(v1.kind)) {
+                var $222 = v.value0.count === 1;
+                if ($222) {
                   return v.value1;
                 }
                 ;
@@ -4838,7 +4766,7 @@
               ;
             }
             ;
-            throw new Error("Failed pattern match at Main (line 199, column 9 - line 199, column 61): " + [v.constructor.name, v1.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 198, column 9 - line 198, column 61): " + [v.constructor.name, v1.constructor.name]);
           };
         };
         var addPiece = function(row) {
@@ -4862,10 +4790,10 @@
                   return append13([v.value0])(helper(current_col + 1 | 0));
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 226, column 29 - line 228, column 66): " + [v.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 225, column 29 - line 227, column 66): " + [v.constructor.name]);
               }
               ;
-              throw new Error("Failed pattern match at Main (line 222, column 13 - line 222, column 49): " + [current_col.constructor.name]);
+              throw new Error("Failed pattern match at Main (line 221, column 13 - line 221, column 49): " + [current_col.constructor.name]);
             };
             return helper(0);
           };
@@ -4894,7 +4822,7 @@
                   return append13([getBoardRow(current_row)(board)])(helper(current_row + 1 | 0));
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 235, column 13 - line 235, column 35): " + [current_row.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 234, column 13 - line 234, column 35): " + [current_row.constructor.name]);
               };
               return helper(0);
             };
@@ -4909,7 +4837,7 @@
               }, Nil.value);
             }
             ;
-            if (v instanceof Cons && eq42(v.value0.kind)(v1.kind)) {
+            if (v instanceof Cons && eq5(v.value0.kind)(v1.kind)) {
               return new Cons({
                 kind: v.value0.kind,
                 count: v.value0.count + 1 | 0
@@ -4920,7 +4848,7 @@
               return new Cons(v.value0, addCaptured(v.value1)(v1));
             }
             ;
-            throw new Error("Failed pattern match at Main (line 206, column 9 - line 206, column 63): " + [v.constructor.name, v1.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 205, column 9 - line 205, column 63): " + [v.constructor.name, v1.constructor.name]);
           };
         };
         var capturedPieces = function(captured) {
@@ -4939,24 +4867,24 @@
                 return addCaptured(captured)(v.value0);
               }
               ;
-              throw new Error("Failed pattern match at Main (line 194, column 25 - line 196, column 53): " + [v.constructor.name]);
+              throw new Error("Failed pattern match at Main (line 193, column 25 - line 195, column 53): " + [v.constructor.name]);
             }
             ;
-            throw new Error("Failed pattern match at Main (line 189, column 9 - line 189, column 66): " + [captured.constructor.name, activePiece.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 188, column 9 - line 188, column 66): " + [captured.constructor.name, activePiece.constructor.name]);
           };
         };
-        var $240 = valid_move === true;
-        if ($240) {
+        var $239 = valid_move === true;
+        if ($239) {
           if (state3.activePiece instanceof Nothing) {
             return state3;
           }
           ;
           if (state3.activePiece instanceof Just) {
             var next_player = function() {
-              var $242 = state3.moveCount === 1;
-              if ($242) {
-                var $243 = eq4(state3.currentPlayer)(One.value);
-                if ($243) {
+              var $241 = state3.moveCount === 1;
+              if ($241) {
+                var $242 = eq4(state3.currentPlayer)(One.value);
+                if ($242) {
                   return Two.value;
                 }
                 ;
@@ -4966,15 +4894,15 @@
               return state3.currentPlayer;
             }();
             var checker = function() {
-              var $244 = state3.moveCount === 1;
-              if ($244) {
+              var $243 = state3.moveCount === 1;
+              if ($243) {
                 return 3;
               }
               ;
               return state3.moveCount - 1 | 0;
             }();
-            var $245 = eq4(state3.currentPlayer)(One.value);
-            if ($245) {
+            var $244 = eq4(state3.currentPlayer)(One.value);
+            if ($244) {
               return {
                 tickCount: state3.tickCount,
                 lastReceivedMessage: state3.lastReceivedMessage,
@@ -5021,10 +4949,37 @@
             };
           }
           ;
-          throw new Error("Failed pattern match at Main (line 162, column 12 - line 176, column 39): " + [state3.activePiece.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 161, column 12 - line 175, column 39): " + [state3.activePiece.constructor.name]);
         }
         ;
         return state3;
+      };
+      var kindToBoardFormat = function(kind2) {
+        if (eq5(kind2)(Pawn.value)) {
+          return "p";
+        }
+        ;
+        if (eq5(kind2)(Bishop.value)) {
+          return "b";
+        }
+        ;
+        if (eq5(kind2)(Rook.value)) {
+          return "r";
+        }
+        ;
+        if (eq5(kind2)(Prince.value)) {
+          return "k";
+        }
+        ;
+        if (eq5(kind2)(Princess.value)) {
+          return "q";
+        }
+        ;
+        if (otherwise) {
+          return "xx";
+        }
+        ;
+        throw new Error("Failed pattern match at Main (line 253, column 5 - line 253, column 40): " + [kind2.constructor.name]);
       };
       var getCapturedMessage = function(v) {
         if (v instanceof Nil) {
@@ -5033,31 +4988,7 @@
         ;
         var helper = function(acc) {
           return function(captured_piece) {
-            if (eq42(captured_piece.kind)(Pawn.value)) {
-              return acc + ("p" + show4(captured_piece.count));
-            }
-            ;
-            if (eq42(captured_piece.kind)(Bishop.value)) {
-              return acc + ("b" + show4(captured_piece.count));
-            }
-            ;
-            if (eq42(captured_piece.kind)(Rook.value)) {
-              return acc + ("r" + show4(captured_piece.count));
-            }
-            ;
-            if (eq42(captured_piece.kind)(Prince.value)) {
-              return acc + ("k" + show4(captured_piece.count));
-            }
-            ;
-            if (eq42(captured_piece.kind)(Princess.value)) {
-              return acc + ("q" + show4(captured_piece.count));
-            }
-            ;
-            if (otherwise) {
-              return acc + "xx";
-            }
-            ;
-            throw new Error("Failed pattern match at Main (line 275, column 9 - line 275, column 47): " + [acc.constructor.name, captured_piece.constructor.name]);
+            return acc + (kindToBoardFormat(captured_piece.kind) + show4(captured_piece.count));
           };
         };
         return foldl3(helper)("")(v);
@@ -5080,68 +5011,20 @@
               }
               ;
               if (v instanceof Just) {
-                if (v.value0.kind instanceof Pawn) {
-                  return "p" + function() {
-                    var $255 = eq4(v.value0.player)(One.value);
-                    if ($255) {
-                      return "1" + getBoardMessage(col + 1 | 0)(row)(board);
-                    }
-                    ;
-                    return "2" + getBoardMessage(col + 1 | 0)(row)(board);
-                  }();
-                }
-                ;
-                if (v.value0.kind instanceof Bishop) {
-                  return "b" + function() {
-                    var $256 = eq4(v.value0.player)(One.value);
-                    if ($256) {
-                      return "1" + getBoardMessage(col + 1 | 0)(row)(board);
-                    }
-                    ;
-                    return "2" + getBoardMessage(col + 1 | 0)(row)(board);
-                  }();
-                }
-                ;
-                if (v.value0.kind instanceof Rook) {
-                  return "r" + function() {
-                    var $257 = eq4(v.value0.player)(One.value);
-                    if ($257) {
-                      return "1" + getBoardMessage(col + 1 | 0)(row)(board);
-                    }
-                    ;
-                    return "2" + getBoardMessage(col + 1 | 0)(row)(board);
-                  }();
-                }
-                ;
-                if (v.value0.kind instanceof Prince) {
-                  return "k" + function() {
-                    var $258 = eq4(v.value0.player)(One.value);
-                    if ($258) {
-                      return "1" + getBoardMessage(col + 1 | 0)(row)(board);
-                    }
-                    ;
-                    return "2" + getBoardMessage(col + 1 | 0)(row)(board);
-                  }();
-                }
-                ;
-                if (v.value0.kind instanceof Princess) {
-                  return "q" + function() {
-                    var $259 = eq4(v.value0.player)(One.value);
-                    if ($259) {
-                      return "1" + getBoardMessage(col + 1 | 0)(row)(board);
-                    }
-                    ;
-                    return "2" + getBoardMessage(col + 1 | 0)(row)(board);
-                  }();
-                }
-                ;
-                throw new Error("Failed pattern match at Main (line 262, column 23 - line 267, column 144): " + [v.value0.kind.constructor.name]);
+                return kindToBoardFormat(v.value0.kind) + function() {
+                  var $252 = eq4(v.value0.player)(One.value);
+                  if ($252) {
+                    return "1" + getBoardMessage(col + 1 | 0)(row)(board);
+                  }
+                  ;
+                  return "2" + getBoardMessage(col + 1 | 0)(row)(board);
+                }();
               }
               ;
-              throw new Error("Failed pattern match at Main (line 260, column 21 - line 267, column 144): " + [v.constructor.name]);
+              throw new Error("Failed pattern match at Main (line 268, column 21 - line 270, column 169): " + [v.constructor.name]);
             }
             ;
-            throw new Error("Failed pattern match at Main (line 256, column 5 - line 256, column 53): " + [col.constructor.name, row.constructor.name, board.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 264, column 5 - line 264, column 53): " + [col.constructor.name, row.constructor.name, board.constructor.name]);
           };
         };
       };
@@ -5157,25 +5040,25 @@
         }
         ;
         if (state3.lastReceivedMessage instanceof Just) {
-          var $262 = state3.lastReceivedMessage.value0.payload === "reset";
-          if ($262) {
-            var $263 = eq4(gameState.myPlayerNum)(One.value);
-            if ($263) {
+          var $255 = state3.lastReceivedMessage.value0.payload === "reset";
+          if ($255) {
+            var $256 = eq4(gameState.myPlayerNum)(One.value);
+            if ($256) {
               return initialState;
             }
             ;
             return pure4(state3);
           }
           ;
-          var $264 = take5(5)(state3.lastReceivedMessage.value0.payload) === "init2";
-          if ($264) {
+          var $257 = take5(5)(state3.lastReceivedMessage.value0.payload) === "init2";
+          if ($257) {
             return initialState;
           }
           ;
           return pure4(state3);
         }
         ;
-        throw new Error("Failed pattern match at Main (line 443, column 21 - line 451, column 24): " + [state3.lastReceivedMessage.constructor.name]);
+        throw new Error("Failed pattern match at Main (line 440, column 21 - line 448, column 24): " + [state3.lastReceivedMessage.constructor.name]);
       };
       var constructBoard = function(row) {
         return function(state_col) {
@@ -5228,21 +5111,21 @@
                     return append13([new_piece])(constructRow(col + 1 | 0)(drop4(2)(row_string)));
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 291, column 11 - line 291, column 63): " + [col.constructor.name, row_string.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 288, column 11 - line 288, column 63): " + [col.constructor.name, row_string.constructor.name]);
                 };
               };
               return append13([constructRow(0)(v.value0)])(constructBoard(row + 1 | 0)(state_col)(board));
             }
             ;
-            throw new Error("Failed pattern match at Main (line 287, column 42 - line 307, column 33): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 284, column 42 - line 304, column 33): " + [v.constructor.name]);
           };
         };
       };
       var initializeGame = function(state3) {
         return function __do() {
           (function() {
-            var $272 = state3.initialized === false;
-            if ($272) {
+            var $265 = state3.initialized === false;
+            if ($265) {
               return send("init1 " + (show4(state3.columns) + (" " + (show4(state3.rows) + (" " + getBoardMessage(0)(0)(state3.board))))))();
             }
             ;
@@ -5254,20 +5137,20 @@
             }
             ;
             if (state3.lastReceivedMessage instanceof Just) {
-              var $274 = show32(state3.lastReceivedMessage.value0.playerId) === "Player1";
-              if ($274) {
+              var $267 = show32(state3.lastReceivedMessage.value0.playerId) === "Player1";
+              if ($267) {
                 return "One";
               }
               ;
-              var $275 = show32(state3.lastReceivedMessage.value0.playerId) === "Player2";
-              if ($275) {
+              var $268 = show32(state3.lastReceivedMessage.value0.playerId) === "Player2";
+              if ($268) {
                 return "Two";
               }
               ;
               return "";
             }
             ;
-            throw new Error("Failed pattern match at Main (line 394, column 18 - line 396, column 125): " + [state3.lastReceivedMessage.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 391, column 18 - line 393, column 125): " + [state3.lastReceivedMessage.constructor.name]);
           }();
           var my_player_num = function() {
             if (state3.lastReceivedMessage instanceof Nothing) {
@@ -5275,20 +5158,20 @@
             }
             ;
             if (state3.lastReceivedMessage instanceof Just) {
-              var $278 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "1";
-              if ($278) {
+              var $271 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "1";
+              if ($271) {
                 return One.value;
               }
               ;
-              var $279 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "2";
-              if ($279) {
+              var $272 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "2";
+              if ($272) {
                 return Two.value;
               }
               ;
               return state3.currentPlayer;
             }
             ;
-            throw new Error("Failed pattern match at Main (line 404, column 25 - line 410, column 37): " + [state3.lastReceivedMessage.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 401, column 25 - line 407, column 37): " + [state3.lastReceivedMessage.constructor.name]);
           }();
           var message2 = function() {
             if (state3.lastReceivedMessage instanceof Nothing) {
@@ -5296,20 +5179,20 @@
             }
             ;
             if (state3.lastReceivedMessage instanceof Just) {
-              var $282 = take5(4)(state3.lastReceivedMessage.value0.payload) === "init";
-              if ($282) {
+              var $275 = take5(4)(state3.lastReceivedMessage.value0.payload) === "init";
+              if ($275) {
                 return split(" ")(drop4(6)(state3.lastReceivedMessage.value0.payload));
               }
               ;
               return [];
             }
             ;
-            throw new Error("Failed pattern match at Main (line 398, column 19 - line 402, column 20): " + [state3.lastReceivedMessage.constructor.name]);
+            throw new Error("Failed pattern match at Main (line 395, column 19 - line 399, column 20): " + [state3.lastReceivedMessage.constructor.name]);
           }();
-          var $284 = notEq1(message2)([]);
-          if ($284) {
-            var $285 = player === "One" && state3.initialized === false;
-            if ($285) {
+          var $277 = notEq1(message2)([]);
+          if ($277) {
+            var $278 = player === "One" && state3.initialized === false;
+            if ($278) {
               var new_rows = function() {
                 var v = index(message2)(1);
                 if (v instanceof Nothing) {
@@ -5326,10 +5209,10 @@
                     return v1.value0;
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 424, column 35 - line 426, column 32): " + [v1.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 421, column 35 - line 423, column 32): " + [v1.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 422, column 24 - line 426, column 32): " + [v.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 419, column 24 - line 423, column 32): " + [v.constructor.name]);
               }();
               var new_columns = function() {
                 var v = index(message2)(0);
@@ -5347,10 +5230,10 @@
                     return v1.value0;
                   }
                   ;
-                  throw new Error("Failed pattern match at Main (line 419, column 35 - line 421, column 34): " + [v1.constructor.name]);
+                  throw new Error("Failed pattern match at Main (line 416, column 35 - line 418, column 34): " + [v1.constructor.name]);
                 }
                 ;
-                throw new Error("Failed pattern match at Main (line 417, column 27 - line 421, column 34): " + [v.constructor.name]);
+                throw new Error("Failed pattern match at Main (line 414, column 27 - line 418, column 34): " + [v.constructor.name]);
               }();
               var board_array = function() {
                 var v = dropEnd(1)(drop(2)(message2));
@@ -5361,8 +5244,8 @@
                 return v;
               }();
               var new_board = function() {
-                var $295 = length(board_array) === new_rows;
-                if ($295) {
+                var $288 = length(board_array) === new_rows;
+                if ($288) {
                   return constructBoard(0)(new_columns)(board_array);
                 }
                 ;
@@ -5388,8 +5271,8 @@
               };
             }
             ;
-            var $296 = player === "Two";
-            if ($296) {
+            var $289 = player === "Two";
+            if ($289) {
               return {
                 activePiece: state3.activePiece,
                 board: state3.board,
@@ -5426,7 +5309,7 @@
             return split(" ")(state3.lastReceivedMessage.value0.payload);
           }
           ;
-          throw new Error("Failed pattern match at Main (line 344, column 23 - line 346, column 64): " + [state3.lastReceivedMessage.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 341, column 23 - line 343, column 64): " + [state3.lastReceivedMessage.constructor.name]);
         }();
         var is_command = function() {
           var v = index(payload_arr)(0);
@@ -5435,19 +5318,19 @@
           }
           ;
           if (v instanceof Just) {
-            var $300 = v.value0 === "click";
-            if ($300) {
+            var $293 = v.value0 === "click";
+            if ($293) {
               return true;
             }
             ;
             return false;
           }
           ;
-          throw new Error("Failed pattern match at Main (line 357, column 22 - line 361, column 23): " + [v.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 354, column 22 - line 358, column 23): " + [v.constructor.name]);
         }();
         var player_one_captures = function() {
-          var $302 = is_command === true;
-          if ($302) {
+          var $295 = is_command === true;
+          if ($295) {
             return state3.playerOneCaptures;
           }
           ;
@@ -5460,11 +5343,11 @@
             return state3.playerOneCaptures;
           }
           ;
-          throw new Error("Failed pattern match at Main (line 365, column 16 - line 367, column 47): " + [v.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 362, column 16 - line 364, column 47): " + [v.constructor.name]);
         }();
         var player_two_captures = function() {
-          var $305 = is_command === true;
-          if ($305) {
+          var $298 = is_command === true;
+          if ($298) {
             return state3.playerTwoCaptures;
           }
           ;
@@ -5477,7 +5360,7 @@
             return state3.playerTwoCaptures;
           }
           ;
-          throw new Error("Failed pattern match at Main (line 371, column 16 - line 373, column 45): " + [v.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 368, column 16 - line 370, column 45): " + [v.constructor.name]);
         }();
         var current_player = function() {
           if (state3.lastReceivedMessage instanceof Nothing) {
@@ -5488,12 +5371,12 @@
             return take5(3)(state3.lastReceivedMessage.value0.payload);
           }
           ;
-          throw new Error("Failed pattern match at Main (line 348, column 26 - line 350, column 49): " + [state3.lastReceivedMessage.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 345, column 26 - line 347, column 49): " + [state3.lastReceivedMessage.constructor.name]);
         }();
         var board = drop(3)(payload_arr);
         var new_board = function() {
-          var $310 = length(board) === state3.rows;
-          if ($310) {
+          var $303 = length(board) === state3.rows;
+          if ($303) {
             return constructBoard(0)(state3.columns)(board);
           }
           ;
@@ -5514,13 +5397,13 @@
           myPlayerNum: state3.myPlayerNum,
           board: new_board,
           currentPlayer: function() {
-            var $311 = current_player === "One";
-            if ($311) {
+            var $304 = current_player === "One";
+            if ($304) {
               return One.value;
             }
             ;
-            var $312 = current_player === "Two";
-            if ($312) {
+            var $305 = current_player === "Two";
+            if ($305) {
               return Two.value;
             }
             ;
@@ -5535,8 +5418,8 @@
       }
       ;
       if (gameState.gameStart) {
-        var $314 = notEq22(gameState.myPlayerNum)(gameState.currentPlayer);
-        if ($314) {
+        var $307 = notEq22(gameState.myPlayerNum)(gameState.currentPlayer);
+        if ($307) {
           if (gameState.winner instanceof Nothing) {
             return pure4(updateGameOver(updateTickCount(readStateMessage(gameState))));
           }
@@ -5545,12 +5428,12 @@
             return endGame(gameState);
           }
           ;
-          throw new Error("Failed pattern match at Main (line 466, column 12 - line 472, column 28): " + [gameState.winner.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 453, column 12 - line 459, column 28): " + [gameState.winner.constructor.name]);
         }
         ;
         if (gameState.winner instanceof Nothing) {
-          var $318 = valid_move === true;
-          if ($318) {
+          var $311 = valid_move === true;
+          if ($311) {
             return sendStateMessage(updateGameOver(updateTickCount(updatePossibleMoves(updateActivePiece(makeMove(gameState))))));
           }
           ;
@@ -5561,10 +5444,10 @@
           return endGame(gameState);
         }
         ;
-        throw new Error("Failed pattern match at Main (line 473, column 12 - line 489, column 28): " + [gameState.winner.constructor.name]);
+        throw new Error("Failed pattern match at Main (line 460, column 12 - line 476, column 28): " + [gameState.winner.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Main (line 463, column 3 - line 489, column 28): " + [gameState.gameStart.constructor.name]);
+      throw new Error("Failed pattern match at Main (line 450, column 3 - line 476, column 28): " + [gameState.gameStart.constructor.name]);
     };
   };
   var main = /* @__PURE__ */ startNetworkGame({

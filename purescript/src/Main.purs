@@ -121,10 +121,7 @@ onTick :: (String -> Effect Unit) -> GameState -> Effect GameState
 onTick send gameState = do
   let
     pieceConstructor :: Captured -> Maybe Piece
-    pieceConstructor cp 
-      | cp.kind == Bishop = createPiece Bishop  (-1) (-1) gameState.currentPlayer 
-      | cp.kind == Pawn   = createPiece Pawn    (-1) (-1) gameState.currentPlayer 
-      | otherwise         = createPiece Rook    (-1) (-1) gameState.currentPlayer 
+    pieceConstructor cp = createPiece cp.kind  (-1) (-1) gameState.currentPlayer 
 
     -- Finds currently clicked piece
     pieceFinder :: Int -> Int -> PlayerNum -> Maybe Piece
@@ -252,6 +249,15 @@ onTick send gameState = do
       else if null (protectedPieceMovementCells 0 0 state.board Two) 
         then state { winner = Just Player1 } 
         else state
+
+    kindToBoardFormat :: Kind -> String
+    kindToBoardFormat kind 
+      | kind == Pawn     = "p"
+      | kind == Bishop   = "b"
+      | kind == Rook     = "r"
+      | kind == Prince   = "k"
+      | kind == Princess = "q"
+      | otherwise        = "xx" -- should never reach this branch
     
     -- Transforms the given board into a string that represents
     -- the board, to be used when sending messages
@@ -261,12 +267,7 @@ onTick send gameState = do
       | row >= gameState.rows    = ""
       | otherwise = case accessCell col row board of
         Nothing -> "xx" <> getBoardMessage (col+1) row board
-        Just piece -> case piece.kind of
-          Pawn     -> "p" <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
-          Bishop   -> "b" <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
-          Rook     -> "r" <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
-          Prince   -> "k" <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
-          Princess -> "q" <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
+        Just piece -> kindToBoardFormat piece.kind <> if piece.player == One then "1" <> getBoardMessage (col+1) row board else "2" <> getBoardMessage (col+1) row board
     
     -- Transforms the list of captured pieces into  a string that
     -- represents the list, to be used when sending messages
@@ -275,13 +276,7 @@ onTick send gameState = do
     getCapturedMessage captured_pieces = foldl helper "" captured_pieces
       where
         helper :: String -> Captured -> String
-        helper acc captured_piece
-          | captured_piece.kind == Pawn     = acc <> "p" <> show captured_piece.count
-          | captured_piece.kind == Bishop   = acc <> "b" <> show captured_piece.count
-          | captured_piece.kind == Rook     = acc <> "r" <> show captured_piece.count
-          | captured_piece.kind == Prince   = acc <> "k" <> show captured_piece.count
-          | captured_piece.kind == Princess = acc <> "q" <> show captured_piece.count
-          | otherwise                       = acc <> "xx" -- should never reach this branch
+        helper acc captured_piece = acc <> kindToBoardFormat captured_piece.kind <> show captured_piece.count
 
     -- Constructs the board into the Board representation given 
     -- an array of strings derived from getBoardMessage
@@ -451,16 +446,6 @@ onTick send gameState = do
         else if take 5 message.payload == "init2"
         then initialState
         else pure state
-
-    -- mapper :: List Position -> String
-    -- mapper Nil str = str
-    -- mapper (Cons h t) str =  mapper t (str <> show h)
-
-  -- if gameState.tickCount `mod` fps == 0 then do
-  --   send $ show (concat $ (protectedPieceMovementCells 0 0 gameState.board One) : (protectedPieceMovementCells 0 0 gameState.board Two) : Nil) <> "\n" --<>
-  --     --show gameState.currentPlayer <> "\n" <> 
-  --     -- showBoard gameState.board --<> "\n" 
-  --   else pure unit
 
   case gameState.gameStart of
     false -> initializeGame gameState  
