@@ -1,11 +1,11 @@
 module ProjectTypes
-  ( Kind(..)
-  , Position
-  , Board
-  , PlayerNum(..)
-  , Piece
+  ( Board
   , Captured
   , GameState
+  , Kind(..)
+  , Piece
+  , PlayerNum(..)
+  , Position
   , Winner(..)
   )
   where
@@ -28,14 +28,13 @@ data Kind
   | Princess
 
 instance Show Kind where
-  show Pawn     = "Pawn"
-  show Bishop   = "Bishop"
-  show Rook     = "Rook"
-  show Prince   = "Prince"
-  show Princess = "Princess"
+  show Pawn     = "Pawn"      -- p
+  show Bishop   = "Bishop"    -- b
+  show Rook     = "Rook"      -- r
+  show Prince   = "Prince"    -- k
+  show Princess = "Princess"  -- q
 
 derive instance Eq Kind
-
 
 -- Used to represent the position of a piece on the board
 type Position =
@@ -62,8 +61,7 @@ derive instance Eq PlayerNum
 -- Used to represent a piece and store relevant information to the piece
 type Piece =
   { kind :: Kind            -- Kind of the piece
-  , position :: Position    -- Current position of the piece
-  , image :: String         -- Filename of the image used to draw the piece
+  , position :: Position    -- Current position of the piece, {-1,-1} refers to a captured piece
   , player :: PlayerNum     -- Which player the piece belongs to
   , isProtected :: Boolean    -- If the piece is to be protected
   }
@@ -74,7 +72,6 @@ type Piece =
 type Captured =
   { kind :: Kind      -- Kind of the piece
   , count :: Int      -- How many of that kind of piece is captured
-  , image :: String   -- Filename of the image used to draw the piece
   }
 
 
@@ -93,13 +90,18 @@ derive instance Eq Winner
 type GameState =
   { tickCount :: Int
   , lastReceivedMessage :: Maybe Message
-  , board :: Board
-  , currentPlayer :: PlayerNum        -- Represents whose turn it is
-  , clickedCell :: Position           -- Position of the last clicked cell
-  , possibleMoves :: List Position    -- List of possible moves (position) that the active piece can take
-  , activePiece :: Maybe Piece        -- Currently clicked piece to be moved
+  , board :: Board                       -- Represents the current board
+  , currentPlayer :: PlayerNum           -- Represents whose turn it is
+  , clickedCell :: Position              -- Position of the last clicked cell
+  , possibleMoves :: List Position       -- List of possible moves (position) that the active piece can take
+  , activePiece :: Maybe Piece           -- Currently clicked piece to be moved
   , playerOneCaptures :: List Captured   -- List of pieces captured by player one
   , playerTwoCaptures :: List Captured   -- List of pieces captured by player two
-  , winner :: Maybe Winner
-  , moveCount :: Int
+  , winner :: Maybe Winner               -- Stores the winner of the current game
+  , moveCount :: Int                     -- Available number of moves remaining in the turn
+  , columns :: Int                       -- Number of columns of the board
+  , rows :: Int                          -- Number of rows of the board
+  , gameStart :: Boolean                 -- Used to check if both players have connected
+  , initialized :: Boolean               -- Used to check if board has been initialized based on player 1
+  , myPlayerNum :: PlayerNum             -- Represents your player number
   }
