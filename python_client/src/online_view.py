@@ -1,8 +1,9 @@
 import pygame
 
 from project_types import (
-    TILE_PIXELS, BOARD_ROWS, BOARD_COLS, GameStatus,
-    LivePiece, Location, GameState, PieceKind, ActionType, PlayerAction, PlayerNumber,
+    TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
+    GameStatus, PieceKind, ActionType, Location, PlayerNumber,
+    LivePiece, GameState, PlayerAction,
     MakeTurnObserver, NewGameObserver,
     )
 from view import *

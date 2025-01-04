@@ -1,8 +1,9 @@
 import pygame
 
 from project_types import (
-    TILE_PIXELS, BOARD_ROWS, BOARD_COLS, GameStatus,
-    LivePiece, Location, GameState, PieceKind, ActionType, PlayerAction, PlayerNumber,
+    TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
+    GameStatus, PieceKind, ActionType, Location, PlayerNumber,
+    LivePiece, GameState, PlayerAction,
     MakeTurnObserver, NewGameObserver,
     )
 
@@ -93,11 +94,6 @@ class Tile:
         self._is_targetable = False
 
         self._actual_tile = pygame.Surface((TILE_PIXELS, TILE_PIXELS))
-
-    @property
-    def topleft(self):
-        """Return surface top left (main coordinate for rendering)"""
-        return self._topleft
 
     @property
     def rect(self) -> pygame.Rect:
