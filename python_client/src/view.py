@@ -224,7 +224,12 @@ class GameView:
     def on_state_change(self, state: GameState):
         """Update view state based on passed GameState"""
         self._active_player = state.active_player
-        self._captured_pieces = state.captured_pieces
+
+        self._all_captures: dict[PlayerNumber, list[LivePiece]] = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
+
+        for piece in state.captured_pieces:
+            self._all_captures[piece.owner].append(piece)
+
         self._live_pieces = state.live_pieces
         self._action_count = state.action_count
         self._game_status = state.game_status
@@ -232,16 +237,10 @@ class GameView:
     def _rerender_after_turn(self):
         """For showing state of board every after turn; works with properties established by on_state_change"""
         self._renderable_board.unmark_all()
-        
         self._renderable_board.set_board_state(self._live_pieces)
 
-        _all_captures = {PlayerNumber.ONE: [], PlayerNumber.TWO: []}
-
-        for piece in self._captured_pieces:
-            _all_captures[piece.owner].append(piece)
-
-        self._captures_p1.set_captures(_all_captures[PlayerNumber.ONE])
-        self._captures_p2.set_captures(_all_captures[PlayerNumber.TWO])
+        self._captures_p1.set_captures(self._all_captures[PlayerNumber.ONE])
+        self._captures_p2.set_captures(self._all_captures[PlayerNumber.TWO])
 
         self._current_hovered_location = None
         self._current_hovered_piece = None
@@ -297,7 +296,7 @@ class GameView:
 
                 self._renderable_board.mark_nearby_targetable(Location(_row,_col))
 
-            elif tile._is_targetable and self._current_hovered_piece is not None:
+            elif tile.is_targetable and self._current_hovered_piece is not None:
                 if self._current_hovered_location is not None:
                     """Finish move turn"""
                     self._make_turn(PlayerAction(
