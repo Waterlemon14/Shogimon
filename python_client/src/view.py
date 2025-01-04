@@ -145,7 +145,6 @@ class RenderableBoard:
             for i in range(BOARD_ROWS)
             for j in range(BOARD_COLS)
         }
-
         self._all_locations = [Location(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLS)]
         self._actual_board = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
 
@@ -308,7 +307,6 @@ class GameView:
                         Location(_row, _col),
                         self._current_hovered_piece.kind
                         ))
-                    
                     self._rerender_after_turn()
 
                 else:
@@ -320,15 +318,12 @@ class GameView:
                         Location(_row, _col),
                         self._current_hovered_piece.kind
                         ))
-                    
                     self._rerender_after_turn()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
-        rel_x = abs_pos[0]
-
         if self._game_status == GameStatus.ONGOING:
-            _col = rel_x // TILE_PIXELS
+            _col = abs_pos[0] // TILE_PIXELS
             self._current_hovered_location = None
 
             match player:
