@@ -8,8 +8,22 @@ The bottom player, consisting of non-shiny pieces, serves as Player 1 (and is th
 
 For each round, each player has 3 actions which can either be used by *moving a piece* (i.e., clicking on the on-board piece and clicking a blue dot, which indicates that they can move there); or by *dropping a captured piece* (i.e., clicking on one of your captures and placing them on one of the blue dots shown on screen).
 
-The game is won by trapping the enemy *Latias* in such a way that it cannot move any further.
-Similarly, the game is lost by having your own *Latias* trapped.
+The game is won by trapping the enemy *Latias* and *Latios* in such a way that it cannot move any further.
+Similarly, the game is lost by having your own *Latias* and *Latios* trapped.
+
+To start the offline version of the game, run:
+
+```python
+poetry run python src/main.py
+```
+
+The online version is accesible via:
+
+```python
+poetry run python src/online_main.py
+```
+
+
 
 The game can be restarted at any point the program is running by clicking `R`.
 
