@@ -56,38 +56,15 @@ class OnlineView(GameView):
                 self._start_move_turn(Location(_row,_col))
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
-                self._finish_turn(Location(_row, _col))
+                _returned = self._finish_turn(Location(_row, _col))
+                self._send_message(_returned)
                 
     
     def _start_move_turn(self, loc: Location):
         return super()._start_move_turn(loc)
     
     def _finish_turn(self, loc: Location) -> PlayerAction:
-        "Finish either move turn or drop turn"
-        assert self._current_hovered_piece is not None
-
-        if self._current_hovered_location is not None:
-            """Finish move turn"""
-            returnable = PlayerAction(
-                ActionType.MOVE,
-                self._active_player,
-                self._current_hovered_location,
-                loc,
-                self._current_hovered_piece.kind
-                )
-        else:
-            "Finish drop turn"
-            returnable = PlayerAction(
-                ActionType.DROP,
-                self._active_player,
-                None,
-                loc,
-                self._current_hovered_piece.kind
-                )
-            
-        self._send_message(returnable)
-
-        return returnable
+        return super()._finish_turn(loc)
     
     def _is_cursor_on_captures(self, pos: tuple[int, int]):
         return super()._is_cursor_on_captures(pos)
