@@ -3412,6 +3412,25 @@
       throw new Error("Failed pattern match at ProjectTypes (line 54, column 1 - line 56, column 19): " + [v.constructor.name]);
     }
   };
+  var eqWinner = {
+    eq: function(x) {
+      return function(y) {
+        if (x instanceof Player12 && y instanceof Player12) {
+          return true;
+        }
+        ;
+        if (x instanceof Player22 && y instanceof Player22) {
+          return true;
+        }
+        ;
+        if (x instanceof Draw && y instanceof Draw) {
+          return true;
+        }
+        ;
+        return false;
+      };
+    }
+  };
   var eqPlayerNum = {
     eq: function(x) {
       return function(y) {
@@ -3868,6 +3887,7 @@
   var lookup2 = /* @__PURE__ */ lookup(ordString);
   var show4 = /* @__PURE__ */ show(showInt);
   var show1 = /* @__PURE__ */ show(showWinner);
+  var notEq3 = /* @__PURE__ */ notEq(eqWinner);
   var show22 = /* @__PURE__ */ show(/* @__PURE__ */ showRecord()()(/* @__PURE__ */ showRecordFieldsCons({
     reflectSymbol: function() {
       return "payload";
@@ -3915,8 +3935,8 @@
   var eq5 = /* @__PURE__ */ eq(eqKind);
   var foldl3 = /* @__PURE__ */ foldl(foldableList);
   var show42 = /* @__PURE__ */ show(showPlayerNum);
-  var notEq1 = /* @__PURE__ */ notEq(/* @__PURE__ */ eqArray(eqString));
-  var notEq22 = /* @__PURE__ */ notEq(eqPlayerNum);
+  var notEq22 = /* @__PURE__ */ notEq(/* @__PURE__ */ eqArray(eqString));
+  var notEq32 = /* @__PURE__ */ notEq(eqPlayerNum);
   var onRender = function(images3) {
     return function(ctx) {
       return function(gameState) {
@@ -3975,8 +3995,8 @@
                   ;
                   if (v instanceof Just) {
                     var image = function() {
-                      var $152 = eq4(gameState.currentPlayer)(v.value0.player);
-                      if ($152) {
+                      var $153 = eq4(gameState.currentPlayer)(v.value0.player);
+                      if ($153) {
                         return getCurrentPlayerImage2(v.value0.kind);
                       }
                       ;
@@ -4011,16 +4031,16 @@
             return function(playerTwoCaptures) {
               var player_one_y_offset = (cell_height + 1) * (1 + toNumber(gameState.rows));
               var is_playertwo_current = function() {
-                var $156 = eq4(gameState.currentPlayer)(Two.value);
-                if ($156) {
+                var $157 = eq4(gameState.currentPlayer)(Two.value);
+                if ($157) {
                   return true;
                 }
                 ;
                 return false;
               }();
               var is_playerone_current = function() {
-                var $157 = eq4(gameState.currentPlayer)(One.value);
-                if ($157) {
+                var $158 = eq4(gameState.currentPlayer)(One.value);
+                if ($158) {
                   return true;
                 }
                 ;
@@ -4036,8 +4056,8 @@
                       ;
                       if (v instanceof Cons) {
                         var image = function() {
-                          var $162 = v3 === true;
-                          if ($162) {
+                          var $163 = v3 === true;
+                          if ($163) {
                             return getCurrentPlayerImage2(v.value0.kind);
                           }
                           ;
@@ -4124,7 +4144,14 @@
               color: "black",
               font: "arial",
               size: 18,
-              text: "Game Verdict: " + show1(gameState.winner.value0)
+              text: "Game Verdict: " + (show1(gameState.winner.value0) + function() {
+                var $170 = notEq3(gameState.winner.value0)(Draw.value);
+                if ($170) {
+                  return " won!";
+                }
+                ;
+                return "";
+              }())
             })();
             return drawText(ctx)({
               x: messageX,
@@ -4146,8 +4173,8 @@
       return function(gameState) {
         var cell_row = floor2((toNumber(v.y) - canvas_offset_y - cell_height) / cell_height);
         var cell_col = floor2((toNumber(v.x) - canvas_offset_x - cell_width) / cell_width);
-        var $173 = gameState.gameStart === true && eq4(gameState.currentPlayer)(gameState.myPlayerNum);
-        if ($173) {
+        var $175 = gameState.gameStart === true && eq4(gameState.currentPlayer)(gameState.myPlayerNum);
+        if ($175) {
           return function __do() {
             send("click " + (show4(cell_col) + (" " + show4(cell_row))))();
             return gameState;
@@ -4172,8 +4199,8 @@
           }
           ;
           if (v1 instanceof Just) {
-            var $177 = v1.value0 === "click";
-            if ($177) {
+            var $179 = v1.value0 === "click";
+            if ($179) {
               var cell_row = function() {
                 var v2 = index(command)(2);
                 if (v2 instanceof Nothing) {
@@ -4233,8 +4260,8 @@
         return function __do() {
           log2("Received Message: " + show22(message2))();
           if (!gameState.gameStart) {
-            var $188 = show32(message2.playerId) === "Player1";
-            if ($188) {
+            var $190 = show32(message2.playerId) === "Player1";
+            if ($190) {
               return {
                 activePiece: gameState.activePiece,
                 board: gameState.board,
@@ -4255,8 +4282,8 @@
               };
             }
             ;
-            var $189 = show32(message2.playerId) === "Player2" && isNothing(gameState.lastReceivedMessage) !== true;
-            if ($189) {
+            var $191 = show32(message2.playerId) === "Player2" && isNothing(gameState.lastReceivedMessage) !== true;
+            if ($191) {
               return {
                 activePiece: gameState.activePiece,
                 board: gameState.board,
@@ -4281,8 +4308,8 @@
           }
           ;
           if (gameState.gameStart) {
-            var $190 = eq4(gameState.myPlayerNum)(gameState.currentPlayer) && (show32(message2.playerId) === "Player1" && eq4(gameState.currentPlayer)(One.value) || show32(message2.playerId) === "Player2" && eq4(gameState.currentPlayer)(Two.value));
-            if ($190) {
+            var $192 = eq4(gameState.myPlayerNum)(gameState.currentPlayer) && (show32(message2.playerId) === "Player1" && eq4(gameState.currentPlayer)(One.value) || show32(message2.playerId) === "Player2" && eq4(gameState.currentPlayer)(Two.value));
+            if ($192) {
               return {
                 activePiece: gameState.activePiece,
                 board: gameState.board,
@@ -4340,8 +4367,8 @@
       return function(gameState) {
         return function __do() {
           (function() {
-            var $191 = key2 === "KeyR";
-            if ($191) {
+            var $193 = key2 === "KeyR";
+            if ($193) {
               return send("reset")();
             }
             ;
@@ -4435,10 +4462,10 @@
         };
       };
       var updateGameOver = function(state3) {
-        var $197 = $$null(protectedPieceMovementCells(0)(0)(state3.board)(One.value));
-        if ($197) {
-          var $198 = $$null(protectedPieceMovementCells(0)(0)(state3.board)(Two.value));
-          if ($198) {
+        var $199 = $$null(protectedPieceMovementCells(0)(0)(state3.board)(One.value));
+        if ($199) {
+          var $200 = $$null(protectedPieceMovementCells(0)(0)(state3.board)(Two.value));
+          if ($200) {
             return {
               tickCount: state3.tickCount,
               lastReceivedMessage: state3.lastReceivedMessage,
@@ -4479,8 +4506,8 @@
           };
         }
         ;
-        var $199 = $$null(protectedPieceMovementCells(0)(0)(state3.board)(Two.value));
-        if ($199) {
+        var $201 = $$null(protectedPieceMovementCells(0)(0)(state3.board)(Two.value));
+        if ($201) {
           return {
             tickCount: state3.tickCount,
             lastReceivedMessage: state3.lastReceivedMessage,
@@ -4541,8 +4568,8 @@
             ;
             throw new Error("Failed pattern match at Main (line 332, column 25 - line 334, column 31): " + [v.constructor.name]);
           }();
-          var $203 = count === 0;
-          if ($203) {
+          var $205 = count === 0;
+          if ($205) {
             return Nil.value;
           }
           ;
@@ -4551,8 +4578,8 @@
             count
           }, helper(drop4(2)(remaining_captured)));
         };
-        var $204 = captured_string === "None";
-        if ($204) {
+        var $206 = captured_string === "None";
+        if ($206) {
           return Nil.value;
         }
         ;
@@ -4579,8 +4606,8 @@
               }
               ;
               if (v instanceof Just) {
-                var $209 = eq4(v.value0.player)(player);
-                if ($209) {
+                var $211 = eq4(v.value0.player)(player);
+                if ($211) {
                   return new Just(v.value0);
                 }
                 ;
@@ -4618,8 +4645,8 @@
         }
         ;
         if (v instanceof Just) {
-          var $212 = eq4(v.value0.player)(state3.currentPlayer);
-          if ($212) {
+          var $214 = eq4(v.value0.player)(state3.currentPlayer);
+          if ($214) {
             return {
               tickCount: state3.tickCount,
               lastReceivedMessage: state3.lastReceivedMessage,
@@ -4711,8 +4738,8 @@
       var makeMove = function(state3) {
         var removePiece = function(row) {
           var checker2 = function(to_compare) {
-            var $216 = eq42(state3.activePiece)(to_compare);
-            if ($216) {
+            var $218 = eq42(state3.activePiece)(to_compare);
+            if ($218) {
               return Nothing.value;
             }
             ;
@@ -4721,8 +4748,8 @@
           return map6(checker2)(row);
         };
         var new_piece = function() {
-          var $217 = valid_move === true;
-          if ($217) {
+          var $219 = valid_move === true;
+          if ($219) {
             if (state3.activePiece instanceof Nothing) {
               return Nothing.value;
             }
@@ -4749,8 +4776,8 @@
             ;
             if (v instanceof Cons) {
               if (eq5(v.value0.kind)(v1.kind)) {
-                var $222 = v.value0.count === 1;
-                if ($222) {
+                var $224 = v.value0.count === 1;
+                if ($224) {
                   return v.value1;
                 }
                 ;
@@ -4873,18 +4900,18 @@
             throw new Error("Failed pattern match at Main (line 188, column 9 - line 188, column 66): " + [captured.constructor.name, activePiece.constructor.name]);
           };
         };
-        var $239 = valid_move === true;
-        if ($239) {
+        var $241 = valid_move === true;
+        if ($241) {
           if (state3.activePiece instanceof Nothing) {
             return state3;
           }
           ;
           if (state3.activePiece instanceof Just) {
             var next_player = function() {
-              var $241 = state3.moveCount === 1;
-              if ($241) {
-                var $242 = eq4(state3.currentPlayer)(One.value);
-                if ($242) {
+              var $243 = state3.moveCount === 1;
+              if ($243) {
+                var $244 = eq4(state3.currentPlayer)(One.value);
+                if ($244) {
                   return Two.value;
                 }
                 ;
@@ -4894,15 +4921,15 @@
               return state3.currentPlayer;
             }();
             var checker = function() {
-              var $243 = state3.moveCount === 1;
-              if ($243) {
+              var $245 = state3.moveCount === 1;
+              if ($245) {
                 return 3;
               }
               ;
               return state3.moveCount - 1 | 0;
             }();
-            var $244 = eq4(state3.currentPlayer)(One.value);
-            if ($244) {
+            var $246 = eq4(state3.currentPlayer)(One.value);
+            if ($246) {
               return {
                 tickCount: state3.tickCount,
                 lastReceivedMessage: state3.lastReceivedMessage,
@@ -5012,8 +5039,8 @@
               ;
               if (v instanceof Just) {
                 return kindToBoardFormat(v.value0.kind) + function() {
-                  var $252 = eq4(v.value0.player)(One.value);
-                  if ($252) {
+                  var $254 = eq4(v.value0.player)(One.value);
+                  if ($254) {
                     return "1" + getBoardMessage(col + 1 | 0)(row)(board);
                   }
                   ;
@@ -5040,18 +5067,18 @@
         }
         ;
         if (state3.lastReceivedMessage instanceof Just) {
-          var $255 = state3.lastReceivedMessage.value0.payload === "reset";
-          if ($255) {
-            var $256 = eq4(gameState.myPlayerNum)(One.value);
-            if ($256) {
+          var $257 = state3.lastReceivedMessage.value0.payload === "reset";
+          if ($257) {
+            var $258 = eq4(gameState.myPlayerNum)(One.value);
+            if ($258) {
               return initialState;
             }
             ;
             return pure4(state3);
           }
           ;
-          var $257 = take5(5)(state3.lastReceivedMessage.value0.payload) === "init2";
-          if ($257) {
+          var $259 = take5(5)(state3.lastReceivedMessage.value0.payload) === "init2";
+          if ($259) {
             return initialState;
           }
           ;
@@ -5124,8 +5151,8 @@
       var initializeGame = function(state3) {
         return function __do() {
           (function() {
-            var $265 = state3.initialized === false;
-            if ($265) {
+            var $267 = state3.initialized === false;
+            if ($267) {
               return send("init1 " + (show4(state3.columns) + (" " + (show4(state3.rows) + (" " + getBoardMessage(0)(0)(state3.board))))))();
             }
             ;
@@ -5137,13 +5164,13 @@
             }
             ;
             if (state3.lastReceivedMessage instanceof Just) {
-              var $267 = show32(state3.lastReceivedMessage.value0.playerId) === "Player1";
-              if ($267) {
+              var $269 = show32(state3.lastReceivedMessage.value0.playerId) === "Player1";
+              if ($269) {
                 return "One";
               }
               ;
-              var $268 = show32(state3.lastReceivedMessage.value0.playerId) === "Player2";
-              if ($268) {
+              var $270 = show32(state3.lastReceivedMessage.value0.playerId) === "Player2";
+              if ($270) {
                 return "Two";
               }
               ;
@@ -5158,13 +5185,13 @@
             }
             ;
             if (state3.lastReceivedMessage instanceof Just) {
-              var $271 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "1";
-              if ($271) {
+              var $273 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "1";
+              if ($273) {
                 return One.value;
               }
               ;
-              var $272 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "2";
-              if ($272) {
+              var $274 = take5(1)(drop4(4)(state3.lastReceivedMessage.value0.payload)) === "2";
+              if ($274) {
                 return Two.value;
               }
               ;
@@ -5179,8 +5206,8 @@
             }
             ;
             if (state3.lastReceivedMessage instanceof Just) {
-              var $275 = take5(4)(state3.lastReceivedMessage.value0.payload) === "init";
-              if ($275) {
+              var $277 = take5(4)(state3.lastReceivedMessage.value0.payload) === "init";
+              if ($277) {
                 return split(" ")(drop4(6)(state3.lastReceivedMessage.value0.payload));
               }
               ;
@@ -5189,10 +5216,10 @@
             ;
             throw new Error("Failed pattern match at Main (line 395, column 19 - line 399, column 20): " + [state3.lastReceivedMessage.constructor.name]);
           }();
-          var $277 = notEq1(message2)([]);
-          if ($277) {
-            var $278 = player === "One" && state3.initialized === false;
-            if ($278) {
+          var $279 = notEq22(message2)([]);
+          if ($279) {
+            var $280 = player === "One" && state3.initialized === false;
+            if ($280) {
               var new_rows = function() {
                 var v = index(message2)(1);
                 if (v instanceof Nothing) {
@@ -5244,8 +5271,8 @@
                 return v;
               }();
               var new_board = function() {
-                var $288 = length(board_array) === new_rows;
-                if ($288) {
+                var $290 = length(board_array) === new_rows;
+                if ($290) {
                   return constructBoard(0)(new_columns)(board_array);
                 }
                 ;
@@ -5271,8 +5298,8 @@
               };
             }
             ;
-            var $289 = player === "Two";
-            if ($289) {
+            var $291 = player === "Two";
+            if ($291) {
               return {
                 activePiece: state3.activePiece,
                 board: state3.board,
@@ -5318,8 +5345,8 @@
           }
           ;
           if (v instanceof Just) {
-            var $293 = v.value0 === "click";
-            if ($293) {
+            var $295 = v.value0 === "click";
+            if ($295) {
               return true;
             }
             ;
@@ -5329,8 +5356,8 @@
           throw new Error("Failed pattern match at Main (line 354, column 22 - line 358, column 23): " + [v.constructor.name]);
         }();
         var player_one_captures = function() {
-          var $295 = is_command === true;
-          if ($295) {
+          var $297 = is_command === true;
+          if ($297) {
             return state3.playerOneCaptures;
           }
           ;
@@ -5346,8 +5373,8 @@
           throw new Error("Failed pattern match at Main (line 362, column 16 - line 364, column 47): " + [v.constructor.name]);
         }();
         var player_two_captures = function() {
-          var $298 = is_command === true;
-          if ($298) {
+          var $300 = is_command === true;
+          if ($300) {
             return state3.playerTwoCaptures;
           }
           ;
@@ -5375,8 +5402,8 @@
         }();
         var board = drop(3)(payload_arr);
         var new_board = function() {
-          var $303 = length(board) === state3.rows;
-          if ($303) {
+          var $305 = length(board) === state3.rows;
+          if ($305) {
             return constructBoard(0)(state3.columns)(board);
           }
           ;
@@ -5397,13 +5424,13 @@
           myPlayerNum: state3.myPlayerNum,
           board: new_board,
           currentPlayer: function() {
-            var $304 = current_player === "One";
-            if ($304) {
+            var $306 = current_player === "One";
+            if ($306) {
               return One.value;
             }
             ;
-            var $305 = current_player === "Two";
-            if ($305) {
+            var $307 = current_player === "Two";
+            if ($307) {
               return Two.value;
             }
             ;
@@ -5418,8 +5445,8 @@
       }
       ;
       if (gameState.gameStart) {
-        var $307 = notEq22(gameState.myPlayerNum)(gameState.currentPlayer);
-        if ($307) {
+        var $309 = notEq32(gameState.myPlayerNum)(gameState.currentPlayer);
+        if ($309) {
           if (gameState.winner instanceof Nothing) {
             return pure4(updateGameOver(updateTickCount(readStateMessage(gameState))));
           }
@@ -5432,8 +5459,8 @@
         }
         ;
         if (gameState.winner instanceof Nothing) {
-          var $311 = valid_move === true;
-          if ($311) {
+          var $313 = valid_move === true;
+          if ($313) {
             return sendStateMessage(updateGameOver(updateTickCount(updatePossibleMoves(updateActivePiece(makeMove(gameState))))));
           }
           ;

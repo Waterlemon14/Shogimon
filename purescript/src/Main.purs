@@ -641,7 +641,7 @@ onRender images ctx gameState = do
   case gameState.winner of 
     Nothing -> pure unit
     Just winner -> do
-      drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Game Verdict: " <> show winner }
+      drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Game Verdict: " <> show winner <> if winner /= Draw then " won!" else ""}
       drawText ctx { x: messageX, y: messageY + (toNumber size), color: color, font: font, size: size, text: "Press R to restart the game" }
 
   -- This can be used to check messages received or to print something
