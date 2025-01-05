@@ -45,26 +45,75 @@ class OnlineView(GameView):
         return super()._render_text(text)
 
     def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
-        return super()._mouse_press_on_board(abs_pos)
+        """When mouse is clicked inside RenderableBoard rect"""
+        if self._game_status == GameStatus.ONGOING:
+            _row = (abs_pos[1] - 105) // TILE_PIXELS
+            _col = (abs_pos[0] - 129) // TILE_PIXELS
+
+            tile = self._renderable_board.get_tile(Location(_row,_col))
+
+            if tile.occupier is not None and tile.occupier.owner == self._active_player:
+                self._start_move_turn(Location(_row,_col))
+
+            elif tile.is_targetable and self._current_hovered_piece is not None:
+                self._finish_turn(Location(_row, _col))
+                self._rerender_after_turn()
     
     def _start_move_turn(self, loc: Location):
         return super()._start_move_turn(loc)
     
     def _finish_turn(self, loc: Location) -> PlayerAction:
-        return super()._finish_turn(loc)
+        "Finish either move turn or drop turn"
+        assert self._current_hovered_piece is not None
+
+        if self._current_hovered_location is not None:
+            """Finish move turn"""
+            returnable = PlayerAction(
+                ActionType.MOVE,
+                self._active_player,
+                self._current_hovered_location,
+                loc,
+                self._current_hovered_piece.kind
+                )
+        else:
+            "Finish drop turn"
+            returnable = PlayerAction(
+                ActionType.DROP,
+                self._active_player,
+                None,
+                loc,
+                self._current_hovered_piece.kind
+                )
+            
+        self._send_message(returnable)
+
+        return returnable
     
     def _is_cursor_on_captures(self, pos: tuple[int, int]):
         return super()._is_cursor_on_captures(pos)
+    
+    def _send_message(self, action: PlayerAction):
+
+        message = self._parse_to_message(action)
+        if message:
+            self._networking.send(Message.payload)
 
     def _receive_message(self, message: Message):
         """
         Use received message to manipulate client
         --- Mergable with parse_to_game_state? Since it's gonna be related to on_state_change lang din naman anyway
         """
+        action = self._parse_to_player_action(message)
+        if action:
+            self._make_turn(action)
         ...
 
-    def _parse_to_gamestate(self, message: Message) -> GameState | None:
-        """Convert type message to GameState (if valid; else None)"""
+    def _parse_to_player_action(self, message: Message) -> PlayerAction | None:
+        """Convert type message to PlayerAction (if valid; else None)"""
+        ...
+
+    def _parse_to_message(self, action: PlayerAction) -> Message | None:
+        """Convert type PlayerActiont to message (if valid; else None)"""
         ...
 
     def run(self):
