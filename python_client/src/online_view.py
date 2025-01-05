@@ -94,7 +94,7 @@ class OnlineView(GameView):
                     self._new_game()
                     self._init_view_state()
 
-                elif self._is_cursor_on_captures(event.pos):
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self._renderable_board.rect.collidepoint(event.pos):
                         self._mouse_press_on_board(event.pos)
                     

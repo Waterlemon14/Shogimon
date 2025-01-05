@@ -4,7 +4,7 @@ from controller import GameController
 from cs150241project_networking import CS150241ProjectNetworking
 
 if __name__ == '__main__':
-    networking = CS150241ProjectNetworking.connect('localhost', 1500)
+    networking = CS150241ProjectNetworking.connect('localhost', 15000)
     model = OnlineModel.default()
 
     model.register_network(networking)
