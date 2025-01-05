@@ -252,13 +252,13 @@ class GameView:
     def _evaluate_winner(self):
         """Evaluate game-end on-screen render"""
         if self._game_status == GameStatus.PLAYER_WIN:
-            self._render_text_result("Game Verdict: Player 1 won!")
+            self._render_text("Game Verdict: Player 1 won!")
 
         elif self._game_status == GameStatus.PLAYER_LOSE:
-            self._render_text_result("Game Verdict: Player 2 won!")
+            self._render_text("Game Verdict: Player 2 won!")
             
         elif self._game_status == GameStatus.GAME_DRAW:
-            self._render_text_result("Game Verdict: Draw")
+            self._render_text("Game Verdict: Draw")
 
     def _make_turn(self, action: PlayerAction):
         "For interaction with controller"
@@ -270,7 +270,8 @@ class GameView:
         for observer in self._new_game_observers:
             observer.on_new_game()
 
-    def _render_text_result(self, text: str):
+    def _render_text(self, text: str):
+        """Print text on screen using Pygame"""
         result_text = self._font.render(text, True, 'black')
         _blittable = result_text.get_rect(center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
 
