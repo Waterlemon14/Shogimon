@@ -1,9 +1,3 @@
-"""
-COMMENT:
-I feel like since we're implementing an online-ish game, we're going to need another observer?
-Something related to observing input from opposing player (and not input from view.py of current player)
-"""
-
 from model import GameModel
 from view import GameView
 from project_types import GameState, GameStateChangeObserver, PlayerAction
