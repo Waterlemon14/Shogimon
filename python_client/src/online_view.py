@@ -17,33 +17,6 @@ class OnlineView(GameView):
         self._networking = CS150241ProjectNetworking.connect('localhost', 15000)
         self._server_id = self._networking.player_id
 
-    def _init_view_state(self):
-        return super()._init_view_state()
-    
-    def on_state_change(self, state: GameState):
-        return super().on_state_change(state)
-    
-    def _rerender_after_turn(self):
-        return super()._rerender_after_turn()
-    
-    def register_make_turn_observer(self, observer: MakeTurnObserver):
-        return super().register_make_turn_observer(observer)
-    
-    def register_new_game_observer(self, observer: NewGameObserver):
-        return super().register_new_game_observer(observer)
-    
-    def _evaluate_winner(self):
-        return super()._evaluate_winner()
-    
-    def _make_turn(self, action: PlayerAction):
-        return super()._make_turn(action)
-    
-    def _new_game(self):
-        return super()._new_game()
-    
-    def _render_text(self, text: str):
-        return super()._render_text(text)
-
     def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
         """When mouse is clicked inside RenderableBoard rect"""
         if self._game_status == GameStatus.ONGOING:
@@ -56,18 +29,8 @@ class OnlineView(GameView):
                 self._start_move_turn(Location(_row,_col))
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
-                _returned = self._finish_turn(Location(_row, _col))
-                self._send_message(_returned)
-                
-    
-    def _start_move_turn(self, loc: Location):
-        return super()._start_move_turn(loc)
-    
-    def _finish_turn(self, loc: Location) -> PlayerAction:
-        return super()._finish_turn(loc)
-    
-    def _is_cursor_on_captures(self, pos: tuple[int, int]):
-        return super()._is_cursor_on_captures(pos)
+                _player_turn = self._finish_turn(Location(_row, _col))
+                self._send_message(_player_turn)
     
     def _send_message(self, action: PlayerAction):
         """Same as make_turn, but for online purposes"""
@@ -83,7 +46,6 @@ class OnlineView(GameView):
         if action:
             self._make_turn(action)
             self._rerender_after_turn()
-        ...
     
     def _parse_to_player_action(self, message: Message) -> PlayerAction | None:
         """Convert type message to PlayerAction (if valid; else None)"""
@@ -120,7 +82,6 @@ class OnlineView(GameView):
         payload = f"{action.action_type.value}%{action.player.value}%{source_loc}%{action.target_location.row}-{action.target_location.col}%{action.kind}"
 
         return Message(source=self._server_id, payload=payload)
-
 
     def run(self):
         """Edited to incorporate networking"""

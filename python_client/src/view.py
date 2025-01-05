@@ -293,8 +293,8 @@ class GameView:
                 self._start_move_turn(Location(_row,_col))
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
-                _returned = self._finish_turn(Location(_row, _col))
-                self._make_turn(_returned)
+                _player_turn = self._finish_turn(Location(_row, _col))
+                self._make_turn(_player_turn)
                 self._rerender_after_turn()
 
     def _start_move_turn(self, loc: Location):
