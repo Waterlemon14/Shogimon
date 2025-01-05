@@ -96,7 +96,7 @@ class OnlineView(GameView):
 
         message = self._parse_to_message(action)
         if message:
-            self._networking.send(Message.payload)
+            self._networking.send(message.payload)
 
     def _receive_message(self, message: Message):
         """
