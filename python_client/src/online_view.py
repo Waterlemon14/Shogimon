@@ -101,20 +101,44 @@ class OnlineView(GameView):
     def _receive_message(self, message: Message):
         """
         Use received message to manipulate client
-        --- Mergable with parse_to_game_state? Since it's gonna be related to on_state_change lang din naman anyway
         """
         action = self._parse_to_player_action(message)
         if action:
             self._make_turn(action)
         ...
-
+    
     def _parse_to_player_action(self, message: Message) -> PlayerAction | None:
         """Convert type message to PlayerAction (if valid; else None)"""
-        ...
+        payload = message.payload
+        properties = payload.split('%')
 
+        if len(properties) != 5:
+            return None
+        
+        action_type = ActionType.MOVE if properties[0] == ActionType.MOVE else ActionType.DROP
+
+        if action_type == ActionType.DROP:
+            source_location = None
+        else:
+            source_location = Location(int(properties[2][0]), int(properties[2][2]))
+        
+        return PlayerAction(
+            action_type=action_type,
+            player=PlayerNumber.ONE if properties[1] == PlayerNumber.ONE else PlayerNumber.TWO,
+            source_location=source_location,
+            target_location=Location(int(properties[3][0]), int(properties[3][2])),
+            kind=PieceKind[properties[4]]
+        )
+    
     def _parse_to_message(self, action: PlayerAction) -> Message | None:
-        """Convert type PlayerActiont to message (if valid; else None)"""
-        ...
+        """Convert type PlayerAction to message (if valid; else None) \n
+        """
+
+        source_loc = f"{action.source_location.row}-{action.source_location.col}" if action.source_location else f""
+        payload = f"{action.action_type.value}%{action.player.value}%{source_loc}%{action.target_location.row}-{action.target_location.col}%{action.kind}"
+
+        return Message(self._server_id, payload)
+
 
     def run(self):
         """Edited to incorporate networking"""
