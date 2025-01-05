@@ -116,7 +116,10 @@ class OnlineModel(GameModel):
             for pnum, pkind, row, col in all
             ]
 
-        def get_positions() -> list[tuple[PlayerNumber, PieceKind, Location]]:
-            return positions
+        return NewPiecePositions(positions)
 
-        return type('NewPiecePositions', (), {"get_positions": get_positions})  
+class NewPiecePositions:
+    def __init__(self, positions: list[tuple[PlayerNumber, PieceKind, Location]]) -> None:
+        self._positions = positions
+    def get_positions(self) -> list[tuple[PlayerNumber, PieceKind, Location]]:
+        return self._positions
