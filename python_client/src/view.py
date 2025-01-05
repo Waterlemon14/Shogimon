@@ -286,34 +286,43 @@ class GameView:
             tile = self._renderable_board.get_tile(Location(_row,_col))
 
             if tile.occupier is not None and tile.occupier.owner == self._active_player:
-                """Hover piece (to see possible moves)"""
-                self._current_hovered_location = Location(_row,_col)
-                self._current_hovered_piece = self._renderable_board.get_tile(Location(_row, _col)).occupier
-
-                self._renderable_board.mark_nearby_targetable(Location(_row,_col))
+                self._start_move_turn(Location(_row,_col))
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
-                if self._current_hovered_location is not None:
-                    """Finish move turn"""
-                    self._make_turn(PlayerAction(
-                        ActionType.MOVE,
-                        self._active_player,
-                        self._current_hovered_location,
-                        Location(_row, _col),
-                        self._current_hovered_piece.kind
-                        ))
-                    self._rerender_after_turn()
+                self._finish_turn(Location(_row, _col))
 
-                else:
-                    "Finish drop turn"
-                    self._make_turn(PlayerAction(
-                        ActionType.DROP,
-                        self._active_player,
-                        None,
-                        Location(_row, _col),
-                        self._current_hovered_piece.kind
-                        ))
-                    self._rerender_after_turn()
+    def _start_move_turn(self, loc: Location):
+        """Hover piece (to see possible moves)"""
+        self._current_hovered_location = loc
+        self._current_hovered_piece = self._renderable_board.get_tile(loc).occupier
+
+        self._renderable_board.mark_nearby_targetable(loc)
+
+    def _finish_turn(self, loc: Location):
+        "Finish either move turn or drop turn"
+        assert self._current_hovered_piece is not None
+
+        if self._current_hovered_location is not None:
+            """Finish move turn"""
+            self._make_turn(PlayerAction(
+                ActionType.MOVE,
+                self._active_player,
+                self._current_hovered_location,
+                loc,
+                self._current_hovered_piece.kind
+                ))
+
+        else:
+            "Finish drop turn"
+            self._make_turn(PlayerAction(
+                ActionType.DROP,
+                self._active_player,
+                None,
+                loc,
+                self._current_hovered_piece.kind
+                ))
+            
+        self._rerender_after_turn()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
