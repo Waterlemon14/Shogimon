@@ -342,6 +342,10 @@ class GameView:
 
             self._renderable_board.mark_droppable(self._current_hovered_piece.moves)
 
+    def _is_cursor_on_captures(self, pos: tuple[int, int]):
+        return (self._active_player == PlayerNumber.ONE and self._captures_p1.rect.collidepoint(pos)) \
+                    or (self._active_player == PlayerNumber.TWO and self._captures_p2.rect.collidepoint(pos))
+
     def run(self):
         """Main game running logic; Equivalent to main()"""
         pygame.init()
@@ -364,8 +368,7 @@ class GameView:
                     if self._renderable_board.rect.collidepoint(event.pos):
                         self._mouse_press_on_board(event.pos)
                     
-                    elif (self._active_player == PlayerNumber.ONE and self._captures_p1.rect.collidepoint(event.pos)) \
-                    or (self._active_player == PlayerNumber.TWO and self._captures_p2.rect.collidepoint(event.pos)):
+                    elif self._is_cursor_on_captures(event.pos):
                         self._mouse_press_on_captures(event.pos, self._active_player)
 
             self._screen.fill('black')
