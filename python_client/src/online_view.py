@@ -55,26 +55,14 @@ class OnlineView(GameView):
             return None
         
         action_type = ActionType.MOVE if properties[0] == ActionType.MOVE else ActionType.DROP
-
         player_number = PlayerNumber.ONE if properties[1] == PlayerNumber.ONE else PlayerNumber.TWO
+        source_location = None \
+            if (action_type == ActionType.DROP) \
+                else Location(int(properties[2][0]), int(properties[2][2]))
+        target_location = Location(int(properties[3][0]), int(properties[3][2]))
+        kind = PieceKind(properties[4])
 
-        if action_type == ActionType.DROP:
-            source_location = None
-        else:
-            source_location = Location(int(properties[2][0]), int(properties[2][2]))
-
-        kind = PieceKind.EEVEE
-        for k in PieceKind:
-            if k.value == properties[4]:
-                kind = k
-
-        return PlayerAction(
-            action_type,
-            player_number,
-            source_location,
-            Location(int(properties[3][0]), int(properties[3][2])),
-            kind
-            )
+        return PlayerAction(action_type, player_number, source_location, target_location, kind)
     
     def _parse_to_message(self, action: PlayerAction) -> Message | None:
         """Convert type PlayerAction to message (if valid; else None)"""
