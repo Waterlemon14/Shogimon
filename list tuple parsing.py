@@ -12,7 +12,7 @@ def to_string(data: list[tuple[PlayerNumber, PieceKind, Location]]) -> str:
     returnable: list[str] = []
 
     for item in data:
-        returnable.append(f"{ item[0].value }-{ item[1].value }-{ item[2].row},{item[2].col }")
+        returnable.append(f"{ item[0].value }-{ item[1].value }-{ item[2].row },{ item[2].col }")
 
     return " ".join(returnable)
 
@@ -23,7 +23,10 @@ def to_message(s: str) -> list[tuple[PlayerNumber, PieceKind, Location]]:
 
     _all: list[list[str]] = [item.split("-") for item in _tuples]
 
-    _returnable = [ (PlayerNumber(pnum), PieceKind(pkind), Location(*intparser(loc.split(",")))) for pnum, pkind, loc in _all ]
+    _returnable = [
+        (PlayerNumber(pnum), PieceKind(pkind), Location(*intparser(loc.split(","))))
+        for pnum, pkind, loc in _all
+        ]
 
     return _returnable
 
