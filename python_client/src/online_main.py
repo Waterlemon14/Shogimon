@@ -3,6 +3,8 @@ from online_view import OnlineView
 from controller import GameController
 
 if __name__ == '__main__':
+
+
     model = OnlineModel.default()
     view = OnlineView(model.state)
 

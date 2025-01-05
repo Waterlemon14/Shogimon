@@ -71,7 +71,6 @@ class PlayerAction:
 
 @dataclass(frozen=True)
 class GameState:
-    player_number: PlayerNumber
     active_player: PlayerNumber
     captured_pieces: list[LivePiece]
     live_pieces: list[LivePiece]

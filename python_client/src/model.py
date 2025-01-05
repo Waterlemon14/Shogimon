@@ -412,7 +412,6 @@ class GameModel:
 
 
         state = GameState(
-            player_number = PlayerNumber.ONE,
             active_player = PlayerNumber.ONE,
             captured_pieces= board.get_captured_pieces(),
             live_pieces=board.get_live_pieces(),
@@ -434,23 +433,20 @@ class GameModel:
     def state(self) -> GameState:
         return self._state
     
-    def _update_state(self):
-
+    def _update_turn_status(self):
         if self._action_count == 0:
             self._active_player = PlayerNumber.ONE if self._active_player == PlayerNumber.TWO else PlayerNumber.TWO
             self._action_count = 3
-
+    
+    def _update_state(self):
 
         self._state = GameState(
-            player_number = PlayerNumber.ONE,
             active_player = self._active_player,
             captured_pieces= self._board.get_captured_pieces(),
             live_pieces=self._board.get_live_pieces(),
             action_count=self._action_count,
             game_status=self._game_status
         )
-
-
 
     def _check_if_game_over(self) -> PlayerNumber | None:
         board = self._board
@@ -504,6 +500,7 @@ class GameModel:
 
         self._action_count -= 1
         self._check_if_game_over()
+        self._update_turn_status()
         self._update_state()
         
     def new_game(self):
@@ -512,7 +509,6 @@ class GameModel:
         setter.set_board(self._board)
 
         self._state = GameState(
-            player_number = PlayerNumber.ONE,
             active_player = PlayerNumber.ONE,
             captured_pieces= self._board.get_captured_pieces(),
             live_pieces=self._board.get_live_pieces(),
