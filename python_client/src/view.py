@@ -252,13 +252,13 @@ class GameView:
     def _evaluate_winner(self):
         """Evaluate game-end on-screen render"""
         if self._game_status == GameStatus.PLAYER_WIN:
-            self._render_text_result("YOU WIN")
+            self._render_text_result("Game Verdict: Player 1 won!")
 
         elif self._game_status == GameStatus.PLAYER_LOSE:
-            self._render_text_result("YOU LOSE")
+            self._render_text_result("Game Verdict: Player 2 won!")
             
         elif self._game_status == GameStatus.GAME_DRAW:
-            self._render_text_result("GAME RESULTED IN STALEMATE")
+            self._render_text_result("Game Verdict: Draw")
 
     def _make_turn(self, action: PlayerAction):
         "For interaction with controller"
