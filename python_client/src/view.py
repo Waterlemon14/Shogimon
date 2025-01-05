@@ -1,3 +1,7 @@
+"""
+Offline implementation of the game (pass and play);
+Implemented first before online version in online_view, i.e. GameView superclasses OnlineView.
+"""
 import pygame
 
 from project_types import (
