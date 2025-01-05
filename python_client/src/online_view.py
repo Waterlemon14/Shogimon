@@ -121,13 +121,18 @@ class OnlineView(GameView):
             source_location = None
         else:
             source_location = Location(int(properties[2][0]), int(properties[2][2]))
+
+        kind = PieceKind.EEVEE
+        for k in PieceKind:
+            if k.value == properties[4]:
+                kind = k
         
         return PlayerAction(
             action_type=action_type,
             player=PlayerNumber.ONE if properties[1] == PlayerNumber.ONE else PlayerNumber.TWO,
             source_location=source_location,
             target_location=Location(int(properties[3][0]), int(properties[3][2])),
-            kind=PieceKind[properties[4]]
+            kind=kind
         )
     
     def _parse_to_message(self, action: PlayerAction) -> Message | None:
