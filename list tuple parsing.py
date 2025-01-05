@@ -1,6 +1,4 @@
-from dataclasses import asdict, fields, is_dataclass
-import json
-
+from dataclasses import 
 from python_client.src.project_types import PlayerNumber, PieceKind, Location
 
 parseable = [

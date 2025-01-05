@@ -11,11 +11,11 @@ from view import *
 
 class OnlineView(GameView):
     """MVC class for online implementation"""
-    def __init__(self, state: GameState):
+    def __init__(self, state: GameState, networking: CS150241ProjectNetworking):
         super().__init__(state)
 
-        self._networking = CS150241ProjectNetworking.connect('localhost', 15000)
-        self._server_id = self._networking.player_id
+        self._networking = networking
+        self._server_id = networking.player_id
 
     def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
         """When mouse is clicked inside RenderableBoard rect"""

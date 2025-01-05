@@ -406,8 +406,8 @@ class GameModel:
     def default(cls) -> Self:
 
         board = Board(BOARD_ROWS, BOARD_COLS)
-
-        setter = BoardSetter(DefaultPositions())
+        positions = DefaultPositions()
+        setter = BoardSetter(positions)
         setter.set_board(board)
 
 
@@ -419,15 +419,18 @@ class GameModel:
             game_status=GameStatus.ONGOING
         )
 
-        return cls(state, board, PlayerNumber.ONE, 3)
+        return cls(state, board, PlayerNumber.ONE, 3, BOARD_ROWS, BOARD_COLS, positions)
 
 
-    def __init__(self, state: GameState, board: Board, player: PlayerNumber, action_count: int):
+    def __init__(self, state: GameState, board: Board, player: PlayerNumber, action_count: int, height: int, width: int, positions: PiecePositions):
         self._state = state
         self._board = board
         self._active_player = player
         self._action_count = action_count
         self._game_status: GameStatus = GameStatus.ONGOING
+        self._height = height
+        self._width = width
+        self._positions = positions
     
     @property
     def state(self) -> GameState:
@@ -504,7 +507,7 @@ class GameModel:
         self._update_state()
         
     def new_game(self):
-        self._board = Board(BOARD_ROWS, BOARD_COLS)
+        self._board = Board(self._height, self._width)
         setter = BoardSetter(DefaultPositions())
         setter.set_board(self._board)
 
