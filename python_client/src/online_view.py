@@ -56,15 +56,15 @@ class OnlineView(GameView):
     def _is_cursor_on_captures(self, pos: tuple[int, int]):
         return super()._is_cursor_on_captures(pos)
 
-    def _parse_to_gamestate(self, message: Message) -> GameState | None:
-        """Convert type message to GameState (if valid; else None)"""
-        ...
-
     def _receive_message(self, message: Message):
         """
         Use received message to manipulate client
         --- Mergable with parse_to_game_state? Since it's gonna be related to on_state_change lang din naman anyway
         """
+        ...
+
+    def _parse_to_gamestate(self, message: Message) -> GameState | None:
+        """Convert type message to GameState (if valid; else None)"""
         ...
 
     def run(self):
@@ -89,15 +89,16 @@ class OnlineView(GameView):
                     self._init_view_state()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    _to_send = "INVALID"
+                    """Create string _to_message; to be sent to the networking server"""
+                    _to_send = 'INVALID'
 
                     if self._renderable_board.rect.collidepoint(event.pos):
                         self._mouse_press_on_board(event.pos)
-                        _to_send = "..."
+                        _to_send = '...'
                     
                     elif self._is_cursor_on_captures(event.pos):
                         self._mouse_press_on_captures(event.pos, self._active_player)
-                        _to_send = "..."
+                        _to_send = '...'
                         
                     self._networking.send(_to_send)
 
