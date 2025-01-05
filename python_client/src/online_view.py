@@ -57,7 +57,7 @@ class OnlineView(GameView):
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
                 self._finish_turn(Location(_row, _col))
-                self._rerender_after_turn()
+                
     
     def _start_move_turn(self, loc: Location):
         return super()._start_move_turn(loc)
@@ -105,6 +105,7 @@ class OnlineView(GameView):
         action = self._parse_to_player_action(message)
         if action:
             self._make_turn(action)
+            self._rerender_after_turn()
         ...
     
     def _parse_to_player_action(self, message: Message) -> PlayerAction | None:
