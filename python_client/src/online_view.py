@@ -167,7 +167,7 @@ class OnlineView(GameView):
                     self._new_game()
                     self._init_view_state()
 
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and ((self._server_id == 1 and self._active_player == PlayerNumber.ONE) or (self._server_id == 2 and self._active_player == PlayerNumber.TWO)):
                     """Create string _to_message; to be sent to the networking server"""
                     _to_send = 'INVALID'
 
