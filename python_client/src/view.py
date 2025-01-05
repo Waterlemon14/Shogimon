@@ -299,29 +299,32 @@ class GameView:
 
         self._renderable_board.mark_nearby_targetable(loc)
 
-    def _finish_turn(self, loc: Location):
+    def _finish_turn(self, loc: Location) -> PlayerAction:
         "Finish either move turn or drop turn"
         assert self._current_hovered_piece is not None
 
         if self._current_hovered_location is not None:
             """Finish move turn"""
-            self._make_turn(PlayerAction(
+            returnable = PlayerAction(
                 ActionType.MOVE,
                 self._active_player,
                 self._current_hovered_location,
                 loc,
                 self._current_hovered_piece.kind
-                ))
-
+                )
         else:
             "Finish drop turn"
-            self._make_turn(PlayerAction(
+            returnable = PlayerAction(
                 ActionType.DROP,
                 self._active_player,
                 None,
                 loc,
                 self._current_hovered_piece.kind
-                ))
+                )
+            
+        self._make_turn(returnable)
+
+        return returnable
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
