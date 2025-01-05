@@ -290,6 +290,7 @@ class GameView:
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
                 self._finish_turn(Location(_row, _col))
+                self._rerender_after_turn()
 
     def _start_move_turn(self, loc: Location):
         """Hover piece (to see possible moves)"""
@@ -321,8 +322,6 @@ class GameView:
                 loc,
                 self._current_hovered_piece.kind
                 ))
-            
-        self._rerender_after_turn()
 
     def _mouse_press_on_captures(self, abs_pos: tuple[int, int], player: PlayerNumber):
         """When mouse is clicked inside Captures rect"""
