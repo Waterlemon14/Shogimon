@@ -53,7 +53,7 @@ class OnlineView(GameView):
 
         if len(properties) != 5:
             return None
-        
+
         action_type = ActionType.MOVE if properties[0] == ActionType.MOVE else ActionType.DROP
         player_number = PlayerNumber.ONE if properties[1] == PlayerNumber.ONE else PlayerNumber.TWO
         source_location = None \
@@ -92,19 +92,12 @@ class OnlineView(GameView):
                     self._new_game()
                     self._init_view_state()
 
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and ((self._server_id == 1 and self._active_player == PlayerNumber.ONE) or (self._server_id == 2 and self._active_player == PlayerNumber.TWO)):
-                    """Create string _to_message; to be sent to the networking server"""
-                    _to_send = 'INVALID'
-
+                elif self._is_cursor_on_captures(event.pos):
                     if self._renderable_board.rect.collidepoint(event.pos):
                         self._mouse_press_on_board(event.pos)
-                        _to_send = '...'
                     
                     elif self._is_cursor_on_captures(event.pos):
                         self._mouse_press_on_captures(event.pos, self._active_player)
-                        _to_send = '...'
-                        
-                    self._networking.send(_to_send)
 
             self._screen.fill('black')
             self._renderable_board.render_to_screen(self._screen)
