@@ -137,7 +137,7 @@ class OnlineView(GameView):
         source_loc = f"{action.source_location.row}-{action.source_location.col}" if action.source_location else f""
         payload = f"{action.action_type.value}%{action.player.value}%{source_loc}%{action.target_location.row}-{action.target_location.col}%{action.kind}"
 
-        return Message(self._server_id, payload)
+        return Message(source=self._server_id, payload=payload)
 
 
     def run(self):
