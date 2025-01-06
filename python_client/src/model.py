@@ -434,7 +434,7 @@ class GameModel:
         return self._state
     
     def _update_turn_status(self):
-        if self._action_count == 0:
+        if self._action_count == 0 and GameStatus.ONGOING:
             self._active_player = PlayerNumber.ONE if self._active_player == PlayerNumber.TWO else PlayerNumber.TWO
             self._action_count = 3
     

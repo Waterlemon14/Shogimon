@@ -281,7 +281,7 @@ class GameView:
 
         self._screen.blit(result_text, _blittable)
 
-    def _mouse_press_on_board(self, abs_pos: tuple[int, int]):
+    def _mouse_press_on_board(self, abs_pos: tuple[int, int]) -> PlayerAction | None:
         """When mouse is clicked inside RenderableBoard rect"""
         if self._game_status == GameStatus.ONGOING:
             _row = (abs_pos[1] - 105) // TILE_PIXELS
@@ -291,11 +291,11 @@ class GameView:
 
             if tile.occupier is not None and tile.occupier.owner == self._active_player:
                 self._start_move_turn(Location(_row,_col))
+                return None
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
                 _player_turn = self._finish_turn(Location(_row, _col))
-                self._make_turn(_player_turn)
-                self._rerender_after_turn()
+                return _player_turn
 
     def _start_move_turn(self, loc: Location):
         """Hover piece (to see possible moves)"""
@@ -370,7 +370,11 @@ class GameView:
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self._renderable_board.rect.collidepoint(event.pos):
-                        self._mouse_press_on_board(event.pos)
+                        _player_turn = self._mouse_press_on_board(event.pos)
+
+                        if _player_turn is not None:
+                            self._make_turn(_player_turn)
+                            self._rerender_after_turn()
                     
                     elif self._is_cursor_on_captures(event.pos):
                         self._mouse_press_on_captures(event.pos, self._active_player)

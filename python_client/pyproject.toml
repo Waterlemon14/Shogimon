@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.12"
 cs150241project-networking = {git = "https://github.com/UPD-CS150-241/cs150241project_networking"}
 pygame-ce = "^2.5.2"
+websockets = "^14.1"
 
 
 [build-system]
