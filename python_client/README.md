@@ -25,7 +25,7 @@ Similarly, the offline, pass-and-play version is also accessible via:
 poetry run python src/main_offline.py
 ```
 
-The game can be restarted at any point the program is running by clicking `R`.
+The offline version of the game can be restarted at any point of the program by clicking `R`. For the online implementation, a clean restart is needed (i.e., both the clients and the server).
 
 Disclaimer
 ---
