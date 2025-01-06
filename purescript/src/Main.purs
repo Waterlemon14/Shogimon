@@ -252,12 +252,12 @@ onTick send gameState = do
 
     kindToBoardFormat :: Kind -> String
     kindToBoardFormat kind 
-      | kind == Eevee     = "p"
-      | kind == Pikachu   = "b"
-      | kind == Turtwig     = "r"
-      | kind == Latios   = "k"
-      | kind == Latias = "q"
-      | otherwise        = "xx" -- should never reach this branch
+      | kind == Eevee   = "p"
+      | kind == Pikachu = "b"
+      | kind == Turtwig = "r"
+      | kind == Latios  = "k"
+      | kind == Latias  = "q"
+      | otherwise       = "xx" -- should never reach this branch
     
     -- Transforms the given board into a string that represents
     -- the board, to be used when sending messages
@@ -296,11 +296,11 @@ onTick send gameState = do
                   _ -> Two    -- Assume valid piece always, check later if invalid
 
                 new_piece = case piece of
-                  "p" -> createPiece Eevee     col row player_num
-                  "b" -> createPiece Pikachu   col row player_num
-                  "r" -> createPiece Turtwig     col row player_num
-                  "k" -> createPiece Latios   col row player_num
-                  "q" -> createPiece Latias col row player_num
+                  "p" -> createPiece Eevee   col row player_num
+                  "b" -> createPiece Pikachu col row player_num
+                  "r" -> createPiece Turtwig col row player_num
+                  "k" -> createPiece Latios  col row player_num
+                  "q" -> createPiece Latias  col row player_num
                   _   -> Nothing
 
     -- Used to send the current state of the game
@@ -327,8 +327,7 @@ onTick send gameState = do
                   "b" -> Pikachu
                   "r" -> Turtwig
                   "k" -> Latios
-                  "q" -> Latias
-                  _   -> Eevee -- should never reach this case
+                  _   -> Latias  -- should only be "q" and not anything else
                 count = case fromString (take 1 (drop 1 remaining_captured)) of
                   Just num -> num
                   Nothing -> 0
