@@ -83,10 +83,13 @@ class Captures:
         for piece in self._captures:
             _blittable = get_blittable(piece)
             
-            if order_in_screen < 11:
-                self._actual_row.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
-            else:
-                self._actual_row.blit(_blittable, (TILE_PIXELS*(order_in_screen-11), TILE_PIXELS))
+            match self._owner:
+                case PlayerNumber.ONE:
+                    _top: int = TILE_PIXELS if order_in_screen < 11 else 0
+                case PlayerNumber.TWO:
+                    _top: int = 0 if order_in_screen < 11 else TILE_PIXELS
+
+            self._actual_row.blit(_blittable, (TILE_PIXELS * (order_in_screen%11), _top))
         
             order_in_screen += 1
 
