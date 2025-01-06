@@ -14,18 +14,17 @@ Similarly, the game is lost by having your own *Latias* and *Latios* trapped.
 To start the offline version of the game, run:
 
 ```python
+poetry run python src/offline_main.py
+```
+
+The offline version is accesible via:
+
+```python
 poetry run python src/main.py
 ```
 
-The online version is accesible via:
 
-```python
-poetry run python src/online_main.py
-```
-
-
-
-The game can be restarted at any point the program is running by clicking `R`.
+The offline version of the game can be restarted at any point the program is running by clicking `R`. For the online implementation, a clean restart is needed (clients and the server). 
 
 Disclaimer
 ---
