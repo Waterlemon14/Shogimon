@@ -327,7 +327,8 @@ onTick send gameState = do
                   "b" -> Pikachu
                   "r" -> Turtwig
                   "k" -> Latios
-                  _   -> Latias  -- should only be "q" and not anything else
+                  "q" -> Latias
+                  _   -> Eevee -- should never reach this case
                 count = case fromString (take 1 (drop 1 remaining_captured)) of
                   Just num -> num
                   Nothing -> 0
