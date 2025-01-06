@@ -269,7 +269,7 @@ class Board:
         loc = self._grid[location.row][location.col]
         opponent: PlayerNumber = PlayerNumber.ONE if owner == PlayerNumber.TWO else PlayerNumber.TWO
 
-        for piece in self._protected_pieces[opponent]:
+        for piece in self._protected_pieces[opponent] + self._protected_pieces[owner]:
             if location in piece.get_movement_range(self.get_movable_locations_mapping(opponent)):
                 return False
             
