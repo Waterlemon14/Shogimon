@@ -68,10 +68,12 @@ class OnlineView(GameView):
     
     def _parse_to_message(self, action: PlayerAction) -> Message | None:
         """Convert type PlayerAction to message (if valid; else None)"""
-        source_loc = f"{action.source_location.row}-{action.source_location.col}" if action.source_location else f""
-        payload = f"{action.action_type.value}%{action.player.value}%{source_loc}%{action.target_location.row}-{action.target_location.col}%{action.kind}"
+        source_loc = f"{ action.source_location.row }-{ action.source_location.col }" if action.source_location \
+            else f""
+        
+        payload = f"{ action.action_type.value }%{ action.player.value }%{ source_loc }%{ action.target_location.row }-{ action.target_location.col }%{ action.kind }"
 
-        return Message(source=self._server_id, payload=payload)
+        return Message(self._server_id, payload)
 
     def run(self):
         """Edited to incorporate networking"""
