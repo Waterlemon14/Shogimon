@@ -6,6 +6,7 @@ module PieceFunctions
   , getIdlePlayerImage
   , createPiece
   , getPossibleMoves
+  , kindToBoardFormat
   )
   where
 
@@ -34,6 +35,10 @@ class PieceFunctions a where
   -- and when moving pieces. Add here when adding new pieces
   -- Inputs: Kind, Column, Row, Owner of Piece
   createPiece :: a -> Int -> Int -> PlayerNum -> Maybe Piece
+
+  -- Used to get the message code of a kind
+  -- Inputs: Kind
+  kindToBoardFormat :: a -> String
 
   -- getPossibleMoves should return a list of all possible moves that can be taken
   -- by the piece in its current position given the Board, Position, PlayerNum, and if it isProtected.
@@ -67,6 +72,14 @@ instance PieceFunctions Kind where
   createPiece Turtwig col row pnum = Just {kind: Turtwig, position: {col:col,row:row},  player: pnum, isProtected: false}
   createPiece Latios col row pnum  = Just {kind: Latios,  position: {col:col,row:row},  player: pnum, isProtected: true}
   createPiece Latias col row pnum  = Just {kind: Latias,  position: {col:col,row:row},  player: pnum, isProtected: true}
+
+  -----------------------------------------------------------
+  
+  kindToBoardFormat Eevee   = "p"
+  kindToBoardFormat Pikachu = "b"
+  kindToBoardFormat Turtwig = "r"
+  kindToBoardFormat Latios  = "k"
+  kindToBoardFormat Latias  = "q"
 
   -----------------------------------------------------------
 

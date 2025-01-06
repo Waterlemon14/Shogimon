@@ -31,6 +31,7 @@ import PieceFunctions
   ( getCurrentPlayerImage
   , getIdlePlayerImage
   , createPiece
+  , kindToBoardFormat
   , getPossibleMoves
   , accessCell
   , protectedPieceMovementCells
@@ -298,15 +299,6 @@ onTick send gameState = do
       else if null (protectedPieceMovementCells 0 0 state.board Two) 
         then state { winner = Just Player1 } 
         else state
-
-    kindToBoardFormat :: Kind -> String
-    kindToBoardFormat kind 
-      | kind == Eevee   = "p"
-      | kind == Pikachu = "b"
-      | kind == Turtwig = "r"
-      | kind == Latios  = "k"
-      | kind == Latias  = "q"
-      | otherwise       = "xx" -- should never reach this branch
     
     -- Transforms the given board into a string that represents
     -- the board, to be used when sending messages
