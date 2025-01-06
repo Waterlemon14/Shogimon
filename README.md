@@ -16,10 +16,7 @@ Similarly, the game is lost by having your own *Latias* and *Latios* trapped.
 Python implementation
 ---
 
-For the Python client, your player number is displayed on the left side of the screen when launching the online version of the client.
-Your on-screen player number will turn green when it is your turn, and white when it is the opponent's turn.
-
-To start the online (i.e. main) version of the game, run in terminal:
+For the Python client, to start the online (i.e. main) version of the game, run in terminal:
 
 ```
 poetry run python src/main.py
@@ -30,6 +27,9 @@ Similarly, the offline, pass-and-play version is also accessible via:
 ```
 poetry run python src/main_offline.py
 ```
+
+Upon launching, you will see your assigned player number displayed on the left side of the screen when launching the online version of the client.
+Your on-screen player number will turn green when it is your turn, and white when it is the opponent's turn.
 
 The offline version of the game can be restarted at any point of the program by clicking `R`. For the online implementation, a clean restart is needed (i.e., both the clients and the server).
 
