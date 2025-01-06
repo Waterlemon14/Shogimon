@@ -53,10 +53,9 @@ class OnlineView(GameView):
 
         self._viewing_player = PlayerNumber.ONE if self._server_id == 1 else PlayerNumber.TWO
 
-    def _is_valid_move(self, action: PlayerAction):
+    def _is_valid_move(self):
         """Check if move is for own piece and current active player"""
-        return self._viewing_player == self._active_player \
-                and self._viewing_player == action.player
+        return self._viewing_player == self._active_player
 
     def _send_to_server(self, action: PlayerAction):
         """Send player's message to network --- no local actions done"""
@@ -96,11 +95,11 @@ class OnlineView(GameView):
                     self._new_game()
                     self._init_view_state()
 
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self._is_valid_move():
                     if self._renderable_board.rect.collidepoint(event.pos):
                         _player_turn = self._mouse_press_on_board(event.pos)
 
-                        if _player_turn and self._is_valid_move(_player_turn):
+                        if _player_turn:
                             self._send_to_server(_player_turn)
                     
                     elif self._is_cursor_on_captures(event.pos):
