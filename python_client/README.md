@@ -1,7 +1,7 @@
 Welcome to Shogimon!
 ===
 
-This project is brought to you by **Eisenhower Aldemita**, **Abram Josh Marcelo**, **Christopher Senatin**, and **Jose Ernesto Tomanan**.
+This project is brought to you by **Eisenhower Aldemita II**, **Abram Josh Marcelo**, **Christopher Senatin**, and **Jose Ernesto Tomanan**.
 This shall serve as the game manual.
 
 The bottom player, consisting of non-shiny pieces, serves as Player 1 (and is the first to move), while the top player, consisting of shiny pieces, serves as Player 2.
@@ -14,7 +14,13 @@ The game is won by trapping the enemy *Latias* and *Latios* in such a way that i
 Similarly, the game is lost by having your own *Latias* and *Latios* trapped.
 Finally, the game ends in a draw if both player's *Latias* and *Latios* are unable to move after a single action.
 
-To start the online (i.e. main) version of the game, run in terminal:
+To start the online (i.e. main) version of the game, first run the project server in the project_server directory by running in the terminal:
+
+```
+go run .
+```
+
+and then run in terminal:
 
 ```
 poetry run python src/main.py
