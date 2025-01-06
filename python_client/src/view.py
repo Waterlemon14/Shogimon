@@ -40,7 +40,7 @@ class Captures:
         self._captures: list[LivePiece] = []
         self._owner = number
 
-        self._actual_row = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS))
+        self._actual_row = pygame.Surface((TILE_PIXELS*12, TILE_PIXELS*2))
 
         pygame.font.init()
         self._font = pygame.font.SysFont('Arial', 25)
@@ -82,7 +82,11 @@ class Captures:
         
         for piece in self._captures:
             _blittable = get_blittable(piece)
-            self._actual_row.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
+            
+            if order_in_screen < 11:
+                self._actual_row.blit(_blittable, (TILE_PIXELS*order_in_screen, 0))
+            else:
+                self._actual_row.blit(_blittable, (TILE_PIXELS*(order_in_screen-11), TILE_PIXELS))
         
             order_in_screen += 1
 
@@ -380,11 +384,9 @@ class GameView:
                         self._mouse_press_on_captures(event.pos, self._active_player)
 
             self._screen.fill('black')
-
-            self._renderable_board.render_to_screen(self._screen)
-
             self._captures_p1.render_to_screen(self._screen)
             self._captures_p2.render_to_screen(self._screen)
+            self._renderable_board.render_to_screen(self._screen)
 
             if self._game_status != GameStatus.ONGOING:
                 self._evaluate_winner()
