@@ -9,6 +9,35 @@ from project_types import (
     )
 from view import *
 
+class DataParser:
+    def _parse_to_message(self, server_id, action: PlayerAction) -> Message | None:
+        """Convert type PlayerAction to message (if valid; else None)"""
+        source_loc = f"{ action.source_location.row }-{ action.source_location.col }" if action.source_location \
+            else f""
+        
+        payload = f"{ action.action_type.value }%{ action.player.value }%{ source_loc }%{ action.target_location.row }-{ action.target_location.col }%{ action.kind }"
+
+        return Message(server_id, payload)
+    
+    def _parse_to_player_action(self, message: Message) -> PlayerAction | None:
+        """Convert type message to PlayerAction (if valid; else None)"""
+        properties = message.payload.split('%')
+
+        if len(properties) != 5:
+            return None
+
+        action_type = ActionType.MOVE if properties[0] == ActionType.MOVE else ActionType.DROP
+
+        return PlayerAction(
+            action_type,
+            player = PlayerNumber.ONE if properties[1] == PlayerNumber.ONE else PlayerNumber.TWO,
+            source_location = \
+                None if action_type == ActionType.DROP \
+                else Location(int(properties[2][0]), int(properties[2][2])),
+            target_location = Location(int(properties[3][0]), int(properties[3][2])),
+            kind = PieceKind(properties[4])
+            )
+
 class OnlineView(GameView):
     """MVC class for online implementation"""
     def __init__(self, state: GameState):
@@ -34,46 +63,18 @@ class OnlineView(GameView):
     
     def _send_message(self, action: PlayerAction):
         """Send message to network"""
-        message = self._parse_to_message(action)
+        message = DataParser()._parse_to_message(self._server_id, action)
 
         if message:
             self._networking.send(message.payload)
 
     def _receive_message(self, message: Message):
         """Use received message to manipulate client"""
-        action = self._parse_to_player_action(message)
+        action = DataParser()._parse_to_player_action(message)
 
         if action:
             self._make_turn(action)
             self._rerender_after_turn()
-    
-    def _parse_to_player_action(self, message: Message) -> PlayerAction | None:
-        """Convert type message to PlayerAction (if valid; else None)"""
-        properties = message.payload.split('%')
-
-        if len(properties) != 5:
-            return None
-
-        action_type = ActionType.MOVE if properties[0] == ActionType.MOVE else ActionType.DROP
-
-        return PlayerAction(
-            action_type,
-            player = PlayerNumber.ONE if properties[1] == PlayerNumber.ONE else PlayerNumber.TWO,
-            source_location = \
-                None if action_type == ActionType.DROP \
-                else Location(int(properties[2][0]), int(properties[2][2])),
-            target_location = Location(int(properties[3][0]), int(properties[3][2])),
-            kind = PieceKind(properties[4])
-            )
-    
-    def _parse_to_message(self, action: PlayerAction) -> Message | None:
-        """Convert type PlayerAction to message (if valid; else None)"""
-        source_loc = f"{ action.source_location.row }-{ action.source_location.col }" if action.source_location \
-            else f""
-        
-        payload = f"{ action.action_type.value }%{ action.player.value }%{ source_loc }%{ action.target_location.row }-{ action.target_location.col }%{ action.kind }"
-
-        return Message(self._server_id, payload)
 
     def run(self):
         """Edited to incorporate networking"""
