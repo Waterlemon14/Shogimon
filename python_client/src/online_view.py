@@ -13,7 +13,7 @@ class DataParser:
     """
     Abstraction that only parses messages to type PlayerAction and vice versa; for SRP compliance
     """
-    def _parse_to_message(self, server_id, action: PlayerAction) -> Message | None:
+    def parse_to_message(self, server_id, action: PlayerAction) -> Message | None:
         """Convert type PlayerAction to message (if valid; else None)"""
         source_loc = f"{ action.source_location.row }-{ action.source_location.col }" if action.source_location \
             else f""
@@ -22,7 +22,7 @@ class DataParser:
 
         return Message(server_id, payload)
     
-    def _parse_to_player_action(self, message: Message) -> PlayerAction | None:
+    def parse_to_player_action(self, message: Message) -> PlayerAction | None:
         """Convert type message to PlayerAction (if valid; else None)"""
         properties = message.payload.split('%')
 
@@ -53,14 +53,14 @@ class OnlineView(GameView):
 
     def _send_to_server(self, action: PlayerAction):
         """Send player's message to network --- no local actions done"""
-        message = DataParser()._parse_to_message(self._server_id, action)
+        message = DataParser().parse_to_message(self._server_id, action)
 
         if message:
             self._networking.send(message.payload)
 
     def _receive_from_server(self, message: Message):
         """Use received message to manipulate client"""
-        action = DataParser()._parse_to_player_action(message)
+        action = DataParser().parse_to_player_action(message)
 
         if action:
             self._make_turn(action)
