@@ -71,19 +71,6 @@ class LatiasMovement:
             # Latias cannot capture hence only locations with True values are considered
         ]
 
-class CurrentPlayer:
-    """
-    Subfamily of protocol Player;
-    Get interactions from view
-    """
-    ...
-
-class Opponent:
-    """
-    Subfamily of protocol Player;
-    Get interactions from server (saka na natin problemahin)
-    """
-    ...
 class BasePiece:
     def __init__(self, kind: PieceKind, location: Location, movement: Movement, owner: PlayerNumber):
         self._kind = kind
