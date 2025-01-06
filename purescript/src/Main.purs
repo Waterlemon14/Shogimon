@@ -100,11 +100,56 @@ initialState = do
   , moveCount : 3
   , rows : rows
   , columns : columns
-  , gameStart: false
-  , initialized: false
-  , myPlayerNum: One
+  , gameStart : false
+  , initialized : false
+  , myPlayerNum : One
+  , playOnline : true
+  , toReset : false
   }
 
+-- initialLocalState, copy initial state here and change the following
+-- { initialized = true, playOnline = false, gameStart = true }
+initialLocalState :: Effect GameState
+initialLocalState = do
+  let
+    -- Replace these to change the initial board
+    nothing_row = Array.replicate columns Nothing
+    init_board = [getBackRow 0 Two] <> [getEeveeRow 1 Two 0] <> Array.replicate (rows-4) nothing_row <> [getEeveeRow (rows-2) One 0] <> [getBackRow (rows-1) One]
+    
+    getBackRow :: Int -> PlayerNum -> Array (Maybe Piece)
+    getBackRow row player_num = [ createPiece Turtwig 0 row player_num, 
+                                  createPiece Pikachu 1 row player_num, 
+                                  Nothing,
+                                  createPiece Latios 3 row player_num,
+                                  createPiece Latias 4 row player_num,
+                                  Nothing,
+                                  createPiece Pikachu 6 row player_num, 
+                                  createPiece Turtwig 7 row player_num
+                                ]
+
+    getEeveeRow :: Int -> PlayerNum -> Int -> Array (Maybe Piece)
+    getEeveeRow row player_num col | col == columns = []
+                                  | otherwise = [createPiece Eevee col row player_num] <> getEeveeRow row player_num (col+1)
+
+  pure { tickCount: 0
+  , lastReceivedMessage: Nothing
+  , board: init_board
+  , currentPlayer: One
+  , clickedCell: {col: -1, row: -1}
+  , possibleMoves: Nil
+  , activePiece: Nothing
+  , playerOneCaptures : Nil
+  , playerTwoCaptures : Nil
+  , winner : Nothing
+  , moveCount : 3
+  , rows : rows
+  , columns : columns
+  , gameStart : true
+  , initialized : true
+  , myPlayerNum : One
+  , playOnline : false
+  , toReset : false
+  }
 
 -- Access a specific row of the board
 -- 0 indexed, 1st row is getBoardRow 0 board
@@ -160,9 +205,13 @@ onTick send gameState = do
     makeMove state = if valid_move == true
       then case state.activePiece of
         Nothing -> state
-        Just activePiece -> if state.currentPlayer == One
-          then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = capturedPieces state.playerOneCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
-          else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = capturedPieces state.playerTwoCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
+        Just activePiece -> case state.playOnline of
+          true -> if state.currentPlayer == One
+            then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = capturedPieces state.playerOneCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
+            else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = capturedPieces state.playerTwoCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 } }
+          false -> if state.currentPlayer == One
+            then state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerOneCaptures = capturedPieces state.playerOneCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 }, myPlayerNum = next_player }
+            else state { board = movePiece state.board activePiece.position state.clickedCell, currentPlayer = next_player, playerTwoCaptures = capturedPieces state.playerTwoCaptures activePiece, moveCount = checker, clickedCell = { col: -2, row: -2 }, myPlayerNum = next_player }
           where 
             -- gets whose turn it is after a move is made
             next_player = if state.moveCount == 1 
@@ -437,43 +486,57 @@ onTick send gameState = do
     
     -- Used when the game has finished, game is reset through this
     endGame :: GameState -> Effect GameState
-    endGame state = case state.lastReceivedMessage of
-      Nothing -> pure state
-      Just message -> if message.payload == "reset"
-        then if gameState.myPlayerNum == One
+    endGame state = if state.playOnline == true
+      then case state.lastReceivedMessage of
+        Nothing -> pure state
+        Just message -> if message.payload == "reset"
+          then if gameState.myPlayerNum == One
+            then initialState
+            else pure state
+          else if take 5 message.payload == "init2"
           then initialState
           else pure state
-        else if take 5 message.payload == "init2"
-        then initialState
-        else pure state
+      else case state.toReset of
+        true -> initialLocalState
+        false -> pure state
 
-  case gameState.gameStart of
-    false -> initializeGame gameState  
-    true -> if gameState.myPlayerNum /= gameState.currentPlayer
-      then case gameState.winner of
-        Nothing -> pure $ gameState
-          # readStateMessage
-          # updateTickCount
-          # updateGameOver
-        Just _ ->
-          endGame gameState
-      else case gameState.winner of 
-        Nothing -> if valid_move == true
-          then gameState
-            # makeMove
-            # updateActivePiece
-            # updatePossibleMoves
+  case gameState.playOnline of
+    true -> case gameState.gameStart of
+      false -> initializeGame gameState  
+      true -> if gameState.myPlayerNum /= gameState.currentPlayer
+        then case gameState.winner of
+          Nothing -> pure $ gameState
+            # readStateMessage
             # updateTickCount
             # updateGameOver
-            # sendStateMessage
-          else pure $ gameState
-            # makeMove
-            # updateActivePiece
-            # updatePossibleMoves
-            # updateTickCount
-            # updateGameOver
-        Just _ ->
-          endGame gameState
+          Just _ ->
+            endGame gameState
+        else case gameState.winner of 
+          Nothing -> if valid_move == true
+            then gameState
+              # makeMove
+              # updateActivePiece
+              # updatePossibleMoves
+              # updateTickCount
+              # updateGameOver
+              # sendStateMessage
+            else pure $ gameState
+              # makeMove
+              # updateActivePiece
+              # updatePossibleMoves
+              # updateTickCount
+              # updateGameOver
+          Just _ ->
+            endGame gameState
+    false -> case gameState.winner of 
+          Nothing -> pure $ gameState
+              # makeMove
+              # updateActivePiece
+              # updatePossibleMoves
+              # updateTickCount
+              # updateGameOver
+          Just _ ->
+            endGame gameState
       
 -- Sends the coordinates of the clicked cell
 onMouseDown :: (String -> Effect Unit) -> { x :: Int, y :: Int } -> GameState -> Effect GameState
@@ -488,16 +551,22 @@ onMouseDown send { x, y } gameState = do
   if gameState.gameStart == true && gameState.currentPlayer == gameState.myPlayerNum
   then do
     send $ "click " <> show cell_col <> " " <> show cell_row
-    pure gameState
+    pure gameState { clickedCell = { col: cell_col, row: cell_row } }
   else pure gameState
 
 -- Used to send the reset message used during game over
 onKeyDown :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
-onKeyDown send key gameState = do
-  if key == "KeyR"
-  then send $ "reset"
-  else pure unit
-  pure gameState
+onKeyDown send key gameState = if key == "KeyR" && gameState.playOnline == true
+  then do
+    send $ "reset"
+    pure gameState
+  else if key == "KeyR" && (isNothing gameState.winner == false) && gameState.playOnline == false
+  then do
+    log "huh"
+    pure gameState { toReset = true }
+  else if key == "KeyL" && gameState.gameStart == false
+  then pure $ gameState { initialized = true, playOnline = false, gameStart = true }
+  else pure gameState
 
 -- Unused
 onKeyUp :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
@@ -507,26 +576,6 @@ onKeyUp _ _ gameState = pure gameState
 -- and lastReceivedMessage
 onMessage :: (String -> Effect Unit) -> Message -> GameState -> Effect GameState
 onMessage _ message gameState = do
-  let
-    command = split (Pattern " ") message.payload
-    clicked_cell = case command Array.!! 0 of
-      Nothing -> { col: -2, row: -2 }
-      Just action -> if action == "click"
-        then do
-          let
-            cell_col = case command Array.!! 1 of
-              Nothing -> -2
-              Just col -> case fromString col of
-                Nothing -> -2
-                Just num -> num
-            cell_row = case command Array.!! 2 of
-              Nothing -> -2
-              Just col -> case fromString col of
-                Nothing -> -2
-                Just num -> num
-          { col: cell_col, row: cell_row }
-        else { col: -2, row: -2 }
-  
   log $ "Received Message: " <> show message
   
   case gameState.gameStart of
@@ -537,7 +586,7 @@ onMessage _ message gameState = do
       then  pure $ gameState { lastReceivedMessage = Just message }
       else pure $ gameState
     true -> if gameState.myPlayerNum == gameState.currentPlayer && ( (show message.playerId == "Player1" && gameState.currentPlayer == One) || (show message.playerId == "Player2" && gameState.currentPlayer == Two) )
-      then do pure $ gameState { lastReceivedMessage = Just message, clickedCell = clicked_cell }
+      then do pure $ gameState { lastReceivedMessage = Just message }
       else do
         pure $ gameState { lastReceivedMessage = Just message }
 
@@ -635,7 +684,9 @@ onRender images ctx gameState = do
   -- If game has not yet started, draw a text to show waiting status
   case gameState.gameStart of
     true -> pure unit
-    false -> drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Waiting for Player 2 to connect ..." }
+    false -> do
+      drawText ctx { x: messageX, y: messageY, color: color, font: font, size: size, text: "Waiting for Player 2 to connect ..." }
+      drawText ctx { x: messageX, y: messageY + (toNumber size), color: color, font: font, size: size, text: "Press L to play local" }
 
   -- Draw game end text
   case gameState.winner of 
