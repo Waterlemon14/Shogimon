@@ -42,7 +42,9 @@ class DataParser:
             )
 
 class OnlineView(GameView):
-    """MVC class for online implementation"""
+    """
+    MVC class for online implementation
+    """
     def __init__(self, state: GameState):
         super().__init__(state)
 
@@ -50,7 +52,7 @@ class OnlineView(GameView):
         self._server_id = self._networking.player_id
 
     def _send_to_server(self, action: PlayerAction):
-        """Send message to network"""
+        """Send player's message to network --- no local actions done"""
         message = DataParser()._parse_to_message(self._server_id, action)
 
         if message:
