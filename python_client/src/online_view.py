@@ -60,7 +60,11 @@ class OnlineView(GameView):
 
     def _receive_from_server(self, message: Message):
         """Use received message to manipulate client"""
-        return DataParser().parse_to_player_action(message)
+        _received_turn = DataParser().parse_to_player_action(message)
+
+        if _received_turn:
+            self._make_turn(_received_turn)
+            self._rerender_after_turn()
 
     def run(self):
         """Edited to incorporate networking"""
@@ -72,13 +76,11 @@ class OnlineView(GameView):
         _game_is_running = True
 
         while _game_is_running:
+            """Receive input from server"""
             for message in self._networking.recv():
-                _received_turn = self._receive_from_server(message)
+                self._receive_from_server(message)
 
-                if _received_turn is not None:
-                    self._make_turn(_received_turn)
-                    self._rerender_after_turn()
-
+            "Receive input from client"
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     _game_is_running = False
@@ -91,7 +93,8 @@ class OnlineView(GameView):
                     if self._renderable_board.rect.collidepoint(event.pos):
                         _player_turn = self._mouse_press_on_board(event.pos)
 
-                        if _player_turn is not None:
+                        # logic that scans if player is making his own move
+                        if _player_turn is not None and ...:
                             self._send_to_server(_player_turn)
                     
                     elif self._is_cursor_on_captures(event.pos):
