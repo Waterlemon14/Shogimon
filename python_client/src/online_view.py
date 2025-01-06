@@ -60,12 +60,7 @@ class OnlineView(GameView):
 
     def _receive_from_server(self, message: Message):
         """Use received message to manipulate client"""
-        action = DataParser().parse_to_player_action(message)
-
-        if action:
-            return action
-        
-        return None
+        return DataParser().parse_to_player_action(message)
 
     def run(self):
         """Edited to incorporate networking"""
