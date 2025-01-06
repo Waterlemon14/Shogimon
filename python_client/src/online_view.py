@@ -72,6 +72,17 @@ class OnlineView(GameView):
             self._make_turn(_received_turn)
             self._rerender_after_turn()
 
+    def _render_player_number(self):
+        """Render viewing player, and if it's their turn (green) or not (white)"""
+        _renderable = self._font.render(
+            f"P{self._server_id}",
+            True,
+            'green' if self._active_player == self._viewing_player else 'white'
+            )
+        _blittable = _renderable.get_rect(centery = SCREEN_HEIGHT//2)
+
+        self._screen.blit(_renderable, _blittable)
+
     def run(self):
         """Edited to incorporate networking"""
         pygame.init()
@@ -109,6 +120,8 @@ class OnlineView(GameView):
             self._renderable_board.render_to_screen(self._screen)
             self._captures_p1.render_to_screen(self._screen)
             self._captures_p2.render_to_screen(self._screen)
+
+            self._render_player_number()
 
             if self._game_status != GameStatus.ONGOING:
                 self._evaluate_winner()
