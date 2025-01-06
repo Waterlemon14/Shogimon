@@ -17,7 +17,7 @@ Finally, the game ends in a draw if both player's *Latias* and *Latios* are unab
 Project Server
 ---
 
-First, run the project server in project-server by running in the terminal:
+First, run the project server in `project-server` by running in the terminal:
 
 ```
 go run .
@@ -55,4 +55,4 @@ Disclaimer
 
 Please note that this game's graphics are not owned by the creators, and are purely used for demonstration purposes only.
 
-The project-server implementation was provided by Sir Juan Felipe Coronel.
+The golang server implementation was provided by Sir Juan Felipe Coronel.

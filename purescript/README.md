@@ -13,7 +13,7 @@ The game is won by trapping the enemy *Latias* and *Latios* in such a way that i
 Similarly, the game is lost by having your own *Latias* and *Latios* trapped.
 Finally, the game ends in a draw if both player's *Latias* and *Latios* are unable to move after a single action.
 
-To start the online (i.e. main) version of the game, run the go server in the project_server directory by running in the terminal:
+To start the online (i.e. main) version of the game, run the go server in the `project-server` directory by running in the terminal:
 
 ```
 go run .
