@@ -2,10 +2,8 @@ import pygame
 from cs150241project_networking import CS150241ProjectNetworking, Message
 
 from project_types import (
-    TILE_PIXELS, BOARD_ROWS, BOARD_COLS,
     GameStatus, PieceKind, ActionType, Location, PlayerNumber,
-    LivePiece, GameState, PlayerAction,
-    MakeTurnObserver, NewGameObserver,
+    GameState, PlayerAction,
     )
 from view import *
 
