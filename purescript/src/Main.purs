@@ -572,8 +572,7 @@ onKeyDown send key gameState = if key == "KeyR" && gameState.playOnline == true
 onKeyUp :: (String -> Effect Unit) -> String -> GameState -> Effect GameState
 onKeyUp _ _ gameState = pure gameState
 
--- Manages received messages, used to updated clickedCell
--- and lastReceivedMessage
+-- Manages received messages, used to update lastReceivedMessage
 onMessage :: (String -> Effect Unit) -> Message -> GameState -> Effect GameState
 onMessage _ message gameState = do
   log $ "Received Message: " <> show message
@@ -585,10 +584,7 @@ onMessage _ message gameState = do
       else if show message.playerId == "Player2" && isNothing gameState.lastReceivedMessage /= true
       then  pure $ gameState { lastReceivedMessage = Just message }
       else pure $ gameState
-    true -> if gameState.myPlayerNum == gameState.currentPlayer && ( (show message.playerId == "Player1" && gameState.currentPlayer == One) || (show message.playerId == "Player2" && gameState.currentPlayer == Two) )
-      then do pure $ gameState { lastReceivedMessage = Just message }
-      else do
-        pure $ gameState { lastReceivedMessage = Just message }
+    true -> pure $ gameState { lastReceivedMessage = Just message }
 
 -- Draws the game on the screen using information from the GameState
 onRender :: Map.Map String Canvas.CanvasImageSource -> Canvas.Context2D -> GameState -> Effect Unit
