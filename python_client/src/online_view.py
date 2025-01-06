@@ -33,7 +33,7 @@ class OnlineView(GameView):
                 self._send_message(_player_turn)
     
     def _send_message(self, action: PlayerAction):
-        """Same as make_turn, but for online purposes"""
+        """Send message to network"""
         message = self._parse_to_message(action)
 
         if message:
@@ -94,7 +94,7 @@ class OnlineView(GameView):
                     self._new_game()
                     self._init_view_state()
 
-                elif self._is_cursor_on_captures(event.pos):
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self._renderable_board.rect.collidepoint(event.pos):
                         self._mouse_press_on_board(event.pos)
                     
