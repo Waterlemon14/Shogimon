@@ -46,58 +46,58 @@ class PieceFunctions a where
 
 -- Define functions of the new kind added here
 instance PieceFunctions Kind where
-  getCurrentPlayerImage Pawn = "../../img/eevee.png"
-  getCurrentPlayerImage Bishop = "../../img/pikachu.png"
-  getCurrentPlayerImage Rook = "../../img/turtwig.png"
-  getCurrentPlayerImage Prince = "../../img/latios.png"
-  getCurrentPlayerImage Princess = "../../img/latias.png"
+  getCurrentPlayerImage Eevee   = "../../img/eevee.png"
+  getCurrentPlayerImage Pikachu = "../../img/pikachu.png"
+  getCurrentPlayerImage Turtwig = "../../img/turtwig.png"
+  getCurrentPlayerImage Latios  = "../../img/latios.png"
+  getCurrentPlayerImage Latias  = "../../img/latias.png"
   
   -----------------------------------------------------------
 
-  getIdlePlayerImage Pawn    = "../../img/eevee-shiny.png"
-  getIdlePlayerImage Bishop    = "../../img/pikachu-shiny.png"
-  getIdlePlayerImage Rook    = "../../img/turtwig-shiny.png"
-  getIdlePlayerImage Prince    = "../../img/latios-shiny.png"
-  getIdlePlayerImage Princess    = "../../img/latias-shiny.png"
+  getIdlePlayerImage Eevee    = "../../img/eevee-shiny.png"
+  getIdlePlayerImage Pikachu  = "../../img/pikachu-shiny.png"
+  getIdlePlayerImage Turtwig  = "../../img/turtwig-shiny.png"
+  getIdlePlayerImage Latios   = "../../img/latios-shiny.png"
+  getIdlePlayerImage Latias   = "../../img/latias-shiny.png"
 
   -----------------------------------------------------------
 
-  createPiece Pawn col row pnum     = Just {kind: Pawn,     position: {col:col,row:row},  player: pnum, isProtected: false}
-  createPiece Bishop col row pnum   = Just {kind: Bishop,   position: {col:col,row:row},  player: pnum, isProtected: false}
-  createPiece Rook col row pnum     = Just {kind: Rook,     position: {col:col,row:row},  player: pnum, isProtected: false}
-  createPiece Prince col row pnum   = Just {kind: Prince,   position: {col:col,row:row},  player: pnum, isProtected: true}
-  createPiece Princess col row pnum = Just {kind: Princess, position: {col:col,row:row},  player: pnum, isProtected: true}
+  createPiece Eevee col row pnum   = Just {kind: Eevee,   position: {col:col,row:row},  player: pnum, isProtected: false}
+  createPiece Pikachu col row pnum = Just {kind: Pikachu, position: {col:col,row:row},  player: pnum, isProtected: false}
+  createPiece Turtwig col row pnum = Just {kind: Turtwig, position: {col:col,row:row},  player: pnum, isProtected: false}
+  createPiece Latios col row pnum  = Just {kind: Latios,  position: {col:col,row:row},  player: pnum, isProtected: true}
+  createPiece Latias col row pnum  = Just {kind: Latias,  position: {col:col,row:row},  player: pnum, isProtected: true}
 
   -----------------------------------------------------------
 
   getPossibleMoves _ board _ _ _ true = getFreeCells board 0 0
 
-  getPossibleMoves Pawn board position player isProtected _
+  getPossibleMoves Eevee board position player isProtected _
     | player == One = moveSearcher (position {row = (position.row-1)}) board player 0 (-1) 1 isProtected
     | otherwise     = moveSearcher (position {row = (position.row+1)}) board player 0   1  1 isProtected
     
-  getPossibleMoves Bishop board position player isProtected _ =
+  getPossibleMoves Pikachu board position player isProtected _ =
     concat  $ moveSearcher {col: (position.col-1), row: (position.row-1)} board player (-1) (-1) (getRows board) isProtected
             : moveSearcher {col: (position.col-1), row: (position.row+1)} board player (-1)   1  (getRows board) isProtected
             : moveSearcher {col: (position.col+1), row: (position.row-1)} board player   1  (-1) (getRows board) isProtected
             : moveSearcher {col: (position.col+1), row: (position.row+1)} board player   1    1  (getRows board) isProtected
             : Nil
 
-  getPossibleMoves Rook board position player isProtected _ =
+  getPossibleMoves Turtwig board position player isProtected _ =
     concat  $ moveSearcher {col: (position.col), row: (position.row-1)} board player   0 (-1) (getRows board) isProtected
             : moveSearcher {col: (position.col), row: (position.row+1)} board player   0   1  (getRows board) isProtected
             : moveSearcher {col: (position.col-1), row: (position.row)} board player (-1)  0  (getRows board) isProtected
             : moveSearcher {col: (position.col+1), row: (position.row)} board player   1   0  (getRows board) isProtected
             : Nil
 
-  getPossibleMoves Prince board position player isProtected _ =
+  getPossibleMoves Latios board position player isProtected _ =
     concat  $ moveSearcher {col: (position.col), row: (position.row-1)} board player   0 (-1) 1 isProtected
             : moveSearcher {col: (position.col), row: (position.row+1)} board player   0   1  1 isProtected
             : moveSearcher {col: (position.col-1), row: (position.row)} board player (-1)  0  1 isProtected
             : moveSearcher {col: (position.col+1), row: (position.row)} board player   1   0  1 isProtected
             : Nil
 
-  getPossibleMoves Princess board position player isProtected _ =
+  getPossibleMoves Latias board position player isProtected _ =
     concat  $ moveSearcher {col: (position.col-1), row: (position.row-1)} board player (-1) (-1) 1 isProtected
             : moveSearcher {col: (position.col-1), row: (position.row+1)} board player (-1)   1  1 isProtected
             : moveSearcher {col: (position.col+1), row: (position.row-1)} board player   1  (-1) 1 isProtected

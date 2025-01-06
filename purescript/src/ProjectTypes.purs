@@ -21,18 +21,18 @@ import CS150241Project.Networking (Message)
 -- New type for the kind of piece, will be stored in a Piece record
 -- To add a kind, add to the tagged union and Show instance
 data Kind
-  = Pawn
-  | Bishop
-  | Rook
-  | Prince
-  | Princess
+  = Eevee
+  | Pikachu
+  | Turtwig
+  | Latios
+  | Latias
 
 instance Show Kind where
-  show Pawn     = "Pawn"      -- p
-  show Bishop   = "Bishop"    -- b
-  show Rook     = "Rook"      -- r
-  show Prince   = "Prince"    -- k
-  show Princess = "Princess"  -- q
+  show Eevee    = "Eevee"      -- p
+  show Pikachu  = "Pikachu"    -- b
+  show Turtwig  = "Turtwig"      -- r
+  show Latios   = "Latios"    -- k
+  show Latias   = "Latias"  -- q
 
 derive instance Eq Kind
 

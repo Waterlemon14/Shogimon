@@ -3347,40 +3347,40 @@
     Two2.value = new Two2();
     return Two2;
   }();
-  var Pawn = /* @__PURE__ */ function() {
-    function Pawn2() {
+  var Eevee = /* @__PURE__ */ function() {
+    function Eevee2() {
     }
     ;
-    Pawn2.value = new Pawn2();
-    return Pawn2;
+    Eevee2.value = new Eevee2();
+    return Eevee2;
   }();
-  var Bishop = /* @__PURE__ */ function() {
-    function Bishop2() {
+  var Pikachu = /* @__PURE__ */ function() {
+    function Pikachu2() {
     }
     ;
-    Bishop2.value = new Bishop2();
-    return Bishop2;
+    Pikachu2.value = new Pikachu2();
+    return Pikachu2;
   }();
-  var Rook = /* @__PURE__ */ function() {
-    function Rook2() {
+  var Turtwig = /* @__PURE__ */ function() {
+    function Turtwig2() {
     }
     ;
-    Rook2.value = new Rook2();
-    return Rook2;
+    Turtwig2.value = new Turtwig2();
+    return Turtwig2;
   }();
-  var Prince = /* @__PURE__ */ function() {
-    function Prince2() {
+  var Latios = /* @__PURE__ */ function() {
+    function Latios2() {
     }
     ;
-    Prince2.value = new Prince2();
-    return Prince2;
+    Latios2.value = new Latios2();
+    return Latios2;
   }();
-  var Princess = /* @__PURE__ */ function() {
-    function Princess2() {
+  var Latias = /* @__PURE__ */ function() {
+    function Latias2() {
     }
     ;
-    Princess2.value = new Princess2();
-    return Princess2;
+    Latias2.value = new Latias2();
+    return Latias2;
   }();
   var showWinner = {
     show: function(v) {
@@ -3449,23 +3449,23 @@
   var eqKind = {
     eq: function(x) {
       return function(y) {
-        if (x instanceof Pawn && y instanceof Pawn) {
+        if (x instanceof Eevee && y instanceof Eevee) {
           return true;
         }
         ;
-        if (x instanceof Bishop && y instanceof Bishop) {
+        if (x instanceof Pikachu && y instanceof Pikachu) {
           return true;
         }
         ;
-        if (x instanceof Rook && y instanceof Rook) {
+        if (x instanceof Turtwig && y instanceof Turtwig) {
           return true;
         }
         ;
-        if (x instanceof Prince && y instanceof Prince) {
+        if (x instanceof Latios && y instanceof Latios) {
           return true;
         }
         ;
-        if (x instanceof Princess && y instanceof Princess) {
+        if (x instanceof Latias && y instanceof Latias) {
           return true;
         }
         ;
@@ -3625,46 +3625,46 @@
   };
   var pieceFunctionsKind = {
     getCurrentPlayerImage: function(v) {
-      if (v instanceof Pawn) {
+      if (v instanceof Eevee) {
         return "../../img/eevee.png";
       }
       ;
-      if (v instanceof Bishop) {
+      if (v instanceof Pikachu) {
         return "../../img/pikachu.png";
       }
       ;
-      if (v instanceof Rook) {
+      if (v instanceof Turtwig) {
         return "../../img/turtwig.png";
       }
       ;
-      if (v instanceof Prince) {
+      if (v instanceof Latios) {
         return "../../img/latios.png";
       }
       ;
-      if (v instanceof Princess) {
+      if (v instanceof Latias) {
         return "../../img/latias.png";
       }
       ;
       throw new Error("Failed pattern match at PieceFunctions (line 48, column 1 - line 105, column 18): " + [v.constructor.name]);
     },
     getIdlePlayerImage: function(v) {
-      if (v instanceof Pawn) {
+      if (v instanceof Eevee) {
         return "../../img/eevee-shiny.png";
       }
       ;
-      if (v instanceof Bishop) {
+      if (v instanceof Pikachu) {
         return "../../img/pikachu-shiny.png";
       }
       ;
-      if (v instanceof Rook) {
+      if (v instanceof Turtwig) {
         return "../../img/turtwig-shiny.png";
       }
       ;
-      if (v instanceof Prince) {
+      if (v instanceof Latios) {
         return "../../img/latios-shiny.png";
       }
       ;
-      if (v instanceof Princess) {
+      if (v instanceof Latias) {
         return "../../img/latias-shiny.png";
       }
       ;
@@ -3674,9 +3674,9 @@
       return function(v1) {
         return function(v2) {
           return function(v3) {
-            if (v instanceof Pawn) {
+            if (v instanceof Eevee) {
               return new Just({
-                kind: Pawn.value,
+                kind: Eevee.value,
                 position: {
                   col: v1,
                   row: v2
@@ -3686,9 +3686,9 @@
               });
             }
             ;
-            if (v instanceof Bishop) {
+            if (v instanceof Pikachu) {
               return new Just({
-                kind: Bishop.value,
+                kind: Pikachu.value,
                 position: {
                   col: v1,
                   row: v2
@@ -3698,9 +3698,9 @@
               });
             }
             ;
-            if (v instanceof Rook) {
+            if (v instanceof Turtwig) {
               return new Just({
-                kind: Rook.value,
+                kind: Turtwig.value,
                 position: {
                   col: v1,
                   row: v2
@@ -3710,9 +3710,9 @@
               });
             }
             ;
-            if (v instanceof Prince) {
+            if (v instanceof Latios) {
               return new Just({
-                kind: Prince.value,
+                kind: Latios.value,
                 position: {
                   col: v1,
                   row: v2
@@ -3722,9 +3722,9 @@
               });
             }
             ;
-            if (v instanceof Princess) {
+            if (v instanceof Latias) {
               return new Just({
-                kind: Princess.value,
+                kind: Latias.value,
                 position: {
                   col: v1,
                   row: v2
@@ -3749,7 +3749,7 @@
                   return getFreeCells(v1)(0)(0);
                 }
                 ;
-                if (v instanceof Pawn) {
+                if (v instanceof Eevee) {
                   if (eq3(v3)(One.value)) {
                     return moveSearcher({
                       col: v2.col,
@@ -3766,7 +3766,7 @@
                   ;
                 }
                 ;
-                if (v instanceof Bishop) {
+                if (v instanceof Pikachu) {
                   return concat2(new Cons(moveSearcher({
                     col: v2.col - 1 | 0,
                     row: v2.row - 1 | 0
@@ -3782,7 +3782,7 @@
                   })(v1)(v3)(1)(1)(getRows(v1))(v4), Nil.value)))));
                 }
                 ;
-                if (v instanceof Rook) {
+                if (v instanceof Turtwig) {
                   return concat2(new Cons(moveSearcher({
                     col: v2.col,
                     row: v2.row - 1 | 0
@@ -3798,7 +3798,7 @@
                   })(v1)(v3)(1)(0)(getRows(v1))(v4), Nil.value)))));
                 }
                 ;
-                if (v instanceof Prince) {
+                if (v instanceof Latios) {
                   return concat2(new Cons(moveSearcher({
                     col: v2.col,
                     row: v2.row - 1 | 0
@@ -3814,7 +3814,7 @@
                   })(v1)(v3)(1)(0)(1)(v4), Nil.value)))));
                 }
                 ;
-                if (v instanceof Princess) {
+                if (v instanceof Latias) {
                   return concat2(new Cons(moveSearcher({
                     col: v2.col - 1 | 0,
                     row: v2.row - 1 | 0
@@ -4381,7 +4381,7 @@
   };
   var initialState = /* @__PURE__ */ function() {
     var nothing_row = replicate(columns)(Nothing.value);
-    var getPawnRow = function(row) {
+    var getEeveeRow = function(row) {
       return function(player_num) {
         return function(col) {
           if (col === columns) {
@@ -4389,19 +4389,19 @@
           }
           ;
           if (otherwise) {
-            return append13([createPiece2(Pawn.value)(col)(row)(player_num)])(getPawnRow(row)(player_num)(col + 1 | 0));
+            return append13([createPiece2(Eevee.value)(col)(row)(player_num)])(getEeveeRow(row)(player_num)(col + 1 | 0));
           }
           ;
-          throw new Error("Failed pattern match at Main (line 86, column 5 - line 86, column 65): " + [row.constructor.name, player_num.constructor.name, col.constructor.name]);
+          throw new Error("Failed pattern match at Main (line 86, column 5 - line 86, column 66): " + [row.constructor.name, player_num.constructor.name, col.constructor.name]);
         };
       };
     };
     var getBackRow = function(row) {
       return function(player_num) {
-        return [createPiece2(Rook.value)(0)(row)(player_num), createPiece2(Bishop.value)(1)(row)(player_num), Nothing.value, createPiece2(Prince.value)(3)(row)(player_num), createPiece2(Princess.value)(4)(row)(player_num), Nothing.value, createPiece2(Bishop.value)(6)(row)(player_num), createPiece2(Rook.value)(7)(row)(player_num)];
+        return [createPiece2(Turtwig.value)(0)(row)(player_num), createPiece2(Pikachu.value)(1)(row)(player_num), Nothing.value, createPiece2(Latios.value)(3)(row)(player_num), createPiece2(Latias.value)(4)(row)(player_num), Nothing.value, createPiece2(Pikachu.value)(6)(row)(player_num), createPiece2(Turtwig.value)(7)(row)(player_num)];
       };
     };
-    var init_board = append13([getBackRow(0)(Two.value)])(append13([getPawnRow(1)(Two.value)(0)])(append13(replicate(rows4 - 4 | 0)(nothing_row))(append13([getPawnRow(rows4 - 2 | 0)(One.value)(0)])([getBackRow(rows4 - 1 | 0)(One.value)]))));
+    var init_board = append13([getBackRow(0)(Two.value)])(append13([getEeveeRow(1)(Two.value)(0)])(append13(replicate(rows4 - 4 | 0)(nothing_row))(append13([getEeveeRow(rows4 - 2 | 0)(One.value)(0)])([getBackRow(rows4 - 1 | 0)(One.value)]))));
     return pure4({
       tickCount: 0,
       lastReceivedMessage: Nothing.value,
@@ -4535,26 +4535,26 @@
           var kind2 = function() {
             var v = take5(1)(remaining_captured);
             if (v === "p") {
-              return Pawn.value;
+              return Eevee.value;
             }
             ;
             if (v === "b") {
-              return Bishop.value;
+              return Pikachu.value;
             }
             ;
             if (v === "r") {
-              return Rook.value;
+              return Turtwig.value;
             }
             ;
             if (v === "k") {
-              return Prince.value;
+              return Latios.value;
             }
             ;
             if (v === "q") {
-              return Princess.value;
+              return Latias.value;
             }
             ;
-            return Pawn.value;
+            return Eevee.value;
           }();
           var count = function() {
             var v = fromString(take5(1)(drop4(1)(remaining_captured)));
@@ -4982,23 +4982,23 @@
         return state3;
       };
       var kindToBoardFormat = function(kind2) {
-        if (eq5(kind2)(Pawn.value)) {
+        if (eq5(kind2)(Eevee.value)) {
           return "p";
         }
         ;
-        if (eq5(kind2)(Bishop.value)) {
+        if (eq5(kind2)(Pikachu.value)) {
           return "b";
         }
         ;
-        if (eq5(kind2)(Rook.value)) {
+        if (eq5(kind2)(Turtwig.value)) {
           return "r";
         }
         ;
-        if (eq5(kind2)(Prince.value)) {
+        if (eq5(kind2)(Latios.value)) {
           return "k";
         }
         ;
-        if (eq5(kind2)(Princess.value)) {
+        if (eq5(kind2)(Latias.value)) {
           return "q";
         }
         ;
@@ -5114,23 +5114,23 @@
                     var piece = take5(1)(row_string);
                     var new_piece = function() {
                       if (piece === "p") {
-                        return createPiece2(Pawn.value)(col)(row)(player_num);
+                        return createPiece2(Eevee.value)(col)(row)(player_num);
                       }
                       ;
                       if (piece === "b") {
-                        return createPiece2(Bishop.value)(col)(row)(player_num);
+                        return createPiece2(Pikachu.value)(col)(row)(player_num);
                       }
                       ;
                       if (piece === "r") {
-                        return createPiece2(Rook.value)(col)(row)(player_num);
+                        return createPiece2(Turtwig.value)(col)(row)(player_num);
                       }
                       ;
                       if (piece === "k") {
-                        return createPiece2(Prince.value)(col)(row)(player_num);
+                        return createPiece2(Latios.value)(col)(row)(player_num);
                       }
                       ;
                       if (piece === "q") {
-                        return createPiece2(Princess.value)(col)(row)(player_num);
+                        return createPiece2(Latias.value)(col)(row)(player_num);
                       }
                       ;
                       return Nothing.value;

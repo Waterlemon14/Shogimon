@@ -70,22 +70,22 @@ initialState = do
   let
     -- Replace these to change the initial board
     nothing_row = Array.replicate columns Nothing
-    init_board = [getBackRow 0 Two] <> [getPawnRow 1 Two 0] <> Array.replicate (rows-4) nothing_row <> [getPawnRow (rows-2) One 0] <> [getBackRow (rows-1) One]
+    init_board = [getBackRow 0 Two] <> [getEeveeRow 1 Two 0] <> Array.replicate (rows-4) nothing_row <> [getEeveeRow (rows-2) One 0] <> [getBackRow (rows-1) One]
     
     getBackRow :: Int -> PlayerNum -> Array (Maybe Piece)
-    getBackRow row player_num = [ createPiece Rook 0 row player_num, 
-                                  createPiece Bishop 1 row player_num, 
+    getBackRow row player_num = [ createPiece Turtwig 0 row player_num, 
+                                  createPiece Pikachu 1 row player_num, 
                                   Nothing,
-                                  createPiece Prince 3 row player_num,
-                                  createPiece Princess 4 row player_num,
+                                  createPiece Latios 3 row player_num,
+                                  createPiece Latias 4 row player_num,
                                   Nothing,
-                                  createPiece Bishop 6 row player_num, 
-                                  createPiece Rook 7 row player_num
+                                  createPiece Pikachu 6 row player_num, 
+                                  createPiece Turtwig 7 row player_num
                                 ]
 
-    getPawnRow :: Int -> PlayerNum -> Int -> Array (Maybe Piece)
-    getPawnRow row player_num col | col == columns = []
-                                  | otherwise = [createPiece Pawn col row player_num] <> getPawnRow row player_num (col+1)
+    getEeveeRow :: Int -> PlayerNum -> Int -> Array (Maybe Piece)
+    getEeveeRow row player_num col | col == columns = []
+                                  | otherwise = [createPiece Eevee col row player_num] <> getEeveeRow row player_num (col+1)
 
   pure { tickCount: 0
   , lastReceivedMessage: Nothing
@@ -252,11 +252,11 @@ onTick send gameState = do
 
     kindToBoardFormat :: Kind -> String
     kindToBoardFormat kind 
-      | kind == Pawn     = "p"
-      | kind == Bishop   = "b"
-      | kind == Rook     = "r"
-      | kind == Prince   = "k"
-      | kind == Princess = "q"
+      | kind == Eevee     = "p"
+      | kind == Pikachu   = "b"
+      | kind == Turtwig     = "r"
+      | kind == Latios   = "k"
+      | kind == Latias = "q"
       | otherwise        = "xx" -- should never reach this branch
     
     -- Transforms the given board into a string that represents
@@ -296,11 +296,11 @@ onTick send gameState = do
                   _ -> Two    -- Assume valid piece always, check later if invalid
 
                 new_piece = case piece of
-                  "p" -> createPiece Pawn     col row player_num
-                  "b" -> createPiece Bishop   col row player_num
-                  "r" -> createPiece Rook     col row player_num
-                  "k" -> createPiece Prince   col row player_num
-                  "q" -> createPiece Princess col row player_num
+                  "p" -> createPiece Eevee     col row player_num
+                  "b" -> createPiece Pikachu   col row player_num
+                  "r" -> createPiece Turtwig     col row player_num
+                  "k" -> createPiece Latios   col row player_num
+                  "q" -> createPiece Latias col row player_num
                   _   -> Nothing
 
     -- Used to send the current state of the game
@@ -323,12 +323,12 @@ onTick send gameState = do
             else Cons { kind: kind, count: count } (helper (drop 2 remaining_captured))
               where
                 kind = case take 1 remaining_captured of
-                  "p" -> Pawn
-                  "b" -> Bishop
-                  "r" -> Rook
-                  "k" -> Prince
-                  "q" -> Princess
-                  _   -> Pawn -- should never reach this case
+                  "p" -> Eevee
+                  "b" -> Pikachu
+                  "r" -> Turtwig
+                  "k" -> Latios
+                  "q" -> Latias
+                  _   -> Eevee -- should never reach this case
                 count = case fromString (take 1 (drop 1 remaining_captured)) of
                   Just num -> num
                   Nothing -> 0
