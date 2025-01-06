@@ -12,6 +12,16 @@ For each round, each player has 3 actions which can either be used by *moving a 
 
 The game is won by trapping the enemy *Latias* and *Latios* in such a way that it cannot move any further.
 Similarly, the game is lost by having your own *Latias* and *Latios* trapped.
+Finally, the game ends in a draw if both player's *Latias* and *Latios* are unable to move after a single action.
+
+Project Server
+---
+
+First, run the project server in project-server by running in the terminal:
+
+```
+go run .
+```
 
 Python implementation
 ---
@@ -33,7 +43,16 @@ Your on-screen player number will turn green when it is your turn, and white whe
 
 The offline version of the game can be restarted at any point of the program by clicking `R`. For the online implementation, a clean restart is needed (i.e., both the clients and the server).
 
+Purescript implementation
+---
+
+To open the Purescript web-based client, open 2 instances of **purescript/web/index.html**.
+
+The online version of the game can be restarted at after a game verdict has been made by clicking `R`.
+
 Disclaimer
 ---
 
 Please note that this game's graphics are not owned by the creators, and are purely used for demonstration purposes only.
+
+The project-server implementation was provided by Sir Juan Felipe Coronel.

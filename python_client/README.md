@@ -12,6 +12,7 @@ Your on-screen player number will turn green when it is your turn, and white whe
 
 The game is won by trapping the enemy *Latias* and *Latios* in such a way that it cannot move any further.
 Similarly, the game is lost by having your own *Latias* and *Latios* trapped.
+Finally, the game ends in a draw if both player's *Latias* and *Latios* are unable to move after a single action.
 
 To start the online (i.e. main) version of the game, run in terminal:
 
