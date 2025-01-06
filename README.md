@@ -1,10 +1,15 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/SsQ6IvG7)
+<!-- [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/SsQ6IvG7) -->
 
 Welcome to Shogimon!
 ===
 
 This project is brought to you by **Eisenhower Aldemita II**, **Abram Josh Marcelo**, **Christopher Senatin**, and **Jose Ernesto Tomanan**.
-This shall serve as the game manual.
+This document shall serve as the game manual.
+
+The documentation link can be found here: [Google Drive](https://drive.google.com/file/d/1IMb2bsUELVQYdYqsI-7m-JCATxOJedHp/view?usp=sharing)
+
+Game Mechanics
+---
 
 The bottom player, consisting of non-shiny pieces, serves as Player 1 (and is the first to move), while the top player, consisting of shiny pieces, serves as Player 2.
 
@@ -43,10 +48,10 @@ Your on-screen player number will turn green when it is your turn, and white whe
 
 The offline version of the game can be restarted at any point of the program by clicking `R`. For the online implementation, a clean restart is needed (i.e., both the clients and the server).
 
-Purescript implementation
+PureScript implementation
 ---
 
-To open the Purescript web-based client, open 2 instances of **purescript/web/index.html**.
+To open the Purescript web-based client, open 2 instances of `purescript/web/index.html`.
 
 The online version of the game can be restarted at after a game verdict has been made by clicking `R`.
 
@@ -55,4 +60,4 @@ Disclaimer
 
 Please note that this game's graphics are not owned by the creators, and are purely used for demonstration purposes only.
 
-The golang server implementation was provided by Sir Juan Felipe Coronel.
+The Golang server implementation was provided by Sir Juan Felipe Coronel.
