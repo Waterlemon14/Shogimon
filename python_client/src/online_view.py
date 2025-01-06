@@ -63,8 +63,9 @@ class OnlineView(GameView):
         action = DataParser().parse_to_player_action(message)
 
         if action:
-            self._make_turn(action)
-            self._rerender_after_turn()
+            return action
+        
+        return None
 
     def run(self):
         """Edited to incorporate networking"""
@@ -77,7 +78,11 @@ class OnlineView(GameView):
 
         while _game_is_running:
             for message in self._networking.recv():
-                self._receive_from_server(message)
+                _received_turn = self._receive_from_server(message)
+
+                if _received_turn is not None:
+                    self._make_turn(_received_turn)
+                    self._rerender_after_turn()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
