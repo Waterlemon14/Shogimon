@@ -10,7 +10,9 @@ from project_types import (
 from view import *
 
 class DataParser:
-    """Abstraction that only parses messages to type PlayerAction and vice versa; for SRP compliance"""
+    """
+    Abstraction that only parses messages to type PlayerAction and vice versa; for SRP compliance
+    """
     def _parse_to_message(self, server_id, action: PlayerAction) -> Message | None:
         """Convert type PlayerAction to message (if valid; else None)"""
         source_loc = f"{ action.source_location.row }-{ action.source_location.col }" if action.source_location \
