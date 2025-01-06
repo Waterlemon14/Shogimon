@@ -59,16 +59,16 @@ class OnlineView(GameView):
 
             elif tile.is_targetable and self._current_hovered_piece is not None:
                 _player_turn = self._finish_turn(Location(_row, _col))
-                self._send_message(_player_turn)
+                self._send_to_server(_player_turn)
     
-    def _send_message(self, action: PlayerAction):
+    def _send_to_server(self, action: PlayerAction):
         """Send message to network"""
         message = DataParser()._parse_to_message(self._server_id, action)
 
         if message:
             self._networking.send(message.payload)
 
-    def _receive_message(self, message: Message):
+    def _receive_from_server(self, message: Message):
         """Use received message to manipulate client"""
         action = DataParser()._parse_to_player_action(message)
 
@@ -87,7 +87,7 @@ class OnlineView(GameView):
 
         while _game_is_running:
             for message in self._networking.recv():
-                self._receive_message(message)
+                self._receive_from_server(message)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
