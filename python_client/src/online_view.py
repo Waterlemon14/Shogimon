@@ -115,10 +115,9 @@ class OnlineView(GameView):
                         self._mouse_press_on_captures(event.pos, self._active_player)
 
             self._screen.fill('black')
-            self._renderable_board.render_to_screen(self._screen)
             self._captures_p1.render_to_screen(self._screen)
             self._captures_p2.render_to_screen(self._screen)
-
+            self._renderable_board.render_to_screen(self._screen)
             self._render_player_number()
 
             if self._game_status != GameStatus.ONGOING:
